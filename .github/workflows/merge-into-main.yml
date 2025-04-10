@@ -24,6 +24,7 @@ jobs:
           ref: main
           token: ${{ secrets.GITHUB_TOKEN }} # Use token for push
 
+
       - name: Setup Git Identity
         run: |
           git config --global user.name "GitHub Action"
