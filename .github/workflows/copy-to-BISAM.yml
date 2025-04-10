@@ -1,11 +1,10 @@
 name: Prepare and Push Candidate to BISAM Repo
 
-# Trigger manually from the Actions tab
 on:
   workflow_dispatch:
 
 permissions:
-  contents: read # Read access to BISAM-dev repo is needed
+  contents: read # Read access to BISAM-dev repo
 
 jobs:
   prepare-and-push:
@@ -14,88 +13,99 @@ jobs:
     steps:
       - name: Checkout BISAM-dev code
         uses: actions/checkout@v4
-        # Checks out the branch where the workflow is run (usually main/dev of BISAM-dev)
-
-      - name: Debug Initial BISAM-dev Structure
-        run: |
-          echo "Current directory (BISAM-dev): $(pwd)"
-          echo "Initial repository contents:"
-          ls -laR
-          echo "--------------------"
 
       # --- Step: Prepare R Package Structure ---
-      # (This is the same cleaning logic as before, adapted slightly)
+      # (This step remains largely the same)
       - name: Prepare R Package Structure in Temp Dir
         id: prepare
         run: |
           echo "Starting R package structure preparation..."
-          TEMP_DIR="../r_package_clean_build"
+          TEMP_DIR="../r_package_clean_build" # Use a path outside the checkout
           mkdir -p "$TEMP_DIR"
           echo "Created temporary build directory: $TEMP_DIR"
           mkdir -p "$TEMP_DIR/src"
           echo "Created $TEMP_DIR/src directory"
 
           echo "Searching for .cpp and .h files (excluding main.cpp)..."
-          find . -type f \( -name '*.cpp' -o -name '*.h' \) -not -name 'main.cpp' -print -exec cp {} "$TEMP_DIR/src/" \;
+          find . -path ./$TEMP_DIR -prune -o -type f \( -name '*.cpp' -o -name '*.h' \) -not -name 'main.cpp' -print -exec cp {} "$TEMP_DIR/src/" \;
           echo "Copied C++/H files to $TEMP_DIR/src/"
 
           echo "Copying standard R package components..."
-          rsync -av --ignore-errors R/ "$TEMP_DIR/R/" || echo "No R directory found."
-          rsync -av --ignore-errors man/ "$TEMP_DIR/man/" || echo "No man directory found."
-          rsync -av --ignore-errors data/ "$TEMP_DIR/data/" || echo "No data directory found."
-          rsync -av --ignore-errors inst/ "$TEMP_DIR/inst/" || echo "No inst directory found."
-          rsync -av --ignore-errors vignettes/ "$TEMP_DIR/vignettes/" || echo "No vignettes directory found."
-          rsync -av --ignore-errors tests/ "$TEMP_DIR/tests/" || echo "No tests directory found."
-
-          cp DESCRIPTION "$TEMP_DIR/" 2>/dev/null || echo "No DESCRIPTION file found."
-          cp NAMESPACE "$TEMP_DIR/" 2>/dev/null || echo "No NAMESPACE file found."
-          cp README.md "$TEMP_DIR/" 2>/dev/null || echo "No README.md file found."
-          cp LICENSE* "$TEMP_DIR/" 2>/dev/null || echo "No LICENSE file(s) found."
-          cp .Rbuildignore "$TEMP_DIR/" 2>/dev/null || echo "No .Rbuildignore file found."
+          # Copy directories if they exist
+          [ -d "R" ] && rsync -av R/ "$TEMP_DIR/R/" || echo "No R directory found."
+          [ -d "man" ] && rsync -av man/ "$TEMP_DIR/man/" || echo "No man directory found."
+          [ -d "data" ] && rsync -av data/ "$TEMP_DIR/data/" || echo "No data directory found."
+          [ -d "inst" ] && rsync -av inst/ "$TEMP_DIR/inst/" || echo "No inst directory found."
+          [ -d "vignettes" ] && rsync -av vignettes/ "$TEMP_DIR/vignettes/" || echo "No vignettes directory found."
+          [ -d "tests" ] && rsync -av tests/ "$TEMP_DIR/tests/" || echo "No tests directory found."
+          # Copy files if they exist
+          [ -f "DESCRIPTION" ] && cp DESCRIPTION "$TEMP_DIR/" || echo "No DESCRIPTION file found."
+          [ -f "NAMESPACE" ] && cp NAMESPACE "$TEMP_DIR/" || echo "No NAMESPACE file found."
+          [ -f "README.md" ] && cp README.md "$TEMP_DIR/" || echo "No README.md file found."
+          find . -maxdepth 1 -name 'LICENSE*' -exec cp {} "$TEMP_DIR/" \; 2>/dev/null || echo "No LICENSE file(s) found."
+          [ -f ".Rbuildignore" ] && cp .Rbuildignore "$TEMP_DIR/" || echo "No .Rbuildignore file found."
 
           echo "Prepared structure in $TEMP_DIR:"
           ls -laR "$TEMP_DIR"
           # Set output for the next step
           echo "temp_dir_path=$TEMP_DIR" >> $GITHUB_OUTPUT
 
-      # --- Step: Push to BISAM Repository ---
-      - name: Checkout BISAM repo candidate branch
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/BISAM # Assumes same owner, replace if different
-          path: bisam_repo_checkout # Checkout BISAM repo into a subdirectory
-          ref: candidate # Target branch in BISAM repo
-          token: ${{ secrets.BISAM_REPO_PAT }} # Use the PAT stored in secrets
-
-      - name: Synchronize cleaned files to BISAM checkout
+      # --- Step: Push Prepared Structure to BISAM Repository ---
+      - name: Initialize Git Repo, Add Files, and Push to BISAM candidate branch
+        env:
+          # Make PAT available to the script
+          BISAM_REPO_PAT: ${{ secrets.BISAM_REPO_PAT }}
+          # Define target repo info
+          TARGET_REPO_OWNER: ${{ github.repository_owner }} # Assumes same owner
+          TARGET_REPO_NAME: BISAM
+          TARGET_BRANCH: candidate
         run: |
           PREPARED_DIR="${{ steps.prepare.outputs.temp_dir_path }}"
-          TARGET_DIR="bisam_repo_checkout"
-          echo "Syncing from $PREPARED_DIR to $TARGET_DIR"
-          # Use rsync to copy files from the prepared dir to the target repo checkout
-          # --delete ensures files removed during cleaning are removed from target
-          # --exclude='.git/' prevents deleting the .git dir in the checkout
-          rsync -av --delete --exclude='.git/' "$PREPARED_DIR/" "$TARGET_DIR/"
-          echo "Sync complete. Contents of $TARGET_DIR:"
-          ls -la "$TARGET_DIR"
-          # Clean up the temporary prepared directory
-          rm -rf "$PREPARED_DIR"
+          PUSH_DIR="../bisam_push_temp" # New temporary directory for push operation
 
-      - name: Commit and Push changes to BISAM candidate branch
-        run: |
-          cd bisam_repo_checkout
-          git config --global user.name "GitHub Action (via BISAM-dev)"
-          git config --global user.email "action@github.com"
+          echo "Setting up temporary directory for push: $PUSH_DIR"
+          mkdir "$PUSH_DIR"
+          cd "$PUSH_DIR"
+
+          echo "Initializing Git repository..."
+          # Initialize repo and set the desired branch name upfront
+          git init -b "$TARGET_BRANCH"
+          git config user.name "GitHub Action (via BISAM-dev)"
+          git config user.email "action@github.com"
+
+          echo "Adding BISAM repository as remote origin..."
+          # Add the remote using the PAT for authentication
+          git remote add origin "https://x-access-token:$BISAM_REPO_PAT@github.com/$TARGET_REPO_OWNER/$TARGET_REPO_NAME.git"
+
+          echo "Copying prepared files from $PREPARED_DIR..."
+          # Copy all contents, including hidden files (like .Rbuildignore)
+          # Using cp -a preserves file attributes and handles dotfiles correctly
+          cp -a "$PREPARED_DIR/." .
+
+          echo "Staging files..."
+          git add .
 
           # Check if there are changes to commit
-          if git status --porcelain | grep .; then
-            echo "Changes detected in BISAM checkout, committing..."
-            git add .
-            git commit -m "Update candidate branch from BISAM-dev [skip ci]"
-            # Force push to overwrite the candidate branch completely
-            git push origin candidate --force
-            echo "Force-pushed changes to BISAM/candidate branch."
+          if git diff --staged --quiet; then
+            echo "No changes detected compared to an empty repository (or previous state if branch existed). Nothing to commit."
+            # Optionally: If you want to ensure the branch exists even with no changes,
+            # you could try pushing an empty commit, but typically it's fine to do nothing.
+            # git commit --allow-empty -m "Ensure candidate branch exists [skip ci]"
+            # git push --force origin "$TARGET_BRANCH"
           else
-            echo "No changes detected in BISAM checkout. Nothing to commit or push."
+            echo "Committing changes..."
+            # Add [skip ci] to prevent triggering workflows in BISAM if commit message is checked
+            git commit -m "Update $TARGET_BRANCH branch from BISAM-dev [skip ci]"
+
+            echo "Force-pushing to $TARGET_REPO_NAME/$TARGET_BRANCH..."
+            # Force push the current HEAD (local candidate branch) to the remote candidate branch.
+            # This command handles both creating the branch if it doesn't exist
+            # and overwriting it if it does.
+            git push --force origin HEAD:"refs/heads/$TARGET_BRANCH"
+            echo "Push complete."
           fi
-          cd .. # Go back to the original directory
+
+          echo "Cleaning up temporary directories..."
+          cd ..
+          rm -rf "$PUSH_DIR"
+          rm -rf "$PREPARED_DIR"
