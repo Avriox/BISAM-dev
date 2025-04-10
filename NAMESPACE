@@ -1,0 +1,3 @@
+useDynLib(bisam, .registration = TRUE)
+importFrom(Rcpp, evalCpp)
+export(b_ism)

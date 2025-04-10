@@ -1,0 +1,160 @@
+name: R Package Auto-Build
+
+on:
+  push:
+    branches:
+      - dev
+
+# Add permissions to allow the workflow to push to branches
+permissions:
+  contents: write
+
+jobs:
+  build-r-package:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Fetch all history for all branches
+        token: ${{ secrets.GITHUB_TOKEN }}  # Use GitHub token for authentication
+    
+    - name: Debug Repository Structure
+      run: |
+        echo "Current directory: $(pwd)"
+        echo "Repository contents:"
+        ls -la
+        echo "--------------------"
+        find . -type d -maxdepth 3 | sort
+    
+    - name: Setup Git Identity
+      run: |
+        git config --global user.name "GitHub Action"
+        git config --global user.email "action@github.com"
+    
+    - name: Create or Reset r-package-build Branch
+      run: |
+        # Check if r-package-build branch exists
+        if git ls-remote --heads origin r-package-build | grep r-package-build; then
+          echo "Branch exists, resetting"
+          git checkout package_v2
+          git branch -D r-package-build || true
+          git checkout -b r-package-build
+        else
+          echo "Branch doesn't exist, creating"
+          git checkout -b r-package-build
+        fi
+    
+    - name: Restructure Files for R Package
+      run: |
+        echo "Preparing R package structure"
+        
+        # Create a temporary directory to store the files we want to keep
+        mkdir -p temp_build
+        
+        # Check for bisam-v2 directory (with hyphen)
+        if [ -d "bisam-v2" ]; then
+          echo "Found bisam-v2 directory - copying contents to temp directory"
+          cp -rv bisam-v2/* temp_build/ || echo "Error copying bisam-v2 files"
+        # Check for bisam_v2 directory (with underscore)  
+        elif [ -d "bisam_v2" ]; then
+          echo "Found bisam_v2 directory - copying contents to temp directory"
+          cp -rv bisam_v2/* temp_build/ || echo "Error copying bisam_v2 files"
+        else
+          echo "ERROR: Neither bisam-v2 nor bisam_v2 directory found!"
+          exit 1
+        fi
+        
+        # Remove everything except .git, .github and temp_build
+        echo "Removing non-package directories"
+        find . -mindepth 1 -maxdepth 1 -not -path "./.git" -not -path "./.github" -not -path "./temp_build" -exec rm -rf {} \;
+        
+        # Move files from temp_build to root (this is a complete copy-out)
+        echo "Moving all files from temp_build to root"
+        cp -rv temp_build/* .
+        
+        # Create src directory if it doesn't exist
+        mkdir -p src
+        
+        # Copy any lasso library files to src/ if they're not already there
+        if [ -d "lib/lasso" ]; then
+          echo "Copying lasso library files to src/"
+          cp -v lib/lasso/*.cpp src/ 2>/dev/null || echo "No lasso cpp files found"
+          cp -v lib/lasso/*.h src/ 2>/dev/null || echo "No lasso header files found"
+        fi
+        
+        # Copy any mombf src files to src/ if they're not already there
+        if [ -d "mombf/mombf/src" ]; then
+          echo "Copying mombf source files to src/"
+          cp -v mombf/mombf/src/*.cpp src/ 2>/dev/null || echo "No mombf cpp files found"
+          cp -v mombf/mombf/src/*.h src/ 2>/dev/null || echo "No mombf header files found"
+        fi
+        
+        # Remove development directories that shouldn't be in an R package
+        echo "Removing directories not needed in R package"
+        rm -rf lib 2>/dev/null || true
+        rm -rf mombf 2>/dev/null || true
+        rm -rf r-testing-files 2>/dev/null || true
+        rm -rf material 2>/dev/null || true
+        rm -f CMakeLists.txt 2>/dev/null || true
+        rm -f section_header.py 2>/dev/null || true
+        rm -f mombf_*.tar.gz 2>/dev/null || true
+        rm -f bisam_*.tar.gz 2>/dev/null || true
+        
+        # Remove temp directory
+        rm -rf temp_build
+        
+        # List all files in src/ to verify
+        echo "Files in src/ directory:"
+        ls -la src/
+        
+        # List all files in root to verify
+        echo "Files in root directory:"
+        ls -la
+    
+    - name: Check for Modified Files
+      id: check_modified_files
+      run: |
+        git status --porcelain
+        if [[ -n $(git status --porcelain) ]]; then
+          echo "modified=true" >> $GITHUB_OUTPUT
+        else
+          echo "modified=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Commit and Push Changes
+      if: steps.check_modified_files.outputs.modified == 'true'
+      run: |
+        git add .
+        git commit -m "Auto-update R package structure [skip ci]"
+        
+        # Use GitHub token for authentication when pushing
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        git push -f origin r-package-build
+        echo "Successfully pushed to r-package-build branch"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Check for Modified Files
+      id: check_modified
+      run: |
+        git status --porcelain
+        if [[ -n $(git status --porcelain) ]]; then
+          echo "modified=true" >> $GITHUB_OUTPUT
+        else
+          echo "modified=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Commit and Push Changes
+      if: steps.check_modified.outputs.modified == 'true'
+      run: |
+        git add .
+        git commit -m "Auto-update R package structure [skip ci]"
+        
+        # Use GitHub token for authentication when pushing
+        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git
+        git push -f origin r-package-build
+        echo "Successfully pushed to r-package-build branch"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
