@@ -1,0 +1,62 @@
+name: Merge to Main after Successful Check
+
+on:
+  workflow_run:
+    workflows: ["R CMD Check CRAN"] # MUST match the 'name:' field in r-cmd-check.yaml
+    types:
+      - completed
+    branches:
+      - r-package-build
+
+permissions:
+  contents: write # Need write access to merge and push to main
+
+jobs:
+  merge-to-main:
+    runs-on: ubuntu-latest
+    # Only run if the triggering workflow was successful
+    if: github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }} # Use token for push
+
+      - name: Setup Git Identity
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Merge r-package-build into main
+        run: |
+          echo "Attempting to merge r-package-build into main..."
+          # Fetch the latest changes for all branches, especially r-package-build
+          git fetch origin
+
+          # Verify the r-package-build branch exists remotely
+          if ! git rev-parse --verify origin/r-package-build > /dev/null 2>&1; then
+            echo "Error: Remote branch origin/r-package-build not found."
+            exit 1
+          fi
+
+          # Perform the merge with a merge commit
+          # Use the SHA of the successful workflow run for clarity in the merge message
+          MERGE_SHA=$(echo "${{ github.event.workflow_run.head_sha }}" | cut -c1-7)
+          git merge --no-ff "origin/r-package-build" -m "Merge r-package-build (${MERGE_SHA}) after successful R CMD check [skip ci]"
+
+          echo "Merge successful."
+
+      - name: Push changes to main
+        run: |
+          git push origin main
+          echo "Pushed updated main branch."
+
+      - name: Handle Merge Conflict (Informational)
+        # This step runs if the merge fails, indicating a conflict needs manual resolution.
+        if: failure()
+        run: |
+          echo "::error::Merge conflict detected or merge failed for other reasons."
+          echo "Manual intervention required to merge 'r-package-build' into 'main'."
+          exit 1 # Ensure the workflow fails visibly
