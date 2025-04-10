@@ -1,0 +1,68 @@
+name: Compile Rcpp Attributes
+
+on:
+  push:
+    branches:
+      - r-package-build
+
+permissions:
+  contents: write # Need write access to push changes
+
+jobs:
+  compile-attributes:
+    runs-on: ubuntu-latest
+    # Only run if the push was not triggered by this workflow's own commit
+    # Note: This condition might not be strictly necessary if the check logic is robust,
+    # but it's good practice to prevent potential loops.
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: r-package-build # Ensure we check out the target branch
+          token: ${{ secrets.GITHUB_TOKEN }} # Use token for subsequent push
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release' # Or specify a version
+
+      - name: Install Rcpp dependency
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          packages: |
+            rcpp
+
+      - name: Compile Rcpp attributes
+        run: Rscript -e 'Rcpp::compileAttributes()'
+
+      - name: Setup Git Identity
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+
+      - name: Check for modified files
+        id: check_files
+        run: |
+          # Check if RcppExports.R or files in src/ changed
+          if git status --porcelain | grep -E '(RcppExports\.R|src/RcppExports\.cpp)'; then
+            echo "Changes detected in Rcpp generated files."
+            echo "modified=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes detected in Rcpp generated files."
+            echo "modified=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_files.outputs.modified == 'true'
+        run: |
+          git add R/RcppExports.R src/RcppExports.cpp NAMESPACE # Add potentially changed files
+          git commit -m "Auto-compile Rcpp attributes [skip ci]"
+          git push origin r-package-build
+          echo "Pushed Rcpp attribute changes to r-package-build"
+
+      - name: No changes to commit
+        if: steps.check_files.outputs.modified == 'false'
+        run: |
+          echo "No Rcpp attribute changes needed."
