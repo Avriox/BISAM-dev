@@ -1,7 +1,13 @@
+remove.packages(c("BISAM", "bisam", "BISAMNEW"))
+.rs.restartR()
+
+# library(Rcpp)
 library(devtools)
-remove.packages("bisam")
 devtools::install_github("Avriox/BISAM", ref = "candidate")
-library(bisam)
+# setwd("/Users/jakobgoldmann/Documents/Uni/WU/BISAM/")
+# Rcpp::compileAttributes(verbose = TRUE)
+# install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean=TRUE)
+library(BISAMNEW)
 
 # Create the data matrix
 data <- matrix(c(
@@ -69,7 +75,7 @@ data <- matrix(c(
 
 # Call the b_ism function with the same parameters
 # Note: In R, indexing starts at 1, so I've adjusted the column indices
-result <- b_ism(
+result <- BISAMNEW::b_ism(
   data,         # data matrix
   1,            # column index for group (0 in C++ becomes 1 in R)
   2,            # column index for time (1 in C++ becomes 2 in R)
