@@ -53,10 +53,52 @@ jobs:
           # Create a temporary directory to store the files we want to keep
           mkdir -p temp_build
           
-          # Since the project is now in the root, we just copy everything to temp_build
-          echo "Copying root contents to temp directory"
-          # Copy all files and directories from the root, excluding specific ones
-          find . -maxdepth 1 -not -path "./temp_build" -not -path "./.git" -not -path "./.github" -exec cp -r {} temp_build/ 2>/dev/null \; || echo "Error copying some files"
+          # Selectively copy R package files to temp_build
+          echo "Selectively copying R package files to temp directory"
+          
+          # Copy R directory if it exists
+          if [ -d "R" ]; then
+            echo "Copying R directory"
+            cp -rv R temp_build/
+          fi
+          
+          # Copy man directory if it exists
+          if [ -d "man" ]; then
+            echo "Copying man directory"
+            cp -rv man temp_build/
+          fi
+          
+          # Copy data directory if it exists
+          if [ -d "data" ]; then
+            echo "Copying data directory"
+            cp -rv data temp_build/
+          fi
+          
+          # Copy inst directory if it exists
+          if [ -d "inst" ]; then
+            echo "Copying inst directory"
+            cp -rv inst temp_build/
+          fi
+          
+          # Copy vignettes directory if it exists
+          if [ -d "vignettes" ]; then
+            echo "Copying vignettes directory"
+            cp -rv vignettes temp_build/
+          fi
+          
+          # Copy tests directory if it exists
+          if [ -d "tests" ]; then
+            echo "Copying tests directory"
+            cp -rv tests temp_build/
+          fi
+          
+          # Copy important package files
+          echo "Copying package files"
+          cp -v DESCRIPTION temp_build/ 2>/dev/null || echo "No DESCRIPTION file found"
+          cp -v NAMESPACE temp_build/ 2>/dev/null || echo "No NAMESPACE file found"
+          cp -v README.md temp_build/ 2>/dev/null || echo "No README.md file found"
+          cp -v LICENSE temp_build/ 2>/dev/null || echo "No LICENSE file found"
+          cp -v .Rbuildignore temp_build/ 2>/dev/null || echo "No .Rbuildignore file found"
           
           # Remove everything except .git, .github and temp_build
           echo "Removing non-package directories"
