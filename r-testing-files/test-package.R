@@ -1,6 +1,6 @@
 library(devtools)
 remove.packages("bisam")
-devtools::install_github("Avriox/BISAM", ref = "r-package-build")
+devtools::install_github("Avriox/BISAM", ref = "candidate")
 library(bisam)
 
 # Create the data matrix
