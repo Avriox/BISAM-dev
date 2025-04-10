@@ -38,7 +38,7 @@ jobs:
           # Check if r-package-build branch exists
           if git ls-remote --heads origin r-package-build | grep r-package-build; then
             echo "Branch exists, resetting"
-            git checkout package_v2
+            git checkout dev 
             git branch -D r-package-build || true
             git checkout -b r-package-build
           else
