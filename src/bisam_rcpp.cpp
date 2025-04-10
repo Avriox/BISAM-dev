@@ -4,7 +4,7 @@
 // #include <Rcpp.h>
 #include <RcppArmadillo.h>
 #include "b_ism.h"
-#include "bisam_rcpp.h"
+
 
 // [[Rcpp::plugins(cpp17)]]
 // [[Rcpp::depends(RcppArmadillo)]]

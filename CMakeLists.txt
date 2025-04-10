@@ -81,7 +81,6 @@ add_executable(BISAM main.cpp
         src/b_ism.h
         src/bisam_rcpp.cpp
         src/b_ism.cpp
-        src/bisam_rcpp.h
 )
 
 # Include all necessary directories
