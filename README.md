@@ -4,15 +4,15 @@
 <div id="user-content-toc">
     <ul align="center" style="list-style: none; margin-bottom: 0;">
         <summary>
-        <h1 style="line-height: 1; margin-top: 0; margin-bottom: 0; ">BISAM</h1>
-        <div style="margin-bottom: -15px;">
-  <p>Bayesian Indicator Saturation Model in R</p>
-</div>
+        <h1>BISAM</h1>
+        <p>Bayesian Indicator Saturation Model in R</p>
         </summary>
     </ul>
 </div>
 
-  <a href="https://github.com/Avriox/BISAM">
+---
+
+  <!-- <a href="https://github.com/Avriox/BISAM">
     <img src="https://img.shields.io/badge/Status-Under%20Development-orange.svg" alt="Development Status"/>
   </a>
   <a href="https://github.com/Avriox/BISAM/actions/workflows/R-CMD-check.yaml">
@@ -22,7 +22,7 @@
     <img src="https://www.r-pkg.org/badges/version/BISAM" alt="CRAN Status"/>
   </a>
   <a href="LICENSE"> <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"/> </a>
-  <img src="https://img.shields.io/badge/Depends-Rcpp-blue.svg" alt="Depends Rcpp"/>
+  <img src="https://img.shields.io/badge/Depends-Rcpp-blue.svg" alt="Depends Rcpp"/> -->
 </div>
 
 > [!WARNING]
@@ -42,7 +42,7 @@ The core computations are accelerated using **Rcpp** for improved performance, m
 
 You can install BISAM using one of the following methods:
 
-**1. From GitHub (Development Version):**
+**1. From GitHub:**
 
 The latest development version (currently recommended) is available on the `candidate` branch. You'll need the `remotes` package.
 
@@ -57,7 +57,7 @@ remotes::install_github("Avriox/BISAM@candidate")
 # remotes::install_github("Avriox/BISAM")
 ```
 
-**2. From GitHub Releases (`.tar.gz` - Planned):**
+**2. From GitHub Releases (Planned):**
 
 Once official releases are tagged, you will be able to download the source package (`BISAM_x.y.z.tar.gz`) from the [Releases Page](https://github.com/Avriox/BISAM/releases).
 
@@ -66,7 +66,7 @@ Once official releases are tagged, you will be able to download the source packa
 install.packages("path/to/BISAM_x.y.z.tar.gz", repos = NULL, type = "source")
 ```
 
-**3. From CRAN (Future):**
+**3. From CRAN (Planned):**
 
 BISAM is planned for submission to the Comprehensive R Archive Network (CRAN) in the future. Once accepted, you will be able to install it easily:
 
@@ -104,16 +104,6 @@ library(BISAM)
 
 ---
 
-## Key Features
-
-* Bayesian estimation for Indicator Saturation Models.
-* Detection and modelling of structural breaks, outliers, and parameter instability.
-* Flexible model specification.
-* Performance-optimized computations using Rcpp.
-* (Planned/Included) Tools for result visualization and interpretation.
-
----
-
 ## 🛠️ Dependencies
 
 * R (>= Your required R version, e.g., 4.0.0)
@@ -131,21 +121,6 @@ This package builds upon the indicator saturation methodology. Key references in
 
 ---
 
-## Contributing
-
-Contributions are welcome! If you encounter a bug, have a suggestion, or want to contribute code:
-
-1. **Issues:** Please check the [Issues tab](https://github.com/Avriox/BISAM/issues) to see if your point has already been raised. If not, feel free to open a new issue.
-2. **Pull Requests:**
-   * Fork the repository.
-   * Create a new branch for your feature or bug fix.
-   * Make your changes. Please adhere to the existing coding style.
-   * Add tests for any new functionality.
-   * Ensure `R CMD check` passes locally.
-   * Submit a Pull Request **targeting the `candidate` branch**.
-
----
-
 ## License
 
 This project is licensed under the **[Your License Name]** License. See the [LICENSE](LICENSE) file for details.
@@ -156,3 +131,4 @@ This project is licensed under the **[Your License Name]** License. See the [LIC
 
 ## Citation (Package)
 
+TODO
