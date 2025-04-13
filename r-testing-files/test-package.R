@@ -2,9 +2,6 @@ remove.packages(c("BISAM", "bisam", "BISAMNEW"))
 .rs.restartR()
 
 library(Rcpp)
-# library(devtools)
-# devtools::install_github("Avriox/BISAM", ref = "candidate")
-
 
 setwd("/Users/jakobgoldmann/Documents/Uni/WU/BISAM/")
 Rcpp::compileAttributes(verbose = TRUE)
