@@ -2,7 +2,7 @@
   <img src="img/logo.png" alt="BISAM Logo" width="200"/>
 
 <div id="user-content-toc">
-    <ul align="center" style="list-style: none;">
+    <ul align="center" style="list-style: none; margin-bottom: 0 !important;">
         <summary>
         <h1>BISAM</h1>
         </summary>
