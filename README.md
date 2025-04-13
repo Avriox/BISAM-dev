@@ -5,12 +5,13 @@
     <ul align="center" style="list-style: none; margin-bottom: 0;">
         <summary>
         <h1 style="line-height: 1; margin-top: 0; margin-bottom: 0; ">BISAM</h1>
+        <div style="margin-bottom: -15px;">
+  <p>Bayesian Indicator Saturation Model in R</p>
+</div>
         </summary>
     </ul>
 </div>
-<div style="margin-bottom: -15px;">
-  <p>Bayesian Indicator Saturation Model in R</p>
-</div>
+
   <a href="https://github.com/Avriox/BISAM">
     <img src="https://img.shields.io/badge/Status-Under%20Development-orange.svg" alt="Development Status"/>
   </a>
