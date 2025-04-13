@@ -6,6 +6,13 @@ set(CMAKE_CXX_STANDARD 17)
 # Defines DEV
 add_compile_definitions(DEV)
 
+# Find OpenMP
+find_package(OpenMP)
+if (OpenMP_CXX_FOUND)
+    message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
+else ()
+    message(STATUS "OpenMP not found - building without parallel support")
+endif ()
 
 # Special settings to show full command line
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -98,3 +105,11 @@ target_link_libraries(BISAM PRIVATE
         ${LAPACK_LIBRARIES}
         -L${R_LIB_DIR} -lR
 )
+
+# Add OpenMP flags if found
+if (OpenMP_CXX_FOUND)
+    target_compile_options(BISAM PRIVATE ${OpenMP_CXX_FLAGS})
+    target_link_libraries(BISAM PRIVATE ${OpenMP_CXX_LIBRARIES})
+    # Add a definition so the code knows OpenMP is available
+    target_compile_definitions(BISAM PRIVATE HAVE_OPENMP)
+endif ()

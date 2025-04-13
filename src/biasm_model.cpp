@@ -10,7 +10,8 @@ namespace bisam {
                                long long num_burnin, std::string b_prior, double lambda_b, double c0, double C0,
                                double va,
                                double vb, double tau,
-                               bool use_phiinit, bool const_val, bool ife, bool tfe, bool iis, bool sis) {
+                               bool use_phiinit, bool const_val, bool ife, bool tfe, bool iis, bool sis,
+                               ComputationStrategy strategy) {
         // [DEV]
         // This sets up a "random device" for development purposes. We need it because RcppArmadillo tries to
         // use R's random number generator per default which we have not loaded when we are developing in cpp.
@@ -429,7 +430,7 @@ namespace bisam {
                                                                        0.5,
                                                                        thinit,
                                                                        initpar_type,
-                                                                       ComputationStrategy::SPLIT_SEQUENTIAL,
+                                                                       strategy,
                                                                        n
             );
 

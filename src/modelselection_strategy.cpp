@@ -2,14 +2,153 @@
 // Created by jakob on 4/13/25.
 //
 #include "../include/modelselection_strategy.h"
+#include <stdexcept>
 
 namespace bisam {
+    // Global instance of the parallel executor to be reused across calls
+    static ModelSelectionParallelExecutor g_parallel_executor;
+
+    // ModelSelectionParallelExecutor implementation
+    ModelSelectionParallelExecutor::ModelSelectionParallelExecutor(int num_threads) : initialized(false) {
+        if (num_threads <= 0) {
+            // Use the maximum number of threads available
+#ifdef _OPENMP
+            this->num_threads = omp_get_max_threads();
+#else
+            this->num_threads = 1;
+#endif
+        } else {
+            this->num_threads = num_threads;
+        }
+    }
+
+    void ModelSelectionParallelExecutor::set_max_threads(int max_threads) {
+        if (max_threads > 0) {
+            this->num_threads = max_threads;
+#ifdef _OPENMP
+            // Update OpenMP's global thread pool size
+            omp_set_num_threads(max_threads);
+#endif
+        }
+    }
+
+    void ModelSelectionParallelExecutor::initialize() {
+        if (!initialized) {
+#ifdef _OPENMP
+            // Set the OpenMP thread pool size once at initialization
+            omp_set_num_threads(num_threads);
+#endif
+            initialized = true;
+        }
+    }
+
+    // The main execution method that handles parallel processing
+    arma::Col<int> ModelSelectionParallelExecutor::execute_parallel(
+        const arma::vec &y,
+        const arma::mat &x,
+        int niter,
+        int thinning,
+        int burnin,
+        arma::Col<int> &deltaini_input,
+        bool center,
+        bool scale,
+        bool XtXprecomp,
+        double phi,
+        double tau,
+        double priorSkew,
+        double prDeltap,
+        arma::vec thinit,
+        InitType initpar_type,
+        int n
+    ) {
+        // Make sure we're initialized with appropriate thread count
+        if (!initialized) {
+            // For first initialization, set thread pool size based on partition count
+            // This ensures we never create more threads than necessary
+            int appropriate_thread_count = std::min(n,
+#ifdef _OPENMP
+                                                    omp_get_max_threads()
+#else
+                1
+#endif
+            );
+            set_max_threads(appropriate_thread_count);
+            initialize();
+        }
+
+        // Prepare the split data
+        DataPartition split_data = partition_data(y, x, deltaini_input, thinit, n);
+
+        // Initialize vector for results
+        std::vector<arma::Col<int> > results(n);
+
+        // Execute in parallel using OpenMP's thread pool (already sized appropriately)
+#ifdef _OPENMP
+#pragma omp parallel for
+        for (int part = 0; part < n; part++) {
+            results[part] = modelSelection(
+                split_data.y_parts[part],
+                split_data.common_x,
+                niter,
+                thinning,
+                burnin,
+                split_data.delta_init_parts[part],
+                center,
+                scale,
+                XtXprecomp,
+                phi,
+                tau,
+                priorSkew,
+                prDeltap,
+                split_data.theta_init_parts[part],
+                initpar_type);
+        }
+#else
+        // Fallback to sequential execution if OpenMP is not available
+        for (int part = 0; part < n; part++) {
+            results[part] = modelSelection(
+                split_data.y_parts[part],
+                split_data.common_x,
+                niter,
+                thinning,
+                burnin,
+                split_data.delta_init_parts[part],
+                center,
+                scale,
+                XtXprecomp,
+                phi,
+                tau,
+                priorSkew,
+                prDeltap,
+                split_data.theta_init_parts[part],
+                initpar_type);
+        }
+#endif
+
+        // Combine and return results
+        return combine_partition_results(results, split_data.start_columns, split_data.end_columns, x.n_cols);
+    }
+
     arma::Col<int> model_selection_with_strategy(const arma::vec &y, const arma::mat &x, int niter, int thinning,
                                                  int burnin, arma::Col<int> &deltaini_input, bool center, bool scale,
                                                  bool XtXprecomp, double phi, double tau, double priorSkew,
                                                  double prDeltap, arma::vec thinit,
                                                  InitType initpar_type,
                                                  ComputationStrategy strategy, int n) {
+        // Important: Set the thread pool size based on partition count BEFORE the first parallel region
+        // This ensures the OpenMP thread pool is created with the optimal size and reused for all iterations
+        static bool first_call = true;
+        if (first_call && strategy == ComputationStrategy::SPLIT_PARALLEL) {
+#ifdef _OPENMP
+            // Only set thread count if partitions are fewer than available cores
+            int max_threads = omp_get_max_threads();
+            if (n < max_threads) {
+                g_parallel_executor.set_max_threads(n);
+            }
+#endif
+            first_call = false;
+        }
+
         switch (strategy) {
             case ComputationStrategy::STANDARD:
                 // Simple passthrough to modelSelection
@@ -60,37 +199,12 @@ namespace bisam {
             }
 
             case ComputationStrategy::SPLIT_PARALLEL: {
-                // Prepare the split data (same as sequential)
-                DataPartition split_data = partition_data(y, x, deltaini_input, thinit, n);
-
-                // Process each part in parallel (placeholder for now)
-                std::vector<arma::Col<int> > results(n);
-
-                // Here you would add parallel execution code
-                // For example using OpenMP:
-                // #pragma omp parallel for
-                for (int part = 0; part < n; part++) {
-                    results[part] = modelSelection(
-                        split_data.y_parts[part],
-                        split_data.common_x,
-                        niter,
-                        thinning,
-                        burnin,
-                        split_data.delta_init_parts[part],
-                        center,
-                        scale,
-                        XtXprecomp,
-                        phi,
-                        tau,
-                        priorSkew,
-                        prDeltap,
-                        split_data.theta_init_parts[part],
-                        initpar_type);
-                }
-
-                // Combine and return results (same as sequential)
-                return combine_partition_results(results, split_data.start_columns, split_data.end_columns,
-                                                 x.n_cols);
+                // Use the global parallel executor which maintains thread state between calls
+                return g_parallel_executor.execute_parallel(
+                    y, x, niter, thinning, burnin, deltaini_input,
+                    center, scale, XtXprecomp, phi, tau, priorSkew,
+                    prDeltap, thinit, initpar_type, n
+                );
             }
 
             default:
@@ -98,8 +212,7 @@ namespace bisam {
         }
     }
 
-    DataPartition partition_data( // Previously split_data, clearer name
-
+    DataPartition partition_data(
         const arma::vec &y,
         const arma::mat &x,
         arma::Col<int> &delta_initial,
@@ -174,7 +287,7 @@ namespace bisam {
         return data;
     }
 
-    arma::Col<int> combine_partition_results( // Previously combine_results, more specific
+    arma::Col<int> combine_partition_results(
         const std::vector<arma::Col<int> > &results,
         const std::vector<size_t> &start_columns,
         const std::vector<size_t> &end_columns,

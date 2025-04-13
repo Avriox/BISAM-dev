@@ -104,37 +104,94 @@ int main() {
     //     true
     // );
 
-    bisam::BisamResult result = bisam::estimate_model(data,
-                                                      0,
-                                                      1,
-                                                      2,
-                                                      5000,
-                                                      500,
-                                                      "g",
-                                                      100.0,
-                                                      0.001,
-                                                      0.001,
-                                                      1.0,
-                                                      1.0,
-                                                      1.0,
-                                                      true,
-                                                      false,
-                                                      false,
-                                                      false,
-                                                      true,
-                                                      true);
-    // Print the results
-    std::cout << "Column means of w_store:" << std::endl;
-    std::cout << result.indicator_means.t() << std::endl;
+    bisam::FunctionTimer timer;
 
+    timer.start_section("Standard");
 
-    // Print the results
-    std::cout << "Column means of b_store:" << std::endl;
-    std::cout << result.beta_samples.t() << std::endl;
+    bisam::BisamResult result1 = bisam::estimate_model(data,
+                                                       0,
+                                                       1,
+                                                       2,
+                                                       5000,
+                                                       500,
+                                                       "g",
+                                                       100.0,
+                                                       0.001,
+                                                       0.001,
+                                                       1.0,
+                                                       1.0,
+                                                       1.0,
+                                                       true,
+                                                       false,
+                                                       false,
+                                                       false,
+                                                       true,
+                                                       true,
+                                                       bisam::ComputationStrategy::STANDARD);
 
-    // Print the results
-    std::cout << "Column means of s2_store:" << std::endl;
-    std::cout << result.sigma2_means.t() << std::endl;
+    timer.end_section("Standard");
+    timer.start_section("Split Sequential");
+
+    bisam::BisamResult result2 = bisam::estimate_model(data,
+                                                       0,
+                                                       1,
+                                                       2,
+                                                       5000,
+                                                       500,
+                                                       "g",
+                                                       100.0,
+                                                       0.001,
+                                                       0.001,
+                                                       1.0,
+                                                       1.0,
+                                                       1.0,
+                                                       true,
+                                                       false,
+                                                       false,
+                                                       false,
+                                                       true,
+                                                       true,
+                                                       bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
+
+    timer.end_section("Split Sequential");
+    timer.start_section("Split Parallel");
+
+    bisam::BisamResult result3 = bisam::estimate_model(data,
+                                                       0,
+                                                       1,
+                                                       2,
+                                                       5000,
+                                                       500,
+                                                       "g",
+                                                       100.0,
+                                                       0.001,
+                                                       0.001,
+                                                       1.0,
+                                                       1.0,
+                                                       1.0,
+                                                       true,
+                                                       false,
+                                                       false,
+                                                       false,
+                                                       true,
+                                                       true,
+                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
+    timer.end_section("Split Parallel");
+
+    timer.print_section_summary();
+
+    // // Print the results
+    // std::cout << "Column means of w_store:" << std::endl;
+    // std::cout << result.indicator_means.t() << std::endl;
+    //
+    //
+    // // Print the results
+    // std::cout << "Column means of b_store:" << std::endl;
+    // std::cout << result.beta_samples.t() << std::endl;
+    //
+    // // Print the results
+    // std::cout << "Column means of s2_store:" << std::endl;
+    // std::cout << result.sigma2_means.t() << std::endl;
 
     return 0;
 }

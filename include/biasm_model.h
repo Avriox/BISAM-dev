@@ -29,7 +29,8 @@ namespace bisam {
         bool ife,
         bool tfe,
         bool iis,
-        bool sis
+        bool sis,
+        ComputationStrategy strategy
     );
 }
 

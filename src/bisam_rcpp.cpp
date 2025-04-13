@@ -6,6 +6,8 @@
 #include "../include/biasm_model.h"
 #include "../include/bisam_types.h"
 
+// TODO HARD CODED VALUES!!!
+
 namespace bisam {
     // [[Rcpp::plugins(cpp17)]]
     // [[Rcpp::depends(RcppArmadillo)]]
@@ -52,7 +54,8 @@ namespace bisam {
             ife,
             tfe,
             iis,
-            sis
+            sis,
+            ComputationStrategy::SPLIT_SEQUENTIAL
         );
 
         // Convert the output struct to an R list
