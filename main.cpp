@@ -1,8 +1,7 @@
 #include <iostream>
 #include <RcppArmadillo.h>
 
-#include "src/b_ism.h"
-#include "src/mombf-bridge.h"
+#include "include/biasm_model.h"
 
 #define DEBUG_PRINTING // Print some additional debug info. Comment to disable.
 
@@ -81,42 +80,61 @@ int main() {
         {3, 20, -0.69086139, -2.07200545, -1.89931838, -0.63308381}
     };
 
-    // Assuming 'data' is your data matrix
-    BIsmOutput result = b_ism(
-        data,
-        0,
-        1,
-        2,
-        5000,
-        500,
-        "g",
-        100.0,
-        0.001,
-        0.001,
-        1.0,
-        1.0,
-        1.0,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true
-    );
+    // // Assuming 'data' is your data matrix
+    // BIsmOutput result = b_ism(
+    //     data,
+    //     0,
+    //     1,
+    //     2,
+    //     5000,
+    //     500,
+    //     "g",
+    //     100.0,
+    //     0.001,
+    //     0.001,
+    //     1.0,
+    //     1.0,
+    //     1.0,
+    //     false,
+    //     true,
+    //     false,
+    //     false,
+    //     false,
+    //     true,
+    //     true
+    // );
 
+    bisam::BisamResult result = bisam::estimate_model(data,
+                                                      0,
+                                                      1,
+                                                      2,
+                                                      5000,
+                                                      500,
+                                                      "g",
+                                                      100.0,
+                                                      0.001,
+                                                      0.001,
+                                                      1.0,
+                                                      1.0,
+                                                      1.0,
+                                                      true,
+                                                      false,
+                                                      false,
+                                                      false,
+                                                      true,
+                                                      true);
     // Print the results
     std::cout << "Column means of w_store:" << std::endl;
-    std::cout << result.w_store_means.t() << std::endl;
+    std::cout << result.indicator_means.t() << std::endl;
 
 
     // Print the results
     std::cout << "Column means of b_store:" << std::endl;
-    std::cout << result.b_store_means.t() << std::endl;
+    std::cout << result.beta_samples.t() << std::endl;
 
     // Print the results
     std::cout << "Column means of s2_store:" << std::endl;
-    std::cout << result.s2_store_means.t() << std::endl;
+    std::cout << result.sigma2_means.t() << std::endl;
 
     return 0;
 }
