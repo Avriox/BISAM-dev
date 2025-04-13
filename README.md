@@ -2,11 +2,9 @@
   <img src="img/logo.png" alt="BISAM Logo" width="200"/>
 
 <div id="user-content-toc">
-    
-        <summary>
-        <h1>BISAM</h1>
-        </summary>
-    
+<summary>
+<h1>BISAM</h1>
+</summary>
 </div>
 
   <p font-size="100px">BISAM<p>
