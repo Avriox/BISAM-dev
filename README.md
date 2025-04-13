@@ -2,13 +2,13 @@
   <img src="img/logo.png" alt="BISAM Logo" width="200"/>
 
 <div id="user-content-toc">
-<summary>
-<h1>BISAM</h1>
-</summary>
+    <ul align="center" style="list-style: none;">
+        <summary>
+        <h1>BISAM</h1>
+        </summary>
+    </ul>
 </div>
-
-  <p font-size="100px">BISAM<p>
-  <p><strong>Bayesian Indicator Saturation Model in R</strong></p>
+  <p>Bayesian Indicator Saturation Model in R</p>
 
   <a href="https://github.com/Avriox/BISAM">
     <img src="https://img.shields.io/badge/Status-Under%20Development-orange.svg" alt="Development Status"/>
