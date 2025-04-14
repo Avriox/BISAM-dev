@@ -56,7 +56,7 @@ estimate_model <- function(
     y_index_cpp <- y_index - 1
 
     # Call the C++ function
-    result <- estimate_model(
+    result <- rcpp_estimate_model(
         data, i_index_cpp, t_index_cpp, y_index_cpp, Ndraw, Nburn, b_prior,
         lambda_b, c0, C0, va, vb, tau, use_phiinit,
         const_val, ife, tfe, iis, sis

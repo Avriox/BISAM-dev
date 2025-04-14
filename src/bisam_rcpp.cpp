@@ -12,7 +12,7 @@
     // [[Rcpp::depends(RcppArmadillo)]]
 
     // [[Rcpp::export]]
-    Rcpp::List estimate_model(
+    Rcpp::List rcpp_estimate_model(
         arma::mat data,
         int i_index,
         int t_index,
