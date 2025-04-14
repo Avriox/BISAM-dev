@@ -7,7 +7,7 @@
 
 #include "bisam_types.h"
 #include <RcppArmadillo.h>
-#include "../include/utils.h"
+#include "utils.h"
 
 namespace bisam {
     BisamResult estimate_model(
