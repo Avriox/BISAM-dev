@@ -8,7 +8,7 @@
 
 #include "bisam_types.h"
 #include "modelSel_regression.h"
-#include "../lib/lasso/LassoRegression.h"
+#include "LassoRegression.h"
 
 namespace bisam {
     arma::Col<int> modelSelection(const arma::vec &y,
