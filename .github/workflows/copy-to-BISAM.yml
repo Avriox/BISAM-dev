@@ -38,7 +38,8 @@ jobs:
           [ -d "inst" ] && rsync -av inst/ "$TEMP_DIR/inst/" || echo "No inst directory found."
           [ -d "vignettes" ] && rsync -av vignettes/ "$TEMP_DIR/vignettes/" || echo "No vignettes directory found."
           [ -d "tests" ] && rsync -av tests/ "$TEMP_DIR/tests/" || echo "No tests directory found."
-          [ -d "img" ] && rsync -av img/ "$TEMP_DIR/img/" || echo "No tests directory found."
+          [ -d "img" ] && rsync -av img/ "$TEMP_DIR/img/" || echo "No img directory found."
+          [ -d "include" ] && rsync -av include/ "$TEMP_DIR/include/" || echo "No include directory found."
           # Copy files if they exist
           [ -f "DESCRIPTION" ] && cp DESCRIPTION "$TEMP_DIR/" || echo "No DESCRIPTION file found."
           [ -f "NAMESPACE" ] && cp NAMESPACE "$TEMP_DIR/" || echo "No NAMESPACE file found."
