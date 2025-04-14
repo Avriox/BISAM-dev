@@ -1,4 +1,4 @@
-remove.packages(c("BISAM", "bisam", "BISAMNEW"))
+remove.packages(c("BISAM", "bisam"))
 .rs.restartR()
 
 remotes::install_github("Avriox/BISAM@candidate")
@@ -8,7 +8,8 @@ remotes::install_github("Avriox/BISAM@candidate")
 # setwd("/Users/jakobgoldmann/Documents/Uni/WU/BISAM/")
 # Rcpp::compileAttributes(verbose = TRUE)
 # install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean=TRUE)
-# library(BISAM)
+
+library(BISAM)
 
 # Create the data matrix
 data <- matrix(c(

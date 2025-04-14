@@ -44,17 +44,13 @@ You can install BISAM using one of the following methods:
 
 **1. From GitHub:**
 
-The latest development version (currently recommended) is available on the `candidate` branch. You'll need the `remotes` package.
+The latest development version (currently recommended) is available on the `candidate` branch. You will need to clone the content of this branch to your local disk.
 
 ```R
-# Install remotes if you haven't already
-# install.packages("remotes")
-
-# Install BISAM from the candidate branch
-remotes::install_github("Avriox/BISAM@candidate")
-
-# Note: Once the 'main' branch is stable, you might use:
-# remotes::install_github("Avriox/BISAM")
+library(Rcpp)
+setwd("path/to/BISAM")
+Rcpp::compileAttributes(verbose = TRUE)
+install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean=TRUE)
 ```
 
 **2. From GitHub Releases (Planned):**

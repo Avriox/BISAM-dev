@@ -23,7 +23,7 @@
 #'
 #' @return A list containing MCMC results and summary statistics
 #' @export
-b_ism <- function(
+estimate_model <- function(
     data,
     i_index = 1,
     t_index = 2,
@@ -56,9 +56,9 @@ b_ism <- function(
     y_index_cpp <- y_index - 1
 
     # Call the C++ function
-    result <- b_ism_rcpp(
+    result <- estimate_model(
         data, i_index_cpp, t_index_cpp, y_index_cpp, Ndraw, Nburn, b_prior,
-        lambda_b, c0, C0, va, vb, tau, geweke, use_phiinit,
+        lambda_b, c0, C0, va, vb, tau, use_phiinit,
         const_val, ife, tfe, iis, sis
     )
 

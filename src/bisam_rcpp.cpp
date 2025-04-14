@@ -8,12 +8,11 @@
 
 // TODO HARD CODED VALUES!!!
 
-namespace bisam {
     // [[Rcpp::plugins(cpp17)]]
     // [[Rcpp::depends(RcppArmadillo)]]
 
     // [[Rcpp::export]]
-    Rcpp::List b_ism_rcpp(
+    Rcpp::List estimate_model(
         arma::mat data,
         int i_index,
         int t_index,
@@ -35,7 +34,8 @@ namespace bisam {
         bool sis
     ) {
         // Call the C++ function
-        BisamResult result = estimate_model(
+
+        bisam::BisamResult result = bisam::estimate_model(
             data,
             i_index,
             t_index,
@@ -55,7 +55,7 @@ namespace bisam {
             tfe,
             iis,
             sis,
-            ComputationStrategy::SPLIT_SEQUENTIAL
+            bisam::ComputationStrategy::SPLIT_SEQUENTIAL
         );
 
         // Convert the output struct to an R list
@@ -70,4 +70,3 @@ namespace bisam {
 
         return ret;
     }
-}
