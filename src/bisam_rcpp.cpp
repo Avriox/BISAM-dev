@@ -3,8 +3,8 @@
 //
 // #include <Rcpp.h>
 #include <RcppArmadillo.h>
-#include "../include/biasm_model.h"
-#include "../include/bisam_types.h"
+#include "biasm_model.h"
+#include "bisam_types.h"
 
 // TODO HARD CODED VALUES!!!
 

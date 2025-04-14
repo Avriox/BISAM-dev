@@ -1,6 +1,8 @@
 remove.packages(c("BISAM", "bisam", "BISAMNEW"))
 .rs.restartR()
 
+remotes::install_github("Avriox/BISAM@candidate")
+
 # library(Rcpp)
 # 
 # setwd("/Users/jakobgoldmann/Documents/Uni/WU/BISAM/")

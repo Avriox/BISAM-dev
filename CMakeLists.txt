@@ -3,19 +3,44 @@ project(BISAM)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# Defines DEV
+# Defines DEV - useful for conditional compilation during development
 add_compile_definitions(DEV)
 
-# Find OpenMP
-find_package(OpenMP)
-if (OpenMP_CXX_FOUND)
-    message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
-else ()
-    message(STATUS "OpenMP not found - building without parallel support")
-endif ()
-
-# Special settings to show full command line
+# Special settings to show full command line during build (optional)
 set(CMAKE_VERBOSE_MAKEFILE ON)
+
+# macOS-specific compiler approach
+if(APPLE)
+    # First try to find OpenMP normally
+    find_package(OpenMP QUIET)
+
+    # If not found, use the macOS-specific approach
+    if(NOT OpenMP_FOUND)
+        # Check if Homebrew's libomp is installed
+        if(EXISTS "/opt/homebrew/opt/libomp")
+            # For macOS, we add the flags directly rather than using OpenMP_* variables
+            add_compile_options(-Xpreprocessor -fopenmp)
+            include_directories("/opt/homebrew/opt/libomp/include")
+            link_directories("/opt/homebrew/opt/libomp/lib")
+            set(OPENMP_ENABLED TRUE)
+            message(STATUS "OpenMP enabled with Homebrew libomp")
+        else()
+            message(STATUS "OpenMP not found - building without parallel support")
+        endif()
+    else()
+        message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
+        set(OPENMP_ENABLED TRUE)
+    endif()
+else()
+    # For non-macOS systems, use standard OpenMP detection
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
+        set(OPENMP_ENABLED TRUE)
+    else()
+        message(STATUS "OpenMP not found - building without parallel support")
+    endif()
+endif()
 
 # Find Rscript (more suitable for scripting than R)
 find_program(RSCRIPT_EXECUTABLE Rscript)
@@ -51,12 +76,11 @@ execute_process(
         OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-# Find OpenBLAS (try this before finding Armadillo)
+# Find OpenBLAS (or other BLAS/LAPACK implementations)
 find_package(BLAS REQUIRED)
 find_package(LAPACK REQUIRED)
 
-
-# Print config details
+# Print config details for verification
 message(STATUS "R include: ${R_INCLUDE_DIR}")
 message(STATUS "R lib: ${R_LIB_DIR}")
 message(STATUS "RcppArmadillo include: ${RCPPARMADILLO_INCLUDE_DIR}")
@@ -73,6 +97,7 @@ file(GLOB_RECURSE MOMBF_SOURCES
         "${MOMBF_SRC_DIR}/*.cpp"
 )
 
+# Define the executable and list all source files
 add_executable(BISAM main.cpp
         ${MOMBF_SOURCES}
         lib/lasso/LassoRegression.h
@@ -91,25 +116,34 @@ add_executable(BISAM main.cpp
         src/utils.cpp
 )
 
-# Include all necessary directories
+# Include all necessary directories for header lookup
 target_include_directories(BISAM PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/lasso
         ${R_INCLUDE_DIR}
         ${RCPPARMADILLO_INCLUDE_DIR}
         ${RCPP_INCLUDE_DIR}
-        ${MOMBF_SRC_DIR} # Include the mombf source directory for header files
+        ${MOMBF_SRC_DIR}
 )
 
-# Link against libraries
+# Link against required libraries
 target_link_libraries(BISAM PRIVATE
         ${BLAS_LIBRARIES}
         ${LAPACK_LIBRARIES}
         -L${R_LIB_DIR} -lR
 )
 
-# Add OpenMP flags if found
-if (OpenMP_CXX_FOUND)
-    target_compile_options(BISAM PRIVATE ${OpenMP_CXX_FLAGS})
-    target_link_libraries(BISAM PRIVATE ${OpenMP_CXX_LIBRARIES})
-    # Add a definition so the code knows OpenMP is available
+# Add OpenMP-related settings
+if(OPENMP_ENABLED)
+    # If using standard OpenMP detection
+    if(OpenMP_CXX_FOUND)
+        target_compile_options(BISAM PRIVATE ${OpenMP_CXX_FLAGS})
+        target_link_libraries(BISAM PRIVATE ${OpenMP_CXX_LIBRARIES})
+        # If using macOS direct approach
+    elseif(APPLE)
+        target_link_libraries(BISAM PRIVATE -lomp)
+    endif()
+
+    # Add a definition so the C++ code can check if OpenMP is enabled
     target_compile_definitions(BISAM PRIVATE HAVE_OPENMP)
-endif ()
+endif()

@@ -1,9 +1,9 @@
 //
 // Created by jakob on 4/13/25.
 //
-#include "../include/biasm_model.h"
+#include "biasm_model.h"
 
-#include "../include/modelselection_strategy.h"
+#include "modelselection_strategy.h"
 
 namespace bisam {
     BisamResult estimate_model(arma::mat &data, int i_index, int t_index, int y_index, long long num_draws,

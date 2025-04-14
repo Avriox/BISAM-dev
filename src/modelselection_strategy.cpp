@@ -1,7 +1,7 @@
 //
 // Created by jakob on 4/13/25.
 //
-#include "../include/modelselection_strategy.h"
+#include "modelselection_strategy.h"
 #include <stdexcept>
 
 namespace bisam {

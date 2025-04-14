@@ -1,7 +1,7 @@
 //
 // Created by jakob on 4/13/25.
 //
-#include "../include/mombf_bridge.h"
+#include "mombf_bridge.h"
 
 namespace bisam {
     /* -------------------------------------------------------------------------- */

@@ -1,7 +1,7 @@
 //
 // Created by jakob on 4/13/25.
 //
-#include "../include/utils.h"
+#include "utils.h"
 
 namespace bisam {
     arma::ivec repeat_value(int value, int times) {

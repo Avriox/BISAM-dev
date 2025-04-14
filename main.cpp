@@ -106,30 +106,30 @@ int main() {
 
     bisam::FunctionTimer timer;
 
-    timer.start_section("Standard");
-
-    bisam::BisamResult result1 = bisam::estimate_model(data,
-                                                       0,
-                                                       1,
-                                                       2,
-                                                       5000,
-                                                       500,
-                                                       "g",
-                                                       100.0,
-                                                       0.001,
-                                                       0.001,
-                                                       1.0,
-                                                       1.0,
-                                                       1.0,
-                                                       true,
-                                                       false,
-                                                       false,
-                                                       false,
-                                                       true,
-                                                       true,
-                                                       bisam::ComputationStrategy::STANDARD);
-
-    timer.end_section("Standard");
+    // timer.start_section("Standard");
+    //
+    // bisam::BisamResult result1 = bisam::estimate_model(data,
+    //                                                    0,
+    //                                                    1,
+    //                                                    2,
+    //                                                    5000,
+    //                                                    500,
+    //                                                    "g",
+    //                                                    100.0,
+    //                                                    0.001,
+    //                                                    0.001,
+    //                                                    1.0,
+    //                                                    1.0,
+    //                                                    1.0,
+    //                                                    true,
+    //                                                    false,
+    //                                                    false,
+    //                                                    false,
+    //                                                    true,
+    //                                                    true,
+    //                                                    bisam::ComputationStrategy::STANDARD);
+    //
+    // timer.end_section("Standard");
     timer.start_section("Split Sequential");
 
     bisam::BisamResult result2 = bisam::estimate_model(data,
