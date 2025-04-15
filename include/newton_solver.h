@@ -29,6 +29,7 @@
  * -------     -------------  ----------------------
  * 01.01        HVE/24Sep2023  Initial release
  * 01.02        ---/15Apr2025  Added warm start capability
+ * 01.03        ---/15Apr2025  Optimized with fixed-size arrays
  *
  * End of Change Record
  * --------------------------------------------------------------------------
@@ -45,15 +46,16 @@
 #endif
 
 // define version string
-static char _VNEWTON_[] = "@(#)Newton.cpp 01.02 -- Copyright (C) Henrik Vestermark";
+static char _VNEWTON_[] = "@(#)Newton.cpp 01.03 -- Copyright (C) Henrik Vestermark";
 
 #include <algorithm>
-#include <vector>
 #include <complex>
 #include <functional>
 #include <cfloat>
+#include <array>
 #include <unordered_map>
 #include <cstdint>
+#include <cstring>  // for memcpy
 #include "PolynomialRootFinder.h"
 
 //[BISAM] _DBL_RADIX was not defined
@@ -61,13 +63,20 @@ static char _VNEWTON_[] = "@(#)Newton.cpp 01.02 -- Copyright (C) Henrik Vesterma
 
 using namespace std;
 constexpr int MAX_ITER          = 50;
-constexpr int POLYNOMIAL_DEGREE = 4;                 // We always have degree 4 polynomials
-constexpr int MAX_ROOTS         = POLYNOMIAL_DEGREE; // Maximum number of roots
+constexpr int POLYNOMIAL_DEGREE = 4;                     // We always have degree 4 polynomials
+constexpr int MAX_COEFF         = POLYNOMIAL_DEGREE + 1; // Number of coefficients in a degree 4 polynomial
+constexpr int MAX_ROOTS         = POLYNOMIAL_DEGREE;     // Maximum number of roots
 
 // ===== Global cache and helper structs =====
 
+// Structure to store roots with a count of valid roots
+struct RootStorage {
+    complex<double> roots[MAX_ROOTS];
+    int count;
+};
+
 // Global cache for storing polynomial roots based on coefficient hash
-static std::unordered_map<uint32_t, std::vector<std::complex<double> > > g_rootCache;
+static std::unordered_map<uint32_t, RootStorage> g_rootCache;
 
 // Evaluation structure
 struct Eval {
@@ -79,26 +88,26 @@ struct Eval {
 // ===== Helper function declarations =====
 
 // Ultra-fast hashing function specialized for our specific polynomial structure
-static uint32_t HashPolynomial(const std::vector<double> &coefficients);
+static uint32_t HashPolynomial(const double coefficients[MAX_COEFF]);
 
 // Compute suitable starting point for root finding
-static double ComputeStartPoint(const std::vector<double> &a);
+static double ComputeStartPoint(const double a[MAX_COEFF], int n);
 
 // Evaluate polynomial with Horner's method
-static Eval EvaluatePolynomial(const std::vector<double> &a, const complex<double> z);
+static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, const complex<double> z);
 
 // Calculate upper bound for rounding errors (Adam's test)
-static double CalculateUpperBound(const std::vector<double> &a, const complex<double> z);
+static double CalculateUpperBound(const double a[MAX_COEFF], int n, const complex<double> z);
 
 // Real root forward deflation
-static void RealDeflation(std::vector<double> &a, const double x);
+static void RealDeflation(double a[MAX_COEFF], int &n, const double x);
 
 // Complex root forward deflation for real coefficients
-static void ComplexDeflation(std::vector<double> &a, const complex<double> z);
+static void ComplexDeflation(double a[MAX_COEFF], int &n, const complex<double> z);
 
 // Solve quadratic polynomial
-static void SolveQuadratic(const std::vector<double> &a, std::vector<complex<double> > &roots,
-                           std::vector<complex<double> > &newRoots);
+static int SolveQuadratic(const double a[MAX_COEFF], int n, complex<double> roots[MAX_ROOTS],
+                          int rootIndex, complex<double> newRoots[MAX_ROOTS], int newRootIndex);
 
 // Root cache management functions
 static void ClearRootCache();
@@ -110,7 +119,7 @@ static void ReserveRootCache(size_t expectedSize);
 // ===== Implementation of helper functions =====
 
 // Ultra-fast hashing function specialized for our specific polynomial structure
-static uint32_t HashPolynomial(const std::vector<double> &coefficients) {
+static uint32_t HashPolynomial(const double coefficients[MAX_COEFF]) {
     // Get the integer parts of coefficients at positions 4, 1, and 0
     int c4_int = static_cast<int>(coefficients[4]);
     int c1_int = static_cast<int>(coefficients[1]);
@@ -133,12 +142,11 @@ static uint32_t HashPolynomial(const std::vector<double> &coefficients) {
 }
 
 // Compute the next starting point based on the polynomial coefficients
-static double ComputeStartPoint(const std::vector<double> &a) {
-    const size_t n = a.size() - 1;
-    double a0      = log(abs(a.back()));
-    double min     = exp((a0 - log(abs(a.front()))) / static_cast<double>(n));
+static double ComputeStartPoint(const double a[MAX_COEFF], int n) {
+    double a0  = log(abs(a[n]));
+    double min = exp((a0 - log(abs(a[0]))) / static_cast<double>(n));
 
-    for (size_t i = 1; i < n; i++) {
+    for (int i = 1; i < n; i++) {
         if (a[i] != 0.0) {
             double tmp = exp((a0 - log(abs(a[i]))) / static_cast<double>(n - i));
             if (tmp < min)
@@ -150,15 +158,14 @@ static double ComputeStartPoint(const std::vector<double> &a) {
 }
 
 // Evaluate a polynomial with real coefficients using Horner's method
-static Eval EvaluatePolynomial(const std::vector<double> &a, const complex<double> z) {
-    const size_t n = a.size() - 1;
-    double p       = -2.0 * z.real();
-    double q       = norm(z);
-    double s       = 0.0;
-    double r       = a[0];
+static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, const complex<double> z) {
+    double p = -2.0 * z.real();
+    double q = norm(z);
+    double s = 0.0;
+    double r = a[0];
     Eval e;
 
-    for (size_t i = 1; i < n; i++) {
+    for (int i = 1; i < n; i++) {
         double t = a[i] - p * r - q * s;
         s        = r;
         r        = t;
@@ -171,17 +178,16 @@ static Eval EvaluatePolynomial(const std::vector<double> &a, const complex<doubl
 }
 
 // Calculate upper bound for rounding errors (Adam's test)
-static double CalculateUpperBound(const std::vector<double> &a, const complex<double> z) {
-    const size_t n = a.size() - 1;
-    double p       = -2.0 * z.real();
-    double q       = norm(z);
-    double u       = sqrt(q);
-    double s       = 0.0;
-    double r       = a[0];
-    double e       = fabs(r) * (3.5 / 4.5);
+static double CalculateUpperBound(const double a[MAX_COEFF], int n, const complex<double> z) {
+    double p = -2.0 * z.real();
+    double q = norm(z);
+    double u = sqrt(q);
+    double s = 0.0;
+    double r = a[0];
+    double e = fabs(r) * (3.5 / 4.5);
     double t;
 
-    for (size_t i = 1; i < n; i++) {
+    for (int i = 1; i < n; i++) {
         t = a[i] - p * r - q * s;
         s = r;
         r = t;
@@ -197,78 +203,76 @@ static double CalculateUpperBound(const std::vector<double> &a, const complex<do
 }
 
 // Real root forward deflation
-static void RealDeflation(std::vector<double> &a, const double x) {
-    const size_t n = a.size() - 1;
-    double r       = 0.0;
+static void RealDeflation(double a[MAX_COEFF], int &n, const double x) {
+    double r = 0.0;
 
-    for (size_t i = 0; i < n; i++)
-        a[i]      = r = r * x + a[i];
+    for (int i = 0; i < n; i++)
+        a[i]   = r = r * x + a[i];
 
-    a.resize(n); // Remove the highest degree coefficient
+    n--; // Reduce polynomial degree by 1
 }
 
 // Complex root forward deflation for real coefficients
-static void ComplexDeflation(std::vector<double> &a, const complex<double> z) {
-    const size_t n = a.size() - 1;
-    double r       = -2.0 * z.real();
-    double u       = norm(z);
+static void ComplexDeflation(double a[MAX_COEFF], int &n, const complex<double> z) {
+    double r = -2.0 * z.real();
+    double u = norm(z);
 
     a[1] -= r * a[0];
     for (int i = 2; i < n - 1; i++)
         a[i]   = a[i] - r * a[i - 1] - u * a[i - 2];
 
-    a.resize(n - 1); // Remove top 2 highest degree coefficients
+    n -= 2; // Reduce polynomial degree by 2 (complex conjugate roots)
 }
 
 // Solve quadratic polynomial
-static void SolveQuadratic(const std::vector<double> &a, std::vector<complex<double> > &roots,
-                           std::vector<complex<double> > &newRoots) {
-    const size_t n = a.size() - 1;
+static int SolveQuadratic(const double a[MAX_COEFF], int n, complex<double> roots[MAX_ROOTS],
+                          int rootIndex, complex<double> newRoots[MAX_ROOTS], int newRootIndex) {
     complex<double> v;
     double r;
 
     // Notice that a[0] is !=0 since roots=zero has already been handled
     if (n == 1) {
-        v = complex<double>(-a[1] / a[0], 0);
-        roots.push_back(v);
-        newRoots.push_back(v);
+        v                        = complex<double>(-a[1] / a[0], 0);
+        roots[rootIndex++]       = v;
+        newRoots[newRootIndex++] = v;
     } else {
         if (a[1] == 0.0) {
             r = -a[2] / a[0];
             if (r < 0) {
-                r = sqrt(-r);
-                v = complex<double>(0, r);
-                roots.push_back(v);
-                roots.push_back(conj(v));
-                newRoots.push_back(v);
-                newRoots.push_back(conj(v));
+                r                        = sqrt(-r);
+                v                        = complex<double>(0, r);
+                roots[rootIndex++]       = v;
+                roots[rootIndex++]       = conj(v);
+                newRoots[newRootIndex++] = v;
+                newRoots[newRootIndex++] = conj(v);
             } else {
-                r = sqrt(r);
-                v = complex<double>(r, 0);
-                roots.push_back(v);
-                roots.push_back(complex<double>(-r, 0));
-                newRoots.push_back(v);
-                newRoots.push_back(complex<double>(-r, 0));
+                r                        = sqrt(r);
+                v                        = complex<double>(r, 0);
+                roots[rootIndex++]       = v;
+                roots[rootIndex++]       = complex<double>(-r, 0);
+                newRoots[newRootIndex++] = v;
+                newRoots[newRootIndex++] = complex<double>(-r, 0);
             }
         } else {
             r = 1.0 - 4.0 * a[0] * a[2] / (a[1] * a[1]);
             if (r < 0) {
                 v = complex<double>(-a[1] / (2.0 * a[0]), a[1] *
                                                           sqrt(-r) / (2.0 * a[0]));
-                roots.push_back(v);
-                roots.push_back(conj(v));
-                newRoots.push_back(v);
-                newRoots.push_back(conj(v));
+                roots[rootIndex++]       = v;
+                roots[rootIndex++]       = conj(v);
+                newRoots[newRootIndex++] = v;
+                newRoots[newRootIndex++] = conj(v);
             } else {
-                v = complex<double>((-1.0 - sqrt(r)) * a[1] / (2.0 * a[0]), 0);
-                roots.push_back(v);
-                newRoots.push_back(v);
-                v = complex<double>(a[2] / (a[0] * v.real()), 0);
-                roots.push_back(v);
-                newRoots.push_back(v);
+                v                        = complex<double>((-1.0 - sqrt(r)) * a[1] / (2.0 * a[0]), 0);
+                roots[rootIndex++]       = v;
+                newRoots[newRootIndex++] = v;
+                v                        = complex<double>(a[2] / (a[0] * v.real()), 0);
+                roots[rootIndex++]       = v;
+                newRoots[newRootIndex++] = v;
             }
         }
     }
+    return rootIndex;
 }
 
 // Root cache management functions
@@ -291,9 +295,9 @@ static void ReserveRootCache(size_t expectedSize) {
 // ===== Main polynomial roots function =====
 
 // Find all polynomial zeros using a modified Newton method with warm start capability
-static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &coefficients) {
+static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double> roots[MAX_ROOTS]) {
     const complex<double> complexzero(0.0, 0); // Complex zero (0+i0)
-    size_t n;                                  // Size of Polynomial p(x)
+    int n = POLYNOMIAL_DEGREE;                 // Polynomial degree is fixed at 4
     Eval pz;                                   // P(z)
     Eval pzprev;                               // P(zprev)
     Eval p1z;                                  // P'(z)
@@ -301,40 +305,42 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
     complex<double> z;                         // Use as temporary variable
     complex<double> dz;                        // The current stepsize dz
     int itercnt;                               // Hold the number of iterations per root
+    int rootIndex = 0;                         // Index for storing roots
 
-    // Pre-allocate vectors with known sizes to avoid resizing
-    std::vector<complex<double> > roots; // Holds the roots of the Polynomial
-    roots.reserve(MAX_ROOTS);            // Pre-allocate for maximum possible roots
-
-    std::vector<double> coeff(coefficients.size()); // Holds the current coefficients of P(z)
+    // Fixed-size array for coefficients
+    double coeff[MAX_COEFF];
+    memcpy(coeff, coefficients, sizeof(double) * MAX_COEFF);
 
     // Generate hash for this polynomial to check cache - ultra fast integer hash
     uint32_t polyHash     = HashPolynomial(coefficients);
     bool usingCachedRoots = false;
-    std::vector<complex<double> > cachedRoots;
+    complex<double> cachedRoots[MAX_ROOTS];
+    int cachedRootCount = 0;
 
     // Check if we have solved a similar polynomial before
     auto cacheIt = g_rootCache.find(polyHash);
     if (cacheIt != g_rootCache.end()) {
-        cachedRoots      = cacheIt->second;
+        const RootStorage &storage = cacheIt->second;
+        cachedRootCount            = storage.count;
+        memcpy(cachedRoots, storage.roots, sizeof(complex<double>) * cachedRootCount);
         usingCachedRoots = true;
         DEBUG_PRINT("Found cached roots for polynomial with hash: 0x"
             << std::hex << polyHash << std::dec);
     }
 
-    copy(coefficients.begin(), coefficients.end(), coeff.begin());
-
     // Step 1 eliminate all simple roots
-    for (n = coeff.size() - 1; n > 0 && coeff.back() == 0.0; --n)
-        roots.push_back(complexzero); // Store zero as the root
+    while (n > 0 && coeff[n] == 0.0) {
+        roots[rootIndex++] = complexzero; // Store zero as the root
+        n--;
+    }
 
     // Index for tracking cached roots
-    size_t cacheRootIndex = 0;
-    std::vector<complex<double> > newRoots;
-    newRoots.reserve(MAX_ROOTS); // Pre-allocate space for new roots
+    int cacheRootIndex = 0;
+    complex<double> newRoots[MAX_ROOTS];
+    int newRootIndex = 0;
 
     // Do Newton iteration for polynomial order higher than 2
-    for (; n > 2; --n) {
+    while (n > 2) {
         const double Max_stepsize      = 5.0;                       // Allow the next step size to be up to 5x larger
         const complex<double> rotation = complex<double>(0.6, 0.8); // Rotation amount
         double r;                                                   // Current radius
@@ -343,19 +349,18 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
         bool stage1 = true;                                         // By default start in stage1
         int steps   = 1;                                            // Multisteps if > 1
 
-        // Pre-allocate coefficient derivative vector
-        std::vector<double> coeffprime;
-        coeffprime.reserve(n); // Pre-allocate exactly what we need
+        // Fixed-size array for derivative coefficients
+        double coeffprime[MAX_COEFF - 1];
 
         // Calculate coefficients of p'(x)
-        for (int i = 0; i < n; i++)
-            coeffprime.push_back(coeff[i] * double(n - i));
+        for (int i        = 0; i < n; i++)
+            coeffprime[i] = coeff[i] * double(n - i);
 
         // Step 2 find a suitable starting point z
-        rprev = ComputeStartPoint(coeff); // Computed startpoint
+        rprev = ComputeStartPoint(coeff, n); // Computed startpoint
 
         // If we have cached roots, use the next one as a starting point
-        if (usingCachedRoots && cacheRootIndex < cachedRoots.size()) {
+        if (usingCachedRoots && cacheRootIndex < cachedRootCount) {
             z = cachedRoots[cacheRootIndex++];
             DEBUG_PRINT("Using cached root as starting point: " << z);
         } else {
@@ -366,7 +371,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
 
         // Setup the iteration
         // Current P(z)
-        pz = EvaluatePolynomial(coeff, z);
+        pz = EvaluatePolynomial(coeff, n, z);
 
         // pzprev which is the previous z or P(0)
         pzprev.z   = complex<double>(0, 0);
@@ -375,7 +380,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
 
         // p1zprev P'(0) is the P'(0)
         p1zprev.z   = pzprev.z;
-        p1zprev.pz  = coeff[n - 1]; // P'(0)
+        p1zprev.pz  = coeffprime[n - 1]; // P'(0)
         p1zprev.apz = abs(p1zprev.pz);
 
         // Set previous dz and calculate the radius of operations.
@@ -390,7 +395,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
         // then we accept z as a root
         for (itercnt = 0; pz.z + dz != pz.z && pz.apz > eps && itercnt < MAX_ITER; itercnt++) {
             // Calculate current P'(z)
-            p1z = EvaluatePolynomial(coeffprime, pz.z);
+            p1z = EvaluatePolynomial(coeffprime, n - 1, pz.z);
             if (p1z.apz == 0.0)                                    // P'(z)==0 then rotate and try again
                 dz *= rotation * complex<double>(Max_stepsize, 0); // Multiply with 5
             // to get away from saddlepoint
@@ -418,7 +423,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
             // Step accepted. Save pz in pzprev
             pzprev = pz;
             z      = pzprev.z - dz; // Next z
-            pz     = EvaluatePolynomial(coeff, z);
+            pz     = EvaluatePolynomial(coeff, n, z);
             steps  = 1;
             if (stage1) {
                 // Try multiple steps or shorten steps depending if P(z)
@@ -437,7 +442,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
                         zn -= dz; // try another step in the same direction
 
                     // Evaluate new try step
-                    npz = EvaluatePolynomial(coeff, zn);
+                    npz = EvaluatePolynomial(coeff, n, zn);
                     if (npz.apz >= pz.apz)
                         break; // Break if no improvement
 
@@ -448,7 +453,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
                         // To many shorten steps => try another direction and break
                         dz *= rotation;
                         z  = pzprev.z - dz;
-                        pz = EvaluatePolynomial(coeff, z);
+                        pz = EvaluatePolynomial(coeff, n, z);
                         break;
                     }
                 }
@@ -456,14 +461,14 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
                 // calculate the upper bound of error using Grant & Hitchins's
                 // test for complex coefficients
                 // Now that we are within the convergence circle.
-                eps = CalculateUpperBound(coeff, pz.z);
+                eps = CalculateUpperBound(coeff, n, pz.z);
             }
         }
 
         DEBUG_PRINT("Root found after " << itercnt << " iterations: " << pz.z);
 
         // Check if warm start improved convergence
-        if (usingCachedRoots && cacheRootIndex <= cachedRoots.size()) {
+        if (usingCachedRoots && cacheRootIndex <= cachedRootCount) {
             DEBUG_PRINT("Using warm start: root found in " << itercnt
                 << " iterations (vs. typically more without warm start)");
         }
@@ -472,32 +477,55 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
         // to evaluate P(z.real). if that is less than P(z).
         // We take that z.real() is a better root than z.
         z      = complex<double>(pz.z.real(), 0.0);
-        pzprev = EvaluatePolynomial(coeff, z);
+        pzprev = EvaluatePolynomial(coeff, n, z);
         if (pzprev.apz <= pz.apz) {
             // real root
             pz = pzprev;
             // Save the root
-            roots.push_back(pz.z);
-            newRoots.push_back(pz.z);
-            RealDeflation(coeff, pz.z.real());
+            roots[rootIndex++]       = pz.z;
+            newRoots[newRootIndex++] = pz.z;
+            RealDeflation(coeff, n, pz.z.real());
         } else {
             // Complex root
             // Save the root
-            roots.push_back(pz.z);
-            roots.push_back(conj(pz.z));
-            newRoots.push_back(pz.z);
-            newRoots.push_back(conj(pz.z));
-            ComplexDeflation(coeff, pz.z);
-            --n;
+            roots[rootIndex++]       = pz.z;
+            roots[rootIndex++]       = conj(pz.z);
+            newRoots[newRootIndex++] = pz.z;
+            newRoots[newRootIndex++] = conj(pz.z);
+            ComplexDeflation(coeff, n, pz.z);
         }
     } // End Iteration
 
     // Solve any remaining linear or quadratic polynomial
     if (n > 0)
-        SolveQuadratic(coeff, roots, newRoots);
+        rootIndex = SolveQuadratic(coeff, n, roots, rootIndex, newRoots, newRootIndex);
 
     // Store the roots in the cache for future use
-    g_rootCache[polyHash] = newRoots;
+    RootStorage storage;
+    memcpy(storage.roots, newRoots, sizeof(complex<double>) * newRootIndex);
+    storage.count         = newRootIndex;
+    g_rootCache[polyHash] = storage;
+
+    return rootIndex; // Return the number of roots found
+}
+
+// Wrapper function to maintain compatibility with vector-based interface
+static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &coefficients) {
+    // Convert vector to fixed-size array
+    double coeffArray[MAX_COEFF];
+    for (int i = 0; i < MAX_COEFF; i++) {
+        coeffArray[i] = coefficients[i];
+    }
+
+    // Call the optimized function
+    complex<double> rootsArray[MAX_ROOTS];
+    int rootCount = PolynomialRoots(coeffArray, rootsArray);
+
+    // Convert back to vector for return
+    std::vector<complex<double> > roots;
+    for (int i = 0; i < rootCount; i++) {
+        roots.push_back(rootsArray[i]);
+    }
 
     return roots;
 }
