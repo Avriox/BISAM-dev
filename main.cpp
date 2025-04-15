@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <RcppArmadillo.h>
 
 #include "include/biasm_model.h"
@@ -183,18 +184,20 @@ int main() {
 
     timer.print_section_summary();
 
-    // Print the results
+
+    // Set precision to 10 digits and use fixed notation
+    std::cout.precision(5);
+    // std::cout.setf(std::ios::fixed);
+
+    // Print the results using raw_print
     std::cout << "Column means of w_store:" << std::endl;
-    std::cout << result2.indicator_means.t() << std::endl;
+    result2.indicator_means.t().raw_print(std::cout);
 
-
-    // Print the results
     std::cout << "Column means of b_store:" << std::endl;
-    std::cout << result2.beta_samples.t() << std::endl;
+    result2.beta_samples.t().raw_print(std::cout);
 
-    // Print the results
     std::cout << "Column means of s2_store:" << std::endl;
-    std::cout << result2.sigma2_means.t() << std::endl;
+    result2.sigma2_means.t().raw_print(std::cout);
 
     return 0;
 }

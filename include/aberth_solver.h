@@ -38,8 +38,8 @@
 using namespace std;
 
 constexpr int MAX_ABERTH_ITER          = 100;
-constexpr double OSCILLATION_THRESHOLD = 1e-10; // Threshold to detect oscillation
-constexpr double GOOD_ENOUGH_THRESHOLD = 1e-5;  // Early termination threshold
+constexpr double OSCILLATION_THRESHOLD = 1e-11; // Threshold to detect oscillation
+constexpr double GOOD_ENOUGH_THRESHOLD = 1e-10; // Early termination threshold
 constexpr int MAX_OSCILLATION_COUNT    = 4;     // Maximum oscillation count before early termination
 
 // ===== Complex number structures and operations =====
