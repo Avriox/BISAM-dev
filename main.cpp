@@ -154,7 +154,7 @@ int main() {
                                                        false,
                                                        true,
                                                        true,
-                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
+                                                       bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
 
     timer.end_section("Split Sequential");
     // timer.start_section("Split Parallel");

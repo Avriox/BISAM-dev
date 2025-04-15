@@ -39,6 +39,8 @@
 #include <iostream>
 #include <ostream>
 
+#include "aberth_solver.h"
+
 //======================================================================
 //  Local constants.
 //======================================================================
@@ -1414,6 +1416,29 @@ PolynomialRootFinder::RootStatus_T PolynomialRootFinder::FindRootsNewton(
 
     // Call our optimized implementation directly
     *number_of_roots_found_ptr = PolynomialRoots(
+        reversed_coeffs,
+        degree,
+        real_zero_vector_ptr,
+        imaginary_zero_vector_ptr
+    );
+
+
+    return RootStatus_T::SUCCESS;
+}
+
+PolynomialRootFinder::RootStatus_T PolynomialRootFinder::FindRootsAberth(
+    double *coefficient_vector_ptr,
+    int degree,
+    double *real_zero_vector_ptr,
+    double *imaginary_zero_vector_ptr,
+    int *number_of_roots_found_ptr) {
+    double reversed_coeffs[MAX_COEFF];
+    for (int i = 0; i < degree + 1; i++) {
+        reversed_coeffs[i] = coefficient_vector_ptr[degree - i];
+    }
+
+    // Call our optimized implementation directly
+    *number_of_roots_found_ptr = PolynomialRootsAberth(
         reversed_coeffs,
         degree,
         real_zero_vector_ptr,

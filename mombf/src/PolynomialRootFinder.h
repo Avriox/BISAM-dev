@@ -113,6 +113,12 @@ public:
                                                        double *imaginary_zero_vector_ptr,
                                                        int *number_of_roots_found_ptr = 0);
 
+    PolynomialRootFinder::RootStatus_T FindRootsAberth(double *coefficient_ptr,
+                                                       int degree,
+                                                       double *real_zero_vector_ptr,
+                                                       double *imaginary_zero_vector_ptr,
+                                                       int *number_of_roots_found_ptr = 0);
+
 private:
     int Fxshfr(int l2var);
 

@@ -116,6 +116,7 @@ add_executable(BISAM main.cpp
         src/utils.cpp
         include/global_storage.h
         include/newton_solver.h
+        include/aberth_solver.h
 )
 
 # Include all necessary directories for header lookup

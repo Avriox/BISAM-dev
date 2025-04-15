@@ -6648,7 +6648,8 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
       // std::cout << " ]" << std::endl;
 
       PolynomialRootFinder finder;
-      (*status) = finder.FindRootsNewton(coef, 4, real_vector, imag_vector, &root_count);
+      // (*status) = finder.FindRootsNewton(coef, 4, real_vector, imag_vector, &root_count);
+      (*status) = finder.FindRootsAberth(coef, 4, real_vector, imag_vector, &root_count);
 
       j     = 0;
       found = false;
