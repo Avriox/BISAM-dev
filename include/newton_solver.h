@@ -34,6 +34,16 @@
  * --------------------------------------------------------------------------
 */
 
+// Define to enable debug printing. Comment out to disable.
+// #define DEBUG_PRINTING
+
+#ifdef DEBUG_PRINTING
+#include <iostream>
+#define DEBUG_PRINT(x) std::cout << x << std::endl
+#else
+#define DEBUG_PRINT(x)
+#endif
+
 // define version string
 static char _VNEWTON_[] = "@(#)Newton.cpp 01.02 -- Copyright (C) Henrik Vestermark";
 
@@ -50,7 +60,9 @@ static char _VNEWTON_[] = "@(#)Newton.cpp 01.02 -- Copyright (C) Henrik Vesterma
 # define _DBL_RADIX FLT_RADIX
 
 using namespace std;
-constexpr int MAX_ITER = 50;
+constexpr int MAX_ITER          = 50;
+constexpr int POLYNOMIAL_DEGREE = 4;                 // We always have degree 4 polynomials
+constexpr int MAX_ROOTS         = POLYNOMIAL_DEGREE; // Maximum number of roots
 
 // ===== Global cache and helper structs =====
 
@@ -262,30 +274,38 @@ static void SolveQuadratic(const std::vector<double> &a, std::vector<complex<dou
 // Root cache management functions
 static void ClearRootCache() {
     g_rootCache.clear();
+    DEBUG_PRINT("Root cache cleared");
 }
 
 static void PrintRootCacheStats() {
-    // All print statements removed for performance
+    DEBUG_PRINT("Root cache contains " << g_rootCache.size() << " entries");
+    DEBUG_PRINT("Root cache bucket count: " << g_rootCache.bucket_count());
+    DEBUG_PRINT("Root cache load factor: " << g_rootCache.load_factor());
 }
 
 static void ReserveRootCache(size_t expectedSize) {
     g_rootCache.reserve(expectedSize);
+    DEBUG_PRINT("Reserved cache for " << expectedSize << " polynomials");
 }
 
 // ===== Main polynomial roots function =====
 
 // Find all polynomial zeros using a modified Newton method with warm start capability
 static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &coefficients) {
-    const complex<double> complexzero(0.0, 0);      // Complex zero (0+i0)
-    size_t n;                                       // Size of Polynomial p(x)
-    Eval pz;                                        // P(z)
-    Eval pzprev;                                    // P(zprev)
-    Eval p1z;                                       // P'(z)
-    Eval p1zprev;                                   // P'(zprev)
-    complex<double> z;                              // Use as temporary variable
-    complex<double> dz;                             // The current stepsize dz
-    int itercnt;                                    // Hold the number of iterations per root
-    std::vector<complex<double> > roots;            // Holds the roots of the Polynomial
+    const complex<double> complexzero(0.0, 0); // Complex zero (0+i0)
+    size_t n;                                  // Size of Polynomial p(x)
+    Eval pz;                                   // P(z)
+    Eval pzprev;                               // P(zprev)
+    Eval p1z;                                  // P'(z)
+    Eval p1zprev;                              // P'(zprev)
+    complex<double> z;                         // Use as temporary variable
+    complex<double> dz;                        // The current stepsize dz
+    int itercnt;                               // Hold the number of iterations per root
+
+    // Pre-allocate vectors with known sizes to avoid resizing
+    std::vector<complex<double> > roots; // Holds the roots of the Polynomial
+    roots.reserve(MAX_ROOTS);            // Pre-allocate for maximum possible roots
+
     std::vector<double> coeff(coefficients.size()); // Holds the current coefficients of P(z)
 
     // Generate hash for this polynomial to check cache - ultra fast integer hash
@@ -298,6 +318,8 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
     if (cacheIt != g_rootCache.end()) {
         cachedRoots      = cacheIt->second;
         usingCachedRoots = true;
+        DEBUG_PRINT("Found cached roots for polynomial with hash: 0x"
+            << std::hex << polyHash << std::dec);
     }
 
     copy(coefficients.begin(), coefficients.end(), coeff.begin());
@@ -309,6 +331,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
     // Index for tracking cached roots
     size_t cacheRootIndex = 0;
     std::vector<complex<double> > newRoots;
+    newRoots.reserve(MAX_ROOTS); // Pre-allocate space for new roots
 
     // Do Newton iteration for polynomial order higher than 2
     for (; n > 2; --n) {
@@ -319,7 +342,10 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
         double eps;                                                 // Iteration termination value
         bool stage1 = true;                                         // By default start in stage1
         int steps   = 1;                                            // Multisteps if > 1
+
+        // Pre-allocate coefficient derivative vector
         std::vector<double> coeffprime;
+        coeffprime.reserve(n); // Pre-allocate exactly what we need
 
         // Calculate coefficients of p'(x)
         for (int i = 0; i < n; i++)
@@ -331,6 +357,7 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
         // If we have cached roots, use the next one as a starting point
         if (usingCachedRoots && cacheRootIndex < cachedRoots.size()) {
             z = cachedRoots[cacheRootIndex++];
+            DEBUG_PRINT("Using cached root as starting point: " << z);
         } else {
             // Use default starting point calculation
             z = coeff[n - 1] == 0.0 ? complex<double>(1.0, 0) : complex<double>(-coeff[n] / coeff[n - 1], 0);
@@ -431,6 +458,14 @@ static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &
                 // Now that we are within the convergence circle.
                 eps = CalculateUpperBound(coeff, pz.z);
             }
+        }
+
+        DEBUG_PRINT("Root found after " << itercnt << " iterations: " << pz.z);
+
+        // Check if warm start improved convergence
+        if (usingCachedRoots && cacheRootIndex <= cachedRoots.size()) {
+            DEBUG_PRINT("Using warm start: root found in " << itercnt
+                << " iterations (vs. typically more without warm start)");
         }
 
         // Check if there is a very small residue in the imaginary part by trying
