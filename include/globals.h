@@ -14,8 +14,8 @@
 
 // This is a cache for storing the "final" th/thopt values calculated (for example in imomModeK) and re-use them for
 // faster convergence.
-inline static std::map<std::string, std::vector<double> > model_thopt_mapping;
-inline std::string current_model;
+thread_local inline static std::map<std::string, std::vector<double> > model_thopt_mapping;
+thread_local inline std::string current_model;
 
 enum PolyRootAlgo {
     JENKINS_TRAUB,

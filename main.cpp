@@ -155,7 +155,7 @@ int main() {
                                                        false,
                                                        true,
                                                        true,
-                                                       bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
+                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
 
     timer.end_section("Split Sequential");
     // timer.start_section("Split Parallel");
@@ -186,7 +186,7 @@ int main() {
 
 
     // Set precision to 10 digits and use fixed notation
-    std::cout.precision(5);
+    std::cout.precision(4);
     // std::cout.setf(std::ios::fixed);
 
     // Print the results using raw_print
