@@ -117,8 +117,6 @@ add_executable(BISAM main.cpp
         src/modelselection_strategy.cpp
         src/utils.cpp
         include/globals.h
-        include/newton_solver.h
-        include/aberth_solver.h
         include/fast_polynomial_solver.h
         src/fast_polynomial_solver.cpp
 )

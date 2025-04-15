@@ -39,7 +39,6 @@
 #include <iostream>
 #include <ostream>
 
-#include "aberth_solver.h"
 
 //======================================================================
 //  Local constants.
