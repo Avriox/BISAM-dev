@@ -77,8 +77,8 @@ struct RootStorage {
     int count;              // Number of valid roots
 };
 
-// Global cache for storing polynomial roots based on coefficient hash
-static std::unordered_map<uint32_t, RootStorage> g_rootCache;
+// Thread-local cache for storing polynomial roots based on coefficient hash
+inline thread_local std::unordered_map<uint32_t, RootStorage> g_rootCache;
 
 // Structure representing a complex number without using std::complex
 struct Complex {

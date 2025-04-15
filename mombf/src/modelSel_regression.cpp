@@ -6666,7 +6666,7 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
     niter++;
   }
 
-  model_thopt_mapping[current_model] = std::vector<double>(th + 1, th + 1 + *nsel);
+  // model_thopt_mapping[current_model] = std::vector<double>(th + 1, th + 1 + *nsel);
 
   free_dvector(coef, 0, 4);
   free_dvector(real_vector, 0, 4);
