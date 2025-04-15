@@ -30,6 +30,8 @@
  * 01.01        HVE/24Sep2023  Initial release
  * 01.02        ---/15Apr2025  Added warm start capability
  * 01.03        ---/15Apr2025  Optimized with fixed-size arrays
+ * 01.04        ---/15Apr2025  Direct C-style interface with no vector operations
+ * 01.05        ---/15Apr2025  Eliminated std::complex operations
  *
  * End of Change Record
  * --------------------------------------------------------------------------
@@ -46,16 +48,15 @@
 #endif
 
 // define version string
-static char _VNEWTON_[] = "@(#)Newton.cpp 01.03 -- Copyright (C) Henrik Vestermark";
+static char _VNEWTON_[] = "@(#)Newton.cpp 01.05 -- Copyright (C) Henrik Vestermark";
 
 #include <algorithm>
-#include <complex>
 #include <functional>
 #include <cfloat>
-#include <array>
 #include <unordered_map>
 #include <cstdint>
 #include <cstring>  // for memcpy
+#include <cmath>    // for sqrt, abs, etc.
 #include "PolynomialRootFinder.h"
 
 //[BISAM] _DBL_RADIX was not defined
@@ -71,19 +72,97 @@ constexpr int MAX_ROOTS         = POLYNOMIAL_DEGREE;     // Maximum number of ro
 
 // Structure to store roots with a count of valid roots
 struct RootStorage {
-    complex<double> roots[MAX_ROOTS];
-    int count;
+    double real[MAX_ROOTS]; // Real parts of the roots
+    double imag[MAX_ROOTS]; // Imaginary parts of the roots
+    int count;              // Number of valid roots
 };
 
 // Global cache for storing polynomial roots based on coefficient hash
 static std::unordered_map<uint32_t, RootStorage> g_rootCache;
 
-// Evaluation structure
-struct Eval {
-    complex<double> z{};
-    complex<double> pz{};
-    double apz{};
+// Structure representing a complex number without using std::complex
+struct Complex {
+    double re; // Real part
+    double im; // Imaginary part
+
+    // Fast norm (squared magnitude)
+    inline double norm() const {
+        return re * re + im * im;
+    }
+
+    // Fast absolute value (magnitude)
+    inline double abs() const {
+        return sqrt(norm());
+    }
 };
+
+// Structure for polynomial evaluation
+struct Eval {
+    double z_re;  // Real part of z
+    double z_im;  // Imaginary part of z
+    double pz_re; // Real part of P(z)
+    double pz_im; // Imaginary part of P(z)
+    double apz;   // |P(z)| - absolute value
+};
+
+// ===== Complex arithmetic operations =====
+
+// Complex number addition
+inline void complex_add(double &result_re, double &result_im,
+                        double a_re, double a_im,
+                        double b_re, double b_im) {
+    result_re = a_re + b_re;
+    result_im = a_im + b_im;
+}
+
+// Complex number subtraction
+inline void complex_sub(double &result_re, double &result_im,
+                        double a_re, double a_im,
+                        double b_re, double b_im) {
+    result_re = a_re - b_re;
+    result_im = a_im - b_im;
+}
+
+// Complex number multiplication
+inline void complex_mul(double &result_re, double &result_im,
+                        double a_re, double a_im,
+                        double b_re, double b_im) {
+    double tmp_re = a_re * b_re - a_im * b_im;
+    double tmp_im = a_re * b_im + a_im * b_re;
+    result_re     = tmp_re;
+    result_im     = tmp_im;
+}
+
+// Complex number division
+inline void complex_div(double &result_re, double &result_im,
+                        double a_re, double a_im,
+                        double b_re, double b_im) {
+    double denom  = b_re * b_re + b_im * b_im;
+    double tmp_re = (a_re * b_re + a_im * b_im) / denom;
+    double tmp_im = (a_im * b_re - a_re * b_im) / denom;
+    result_re     = tmp_re;
+    result_im     = tmp_im;
+}
+
+// Complex number absolute value (magnitude)
+inline double complex_abs(double re, double im) {
+    return sqrt(re * re + im * im);
+}
+
+// Complex number conjugate
+inline void complex_conj(double &result_re, double &result_im,
+                         double a_re, double a_im) {
+    result_re = a_re;
+    result_im = -a_im;
+}
+
+// Scale complex number by a real value
+inline void complex_scale(double &result_re, double &result_im,
+                          double a_re, double a_im,
+                          double scale) {
+    result_re = a_re * scale;
+    result_im = a_im * scale;
+}
 
 // ===== Helper function declarations =====
 
@@ -94,20 +173,22 @@ static uint32_t HashPolynomial(const double coefficients[MAX_COEFF]);
 static double ComputeStartPoint(const double a[MAX_COEFF], int n);
 
 // Evaluate polynomial with Horner's method
-static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, const complex<double> z);
+static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, double z_re, double z_im);
 
 // Calculate upper bound for rounding errors (Adam's test)
-static double CalculateUpperBound(const double a[MAX_COEFF], int n, const complex<double> z);
+static double CalculateUpperBound(const double a[MAX_COEFF], int n, double z_re, double z_im);
 
 // Real root forward deflation
-static void RealDeflation(double a[MAX_COEFF], int &n, const double x);
+static void RealDeflation(double a[MAX_COEFF], int &n, double x);
 
 // Complex root forward deflation for real coefficients
-static void ComplexDeflation(double a[MAX_COEFF], int &n, const complex<double> z);
+static void ComplexDeflation(double a[MAX_COEFF], int &n, double z_re, double z_im);
 
 // Solve quadratic polynomial
-static int SolveQuadratic(const double a[MAX_COEFF], int n, complex<double> roots[MAX_ROOTS],
-                          int rootIndex, complex<double> newRoots[MAX_ROOTS], int newRootIndex);
+static int SolveQuadratic(const double a[MAX_COEFF], int n,
+                          double real_roots[MAX_ROOTS], double imag_roots[MAX_ROOTS],
+                          int rootIndex, double new_real[MAX_ROOTS], double new_imag[MAX_ROOTS],
+                          int newRootIndex);
 
 // Root cache management functions
 static void ClearRootCache();
@@ -143,12 +224,12 @@ static uint32_t HashPolynomial(const double coefficients[MAX_COEFF]) {
 
 // Compute the next starting point based on the polynomial coefficients
 static double ComputeStartPoint(const double a[MAX_COEFF], int n) {
-    double a0  = log(abs(a[n]));
-    double min = exp((a0 - log(abs(a[0]))) / static_cast<double>(n));
+    double a0  = log(fabs(a[n]));
+    double min = exp((a0 - log(fabs(a[0]))) / static_cast<double>(n));
 
     for (int i = 1; i < n; i++) {
         if (a[i] != 0.0) {
-            double tmp = exp((a0 - log(abs(a[i]))) / static_cast<double>(n - i));
+            double tmp = exp((a0 - log(fabs(a[i]))) / static_cast<double>(n - i));
             if (tmp < min)
                 min = tmp;
         }
@@ -158,9 +239,10 @@ static double ComputeStartPoint(const double a[MAX_COEFF], int n) {
 }
 
 // Evaluate a polynomial with real coefficients using Horner's method
-static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, const complex<double> z) {
-    double p = -2.0 * z.real();
-    double q = norm(z);
+// Directly calculates real and imaginary parts without using complex numbers
+static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, double z_re, double z_im) {
+    double p = -2.0 * z_re;
+    double q = z_re * z_re + z_im * z_im; // Norm of z
     double s = 0.0;
     double r = a[0];
     Eval e;
@@ -171,16 +253,20 @@ static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, const complex<d
         r        = t;
     }
 
-    e.z   = z;
-    e.pz  = complex<double>(a[n] + z.real() * r - q * s, z.imag() * r);
-    e.apz = abs(e.pz);
+    // Calculate P(z)
+    e.z_re  = z_re;
+    e.z_im  = z_im;
+    e.pz_re = a[n] + z_re * r - q * s;
+    e.pz_im = z_im * r;
+    e.apz   = sqrt(e.pz_re * e.pz_re + e.pz_im * e.pz_im); // |P(z)|
+
     return e;
 }
 
 // Calculate upper bound for rounding errors (Adam's test)
-static double CalculateUpperBound(const double a[MAX_COEFF], int n, const complex<double> z) {
-    double p = -2.0 * z.real();
-    double q = norm(z);
+static double CalculateUpperBound(const double a[MAX_COEFF], int n, double z_re, double z_im) {
+    double p = -2.0 * z_re;
+    double q = z_re * z_re + z_im * z_im; // Norm of z
     double u = sqrt(q);
     double s = 0.0;
     double r = a[0];
@@ -194,16 +280,16 @@ static double CalculateUpperBound(const double a[MAX_COEFF], int n, const comple
         e = u * e + fabs(t);
     }
 
-    t = a[n] + z.real() * r - q * s;
+    t = a[n] + z_re * r - q * s;
     e = u * e + fabs(t);
     e = (4.5 * e - 3.5 * (fabs(t) + fabs(r) * u) +
-         fabs(z.real()) * fabs(r)) * 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
+         fabs(z_re) * fabs(r)) * 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
 
     return e;
 }
 
 // Real root forward deflation
-static void RealDeflation(double a[MAX_COEFF], int &n, const double x) {
+static void RealDeflation(double a[MAX_COEFF], int &n, double x) {
     double r = 0.0;
 
     for (int i = 0; i < n; i++)
@@ -213,9 +299,9 @@ static void RealDeflation(double a[MAX_COEFF], int &n, const double x) {
 }
 
 // Complex root forward deflation for real coefficients
-static void ComplexDeflation(double a[MAX_COEFF], int &n, const complex<double> z) {
-    double r = -2.0 * z.real();
-    double u = norm(z);
+static void ComplexDeflation(double a[MAX_COEFF], int &n, double z_re, double z_im) {
+    double r = -2.0 * z_re;
+    double u = z_re * z_re + z_im * z_im; // Norm of z
 
     a[1] -= r * a[0];
     for (int i = 2; i < n - 1; i++)
@@ -224,55 +310,98 @@ static void ComplexDeflation(double a[MAX_COEFF], int &n, const complex<double> 
     n -= 2; // Reduce polynomial degree by 2 (complex conjugate roots)
 }
 
-// Solve quadratic polynomial
-static int SolveQuadratic(const double a[MAX_COEFF], int n, complex<double> roots[MAX_ROOTS],
-                          int rootIndex, complex<double> newRoots[MAX_ROOTS], int newRootIndex) {
-    complex<double> v;
+// Solve quadratic polynomial - directly write real and imaginary parts
+static int SolveQuadratic(const double a[MAX_COEFF], int n,
+                          double real_roots[MAX_ROOTS], double imag_roots[MAX_ROOTS],
+                          int rootIndex, double new_real[MAX_ROOTS], double new_imag[MAX_ROOTS],
+                          int newRootIndex) {
+    double real_part, imag_part;
     double r;
 
     // Notice that a[0] is !=0 since roots=zero has already been handled
     if (n == 1) {
-        v                        = complex<double>(-a[1] / a[0], 0);
-        roots[rootIndex++]       = v;
-        newRoots[newRootIndex++] = v;
+        real_part = -a[1] / a[0];
+        imag_part = 0.0;
+
+        real_roots[rootIndex]  = real_part;
+        imag_roots[rootIndex]  = imag_part;
+        new_real[newRootIndex] = real_part;
+        new_imag[newRootIndex] = imag_part;
+
+        return rootIndex + 1;
     } else {
         if (a[1] == 0.0) {
             r = -a[2] / a[0];
             if (r < 0) {
-                r                        = sqrt(-r);
-                v                        = complex<double>(0, r);
-                roots[rootIndex++]       = v;
-                roots[rootIndex++]       = conj(v);
-                newRoots[newRootIndex++] = v;
-                newRoots[newRootIndex++] = conj(v);
+                r         = sqrt(-r);
+                real_part = 0.0;
+                imag_part = r;
+
+                real_roots[rootIndex]     = real_part;
+                imag_roots[rootIndex]     = imag_part;
+                real_roots[rootIndex + 1] = real_part;
+                imag_roots[rootIndex + 1] = -imag_part;
+
+                new_real[newRootIndex]     = real_part;
+                new_imag[newRootIndex]     = imag_part;
+                new_real[newRootIndex + 1] = real_part;
+                new_imag[newRootIndex + 1] = -imag_part;
+
+                return rootIndex + 2;
             } else {
-                r                        = sqrt(r);
-                v                        = complex<double>(r, 0);
-                roots[rootIndex++]       = v;
-                roots[rootIndex++]       = complex<double>(-r, 0);
-                newRoots[newRootIndex++] = v;
-                newRoots[newRootIndex++] = complex<double>(-r, 0);
+                r = sqrt(r);
+
+                real_roots[rootIndex]     = r;
+                imag_roots[rootIndex]     = 0.0;
+                real_roots[rootIndex + 1] = -r;
+                imag_roots[rootIndex + 1] = 0.0;
+
+                new_real[newRootIndex]     = r;
+                new_imag[newRootIndex]     = 0.0;
+                new_real[newRootIndex + 1] = -r;
+                new_imag[newRootIndex + 1] = 0.0;
+
+                return rootIndex + 2;
             }
         } else {
             r = 1.0 - 4.0 * a[0] * a[2] / (a[1] * a[1]);
             if (r < 0) {
-                v = complex<double>(-a[1] / (2.0 * a[0]), a[1] *
-                                                          sqrt(-r) / (2.0 * a[0]));
-                roots[rootIndex++]       = v;
-                roots[rootIndex++]       = conj(v);
-                newRoots[newRootIndex++] = v;
-                newRoots[newRootIndex++] = conj(v);
+                real_part = -a[1] / (2.0 * a[0]);
+                imag_part = a[1] * sqrt(-r) / (2.0 * a[0]);
+
+                real_roots[rootIndex]     = real_part;
+                imag_roots[rootIndex]     = imag_part;
+                real_roots[rootIndex + 1] = real_part;
+                imag_roots[rootIndex + 1] = -imag_part;
+
+                new_real[newRootIndex]     = real_part;
+                new_imag[newRootIndex]     = imag_part;
+                new_real[newRootIndex + 1] = real_part;
+                new_imag[newRootIndex + 1] = -imag_part;
+
+                return rootIndex + 2;
             } else {
-                v                        = complex<double>((-1.0 - sqrt(r)) * a[1] / (2.0 * a[0]), 0);
-                roots[rootIndex++]       = v;
-                newRoots[newRootIndex++] = v;
-                v                        = complex<double>(a[2] / (a[0] * v.real()), 0);
-                roots[rootIndex++]       = v;
-                newRoots[newRootIndex++] = v;
+                real_part = (-1.0 - sqrt(r)) * a[1] / (2.0 * a[0]);
+                imag_part = 0.0;
+
+                real_roots[rootIndex] = real_part;
+                imag_roots[rootIndex] = imag_part;
+
+                new_real[newRootIndex] = real_part;
+                new_imag[newRootIndex] = imag_part;
+
+                real_part = a[2] / (a[0] * real_part);
+
+                real_roots[rootIndex + 1] = real_part;
+                imag_roots[rootIndex + 1] = 0.0;
+
+                new_real[newRootIndex + 1] = real_part;
+                new_imag[newRootIndex + 1] = 0.0;
+
+                return rootIndex + 2;
             }
         }
     }
-    return rootIndex;
 }
 
 // Root cache management functions
@@ -294,27 +423,36 @@ static void ReserveRootCache(size_t expectedSize) {
 
 // ===== Main polynomial roots function =====
 
-// Find all polynomial zeros using a modified Newton method with warm start capability
-static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double> roots[MAX_ROOTS]) {
-    const complex<double> complexzero(0.0, 0); // Complex zero (0+i0)
-    int n = POLYNOMIAL_DEGREE;                 // Polynomial degree is fixed at 4
-    Eval pz;                                   // P(z)
-    Eval pzprev;                               // P(zprev)
-    Eval p1z;                                  // P'(z)
-    Eval p1zprev;                              // P'(zprev)
-    complex<double> z;                         // Use as temporary variable
-    complex<double> dz;                        // The current stepsize dz
-    int itercnt;                               // Hold the number of iterations per root
-    int rootIndex = 0;                         // Index for storing roots
+// C-style interface that directly writes to real and imaginary arrays
+// Optimized version without std::complex operations
+static int PolynomialRoots(
+    const double *coefficient_vector_ptr,
+    int degree,
+    double *real_zero_vector_ptr,
+    double *imaginary_zero_vector_ptr) {
+    int n = degree;      // Polynomial degree
+    Eval pz;             // P(z)
+    Eval pzprev;         // P(zprev)
+    Eval p1z;            // P'(z)
+    Eval p1zprev;        // P'(zprev)
+    double z_re, z_im;   // Current z (replaces complex<double> z)
+    double dz_re, dz_im; // Current step size (replaces complex<double> dz)
+    int itercnt;         // Hold the number of iterations per root
+    int rootIndex = 0;   // Index for storing roots
+
+    // Constants for complex rotation instead of creating complex numbers
+    const double rotation_re = 0.6;
+    const double rotation_im = 0.8;
 
     // Fixed-size array for coefficients
     double coeff[MAX_COEFF];
-    memcpy(coeff, coefficients, sizeof(double) * MAX_COEFF);
+    memcpy(coeff, coefficient_vector_ptr, sizeof(double) * (degree + 1));
 
     // Generate hash for this polynomial to check cache - ultra fast integer hash
-    uint32_t polyHash     = HashPolynomial(coefficients);
+    uint32_t polyHash     = HashPolynomial(coeff);
     bool usingCachedRoots = false;
-    complex<double> cachedRoots[MAX_ROOTS];
+    double cachedReal[MAX_ROOTS];
+    double cachedImag[MAX_ROOTS];
     int cachedRootCount = 0;
 
     // Check if we have solved a similar polynomial before
@@ -322,7 +460,8 @@ static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double>
     if (cacheIt != g_rootCache.end()) {
         const RootStorage &storage = cacheIt->second;
         cachedRootCount            = storage.count;
-        memcpy(cachedRoots, storage.roots, sizeof(complex<double>) * cachedRootCount);
+        memcpy(cachedReal, storage.real, sizeof(double) * cachedRootCount);
+        memcpy(cachedImag, storage.imag, sizeof(double) * cachedRootCount);
         usingCachedRoots = true;
         DEBUG_PRINT("Found cached roots for polynomial with hash: 0x"
             << std::hex << polyHash << std::dec);
@@ -330,24 +469,26 @@ static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double>
 
     // Step 1 eliminate all simple roots
     while (n > 0 && coeff[n] == 0.0) {
-        roots[rootIndex++] = complexzero; // Store zero as the root
+        real_zero_vector_ptr[rootIndex]      = 0.0; // Store real part of zero root
+        imaginary_zero_vector_ptr[rootIndex] = 0.0; // Store imaginary part of zero root
+        rootIndex++;
         n--;
     }
 
     // Index for tracking cached roots
     int cacheRootIndex = 0;
-    complex<double> newRoots[MAX_ROOTS];
+    double newReal[MAX_ROOTS];
+    double newImag[MAX_ROOTS];
     int newRootIndex = 0;
 
     // Do Newton iteration for polynomial order higher than 2
     while (n > 2) {
-        const double Max_stepsize      = 5.0;                       // Allow the next step size to be up to 5x larger
-        const complex<double> rotation = complex<double>(0.6, 0.8); // Rotation amount
-        double r;                                                   // Current radius
-        double rprev;                                               // Previous radius
-        double eps;                                                 // Iteration termination value
-        bool stage1 = true;                                         // By default start in stage1
-        int steps   = 1;                                            // Multisteps if > 1
+        const double Max_stepsize = 5.0; // Allow the next step size to be up to 5x larger
+        double r;                        // Current radius
+        double rprev;                    // Previous radius
+        double eps;                      // Iteration termination value
+        bool stage1 = true;              // By default start in stage1
+        int steps   = 1;                 // Multisteps if > 1
 
         // Fixed-size array for derivative coefficients
         double coeffprime[MAX_COEFF - 1];
@@ -361,88 +502,136 @@ static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double>
 
         // If we have cached roots, use the next one as a starting point
         if (usingCachedRoots && cacheRootIndex < cachedRootCount) {
-            z = cachedRoots[cacheRootIndex++];
-            DEBUG_PRINT("Using cached root as starting point: " << z);
+            z_re = cachedReal[cacheRootIndex];
+            z_im = cachedImag[cacheRootIndex];
+            cacheRootIndex++;
+            DEBUG_PRINT("Using cached root as starting point: " << z_re << " + " << z_im << "i");
         } else {
             // Use default starting point calculation
-            z = coeff[n - 1] == 0.0 ? complex<double>(1.0, 0) : complex<double>(-coeff[n] / coeff[n - 1], 0);
-            z *= complex<double>(rprev, 0) / abs(z);
+            if (coeff[n - 1] == 0.0) {
+                z_re = 1.0;
+                z_im = 0.0;
+            } else {
+                z_re = -coeff[n] / coeff[n - 1];
+                z_im = 0.0;
+            }
+
+            // Scale by rprev / |z|
+            double abs_z = sqrt(z_re * z_re + z_im * z_im);
+            if (abs_z > 0.0) {
+                double scale = rprev / abs_z;
+                z_re *= scale;
+                z_im *= scale;
+            }
         }
 
         // Setup the iteration
         // Current P(z)
-        pz = EvaluatePolynomial(coeff, n, z);
+        pz = EvaluatePolynomial(coeff, n, z_re, z_im);
 
         // pzprev which is the previous z or P(0)
-        pzprev.z   = complex<double>(0, 0);
-        pzprev.pz  = coeff[n];
-        pzprev.apz = abs(pzprev.pz);
+        pzprev.z_re  = 0.0;
+        pzprev.z_im  = 0.0;
+        pzprev.pz_re = coeff[n];
+        pzprev.pz_im = 0.0;
+        pzprev.apz   = fabs(coeff[n]);
 
         // p1zprev P'(0) is the P'(0)
-        p1zprev.z   = pzprev.z;
-        p1zprev.pz  = coeffprime[n - 1]; // P'(0)
-        p1zprev.apz = abs(p1zprev.pz);
+        p1zprev.z_re  = pzprev.z_re;
+        p1zprev.z_im  = pzprev.z_im;
+        p1zprev.pz_re = coeffprime[n - 1];
+        p1zprev.pz_im = 0.0;
+        p1zprev.apz   = fabs(coeffprime[n - 1]);
 
         // Set previous dz and calculate the radius of operations.
-        dz = pz.z;                  // dz=z-zprev=z since zprev==0
-        r  = rprev *= Max_stepsize; // Make a reasonable radius of the maximum step size allowed
+        dz_re = pz.z_re;
+        dz_im = pz.z_im;
+        r     = rprev *= Max_stepsize; // Make a reasonable radius of the maximum step size allowed
 
         // Preliminary eps computed at point P(0) by a crude estimation
         eps = 2 * n * pzprev.apz * pow((double) _DBL_RADIX, -DBL_MANT_DIG);
 
-        // Start iteration and stop if z doesnt change or apz <= eps
-        // we do z+dz!=z instead of dz!=0. if dz does not change z
-        // then we accept z as a root
-        for (itercnt = 0; pz.z + dz != pz.z && pz.apz > eps && itercnt < MAX_ITER; itercnt++) {
+        // Start iteration
+        for (itercnt = 0;
+             // Check if z + dz != z (equivalent to dz != 0 in complex arithmetic)
+             (pz.z_re + dz_re != pz.z_re || pz.z_im + dz_im != pz.z_im) &&
+             pz.apz > eps && itercnt < MAX_ITER;
+             itercnt++) {
             // Calculate current P'(z)
-            p1z = EvaluatePolynomial(coeffprime, n - 1, pz.z);
-            if (p1z.apz == 0.0)                                    // P'(z)==0 then rotate and try again
-                dz *= rotation * complex<double>(Max_stepsize, 0); // Multiply with 5
-            // to get away from saddlepoint
-            else {
-                dz = pz.pz / p1z.pz; // next dz
+            p1z = EvaluatePolynomial(coeffprime, n - 1, pz.z_re, pz.z_im);
+
+            // If P'(z)==0 then rotate and try again
+            if (p1z.apz == 0.0) {
+                // Multiply dz by rotation * Max_stepsize to get away from saddlepoint
+                double tmp_re, tmp_im;
+                complex_mul(tmp_re, tmp_im, dz_re, dz_im, rotation_re, rotation_im);
+                complex_scale(dz_re, dz_im, tmp_re, tmp_im, Max_stepsize);
+            } else {
+                // Calculate next dz = pz.pz / p1z.pz using complex division
+                complex_div(dz_re, dz_im, pz.pz_re, pz.pz_im, p1z.pz_re, p1z.pz_im);
+
                 // Check the Magnitude of Newton's step
-                r = abs(dz);
-                if (r > rprev) // Large than 5 times the previous step size
-                {
-                    // then rotate and adjust step size to prevent
-                    // wild step size near P'(z) close to zero
-                    dz *= rotation * complex<double>(rprev / r, 0);
-                    r = abs(dz);
+                r = sqrt(dz_re * dz_re + dz_im * dz_im);
+
+                if (r > rprev) {
+                    // Too large step - rotate and adjust step size
+                    double tmp_re, tmp_im, scaled_re, scaled_im;
+                    complex_mul(tmp_re, tmp_im, dz_re, dz_im, rotation_re, rotation_im);
+                    complex_scale(scaled_re, scaled_im, tmp_re, tmp_im, rprev / r);
+                    dz_re = scaled_re;
+                    dz_im = scaled_im;
+                    r     = sqrt(dz_re * dz_re + dz_im * dz_im);
                 }
 
-                rprev = r * Max_stepsize; // Save 5 times the current step size
-                // for the next iteration check
-                // of reasonable step size
-                // Calculate if stage1 is true or false. Stage1 is false
-                // if the Newton converge otherwise true
-                z      = (p1zprev.pz - p1z.pz) / (pzprev.z - pz.z);
-                stage1 = (abs(z) / p1z.apz > p1z.apz / pz.apz / 4) || (steps != 1);
+                // Save 5 times the current step size for the next iteration check
+                rprev = r * Max_stepsize;
+
+                // Calculate if stage1 is true or false
+                // Stage1 is false if the Newton converges, otherwise true
+                double z_re_tmp, z_im_tmp;
+                complex_sub(z_re_tmp, z_im_tmp, p1zprev.pz_re, p1zprev.pz_im, p1z.pz_re, p1z.pz_im);
+                double denom_re, denom_im;
+                complex_sub(denom_re, denom_im, pzprev.z_re, pzprev.z_im, pz.z_re, pz.z_im);
+
+                // z = (p1zprev.pz - p1z.pz) / (pzprev.z - pz.z)
+                complex_div(z_re_tmp, z_im_tmp, z_re_tmp, z_im_tmp, denom_re, denom_im);
+
+                // Calculate: (abs(z) / p1z.apz > p1z.apz / pz.apz / 4)
+                double abs_z_tmp = sqrt(z_re_tmp * z_re_tmp + z_im_tmp * z_im_tmp);
+                stage1           = (abs_z_tmp / p1z.apz > p1z.apz / pz.apz / 4) || (steps != 1);
             }
 
             // Step accepted. Save pz in pzprev
             pzprev = pz;
-            z      = pzprev.z - dz; // Next z
-            pz     = EvaluatePolynomial(coeff, n, z);
-            steps  = 1;
+
+            // Next z = pzprev.z - dz
+            complex_sub(z_re, z_im, pzprev.z_re, pzprev.z_im, dz_re, dz_im);
+
+            // Evaluate polynomial at new z
+            pz    = EvaluatePolynomial(coeff, n, z_re, z_im);
+            steps = 1;
+
             if (stage1) {
                 // Try multiple steps or shorten steps depending if P(z)
                 // is an improvement or not P(z)<P(zprev)
                 bool div2;
-                complex<double> zn;
+                double zn_re = pz.z_re;
+                double zn_im = pz.z_im;
                 Eval npz;
 
-                zn = pz.z;
                 for (div2 = pz.apz > pzprev.apz; steps <= n; ++steps) {
                     if (div2 == true) {
                         // Shorten steps
-                        dz *= complex<double>(0.5, 0);
-                        zn = pzprev.z - dz;
-                    } else
-                        zn -= dz; // try another step in the same direction
+                        dz_re *= 0.5;
+                        dz_im *= 0.5;
+                        complex_sub(zn_re, zn_im, pzprev.z_re, pzprev.z_im, dz_re, dz_im);
+                    } else {
+                        // Try another step in the same direction
+                        complex_sub(zn_re, zn_im, zn_re, zn_im, dz_re, dz_im);
+                    }
 
                     // Evaluate new try step
-                    npz = EvaluatePolynomial(coeff, n, zn);
+                    npz = EvaluatePolynomial(coeff, n, zn_re, zn_im);
                     if (npz.apz >= pz.apz)
                         break; // Break if no improvement
 
@@ -450,22 +639,24 @@ static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double>
                     pz = npz;
 
                     if (div2 == true && steps == 2) {
-                        // To many shorten steps => try another direction and break
-                        dz *= rotation;
-                        z  = pzprev.z - dz;
-                        pz = EvaluatePolynomial(coeff, n, z);
+                        // Too many shorten steps => try another direction and break
+                        double tmp_re, tmp_im;
+                        complex_mul(tmp_re, tmp_im, dz_re, dz_im, rotation_re, rotation_im);
+                        dz_re = tmp_re;
+                        dz_im = tmp_im;
+                        complex_sub(z_re, z_im, pzprev.z_re, pzprev.z_im, dz_re, dz_im);
+                        pz = EvaluatePolynomial(coeff, n, z_re, z_im);
                         break;
                     }
                 }
             } else {
-                // calculate the upper bound of error using Grant & Hitchins's
-                // test for complex coefficients
-                // Now that we are within the convergence circle.
-                eps = CalculateUpperBound(coeff, n, pz.z);
+                // Calculate the upper bound of error using Grant & Hitchins's test
+                eps = CalculateUpperBound(coeff, n, pz.z_re, pz.z_im);
             }
         }
 
-        DEBUG_PRINT("Root found after " << itercnt << " iterations: " << pz.z);
+        DEBUG_PRINT("Root found after " << itercnt << " iterations: "
+            << pz.z_re << " + " << pz.z_im << "i");
 
         // Check if warm start improved convergence
         if (usingCachedRoots && cacheRootIndex <= cachedRootCount) {
@@ -473,61 +664,64 @@ static int PolynomialRoots(const double coefficients[MAX_COEFF], complex<double>
                 << " iterations (vs. typically more without warm start)");
         }
 
-        // Check if there is a very small residue in the imaginary part by trying
-        // to evaluate P(z.real). if that is less than P(z).
-        // We take that z.real() is a better root than z.
-        z      = complex<double>(pz.z.real(), 0.0);
-        pzprev = EvaluatePolynomial(coeff, n, z);
-        if (pzprev.apz <= pz.apz) {
-            // real root
-            pz = pzprev;
-            // Save the root
-            roots[rootIndex++]       = pz.z;
-            newRoots[newRootIndex++] = pz.z;
-            RealDeflation(coeff, n, pz.z.real());
+        // Check if there is a very small residue in the imaginary part
+        // Try to evaluate P(z.real), if that is less than P(z)
+        // Take that z.real() is a better root than z
+        Eval pztest = EvaluatePolynomial(coeff, n, pz.z_re, 0.0);
+
+        if (pztest.apz <= pz.apz) {
+            // Real root
+            pz = pztest;
+
+            // Save the root directly to output arrays
+            real_zero_vector_ptr[rootIndex]      = pz.z_re;
+            imaginary_zero_vector_ptr[rootIndex] = 0.0;
+            rootIndex++;
+
+            // Also save to the cache arrays
+            newReal[newRootIndex] = pz.z_re;
+            newImag[newRootIndex] = 0.0;
+            newRootIndex++;
+
+            RealDeflation(coeff, n, pz.z_re);
         } else {
-            // Complex root
-            // Save the root
-            roots[rootIndex++]       = pz.z;
-            roots[rootIndex++]       = conj(pz.z);
-            newRoots[newRootIndex++] = pz.z;
-            newRoots[newRootIndex++] = conj(pz.z);
-            ComplexDeflation(coeff, n, pz.z);
+            // Complex conjugate pair of roots
+
+            // Save both roots directly to output arrays
+            real_zero_vector_ptr[rootIndex]      = pz.z_re;
+            imaginary_zero_vector_ptr[rootIndex] = pz.z_im;
+            rootIndex++;
+
+            real_zero_vector_ptr[rootIndex]      = pz.z_re;
+            imaginary_zero_vector_ptr[rootIndex] = -pz.z_im;
+            rootIndex++;
+
+            // Also save to the cache arrays
+            newReal[newRootIndex] = pz.z_re;
+            newImag[newRootIndex] = pz.z_im;
+            newRootIndex++;
+
+            newReal[newRootIndex] = pz.z_re;
+            newImag[newRootIndex] = -pz.z_im;
+            newRootIndex++;
+
+            ComplexDeflation(coeff, n, pz.z_re, pz.z_im);
         }
     } // End Iteration
 
     // Solve any remaining linear or quadratic polynomial
     if (n > 0)
-        rootIndex = SolveQuadratic(coeff, n, roots, rootIndex, newRoots, newRootIndex);
+        rootIndex = SolveQuadratic(coeff, n, real_zero_vector_ptr, imaginary_zero_vector_ptr,
+                                   rootIndex, newReal, newImag, newRootIndex);
 
     // Store the roots in the cache for future use
     RootStorage storage;
-    memcpy(storage.roots, newRoots, sizeof(complex<double>) * newRootIndex);
+    memcpy(storage.real, newReal, sizeof(double) * newRootIndex);
+    memcpy(storage.imag, newImag, sizeof(double) * newRootIndex);
     storage.count         = newRootIndex;
     g_rootCache[polyHash] = storage;
 
     return rootIndex; // Return the number of roots found
-}
-
-// Wrapper function to maintain compatibility with vector-based interface
-static std::vector<complex<double> > PolynomialRoots(const std::vector<double> &coefficients) {
-    // Convert vector to fixed-size array
-    double coeffArray[MAX_COEFF];
-    for (int i = 0; i < MAX_COEFF; i++) {
-        coeffArray[i] = coefficients[i];
-    }
-
-    // Call the optimized function
-    complex<double> rootsArray[MAX_ROOTS];
-    int rootCount = PolynomialRoots(coeffArray, rootsArray);
-
-    // Convert back to vector for return
-    std::vector<complex<double> > roots;
-    for (int i = 0; i < rootCount; i++) {
-        roots.push_back(rootsArray[i]);
-    }
-
-    return roots;
 }
 
 #endif //NEWTON_SOLVER_H

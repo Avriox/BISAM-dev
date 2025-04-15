@@ -275,7 +275,7 @@ int mspriorCode(int *prCoef, int *prGroup, struct marginalPars *pars) {
         //normalid on all coef
         ans = 4;
       } else if (*prCoef == 10) {
-        ans = 5; //group pMOM 
+        ans = 5; //group pMOM
       } else if (*prCoef == 13) {
         //block Zellner on all coef
         ans = 9;
@@ -6692,13 +6692,14 @@ void imomIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doub
   inv_posdef_upper(V, *nsel, Vinv, &posdef);
   // Asym_xsel(Vinv, *nsel, ytX, sel, thopt); //product Vinv * selected elements in ytX
 
-  if (model_thopt_mapping.count(current_model) > 0) {
-    for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
-      thopt[i + 1] = model_thopt_mapping[current_model][i];
-    }
-  } else {
-    Asym_xsel(Vinv, *nsel, ytX, sel, thopt);
-  }
+  // TODO MODEL STORAGE DOES NOT WORK FOR PARALLEL RUNS!
+  // if (model_thopt_mapping.count(current_model) > 0) {
+  //   for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
+  //     thopt[i + 1] = model_thopt_mapping[current_model][i];
+  //   }
+  // } else {
+  Asym_xsel(Vinv, *nsel, ytX, sel, thopt);
+  // }
 
   //Minimization
   imomModeK(thopt, &status, XtX, ytX, phi, tau, sel, nsel, p);

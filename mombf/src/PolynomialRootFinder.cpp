@@ -1407,31 +1407,19 @@ PolynomialRootFinder::RootStatus_T PolynomialRootFinder::FindRootsNewton(
     double *real_zero_vector_ptr,
     double *imaginary_zero_vector_ptr,
     int *number_of_roots_found_ptr) {
-    std::vector<double> coefficients(degree + 1);
+    double reversed_coeffs[MAX_COEFF];
     for (int i = 0; i < degree + 1; i++) {
-        coefficients[i] = coefficient_vector_ptr[degree - i];
+        reversed_coeffs[i] = coefficient_vector_ptr[degree - i];
     }
 
-    std::vector<std::complex<double> > roots = PolynomialRoots(coefficients);
+    // Call our optimized implementation directly
+    *number_of_roots_found_ptr = PolynomialRoots(
+        reversed_coeffs,
+        degree,
+        real_zero_vector_ptr,
+        imaginary_zero_vector_ptr
+    );
 
-    // // Print each element in the vector
-    // std::cout << "[ ";
-    // for (size_t i = 0; i < roots.size(); ++i) {
-    //     std::cout << roots[i];
-    //     if (i < roots.size() - 1) {
-    //         std::cout << ", ";
-    //     }
-    // }
-    // std::cout << " ]" << std::endl;
-
-    // Store roots in the provided arrays
-    for (size_t i = 0; i < roots.size(); ++i) {
-        real_zero_vector_ptr[i]      = roots[i].real();
-        imaginary_zero_vector_ptr[i] = roots[i].imag();
-    }
-
-    // Set the number of roots found
-    *number_of_roots_found_ptr = roots.size();
 
     return RootStatus_T::SUCCESS;
 }
