@@ -40,15 +40,14 @@
 #include <math.h>
 #include <float.h>
 #include "global_storage.h"
+#include "newton_solver.h"
 
 //======================================================================
 //  Class definition.
 //======================================================================
 
-class PolynomialRootFinder
-{
+class PolynomialRootFinder {
 protected:
-
     typedef double PRF_Float_T;
 
     std::vector<double> m_p_vector;
@@ -57,11 +56,11 @@ protected:
     std::vector<double> m_qk_vector;
     std::vector<double> m_svk_vector;
 
-    double * m_p_vector_ptr;
-    double * m_qp_vector_ptr;
-    double * m_k_vector_ptr;
-    double * m_qk_vector_ptr;
-    double * m_svk_vector_ptr;
+    double *m_p_vector_ptr;
+    double *m_qp_vector_ptr;
+    double *m_k_vector_ptr;
+    double *m_qk_vector_ptr;
+    double *m_svk_vector_ptr;
 
     int m_degree;
     int m_n;
@@ -91,9 +90,7 @@ protected:
     PRF_Float_T m_mre;
 
 public:
-
-    enum RootStatus_T
-    {
+    enum RootStatus_T {
         SUCCESS,
         LEADING_COEFFICIENT_IS_ZERO,
         SCALAR_VALUE_HAS_NO_ROOTS,
@@ -104,41 +101,46 @@ public:
 
     virtual ~PolynomialRootFinder();
 
-    PolynomialRootFinder::RootStatus_T FindRoots(double * coefficient_ptr,
+    PolynomialRootFinder::RootStatus_T FindRoots(double *coefficient_ptr,
                                                  int degree,
-                                                 double * real_zero_vector_ptr,
-                                                 double * imaginary_zero_vector_ptr,
-                                                 int * number_of_roots_found_ptr = 0);
+                                                 double *real_zero_vector_ptr,
+                                                 double *imaginary_zero_vector_ptr,
+                                                 int *number_of_roots_found_ptr = 0);
+
+    PolynomialRootFinder::RootStatus_T FindRootsNewton(double *coefficient_ptr,
+                                                       int degree,
+                                                       double *real_zero_vector_ptr,
+                                                       double *imaginary_zero_vector_ptr,
+                                                       int *number_of_roots_found_ptr = 0);
 
 private:
-
     int Fxshfr(int l2var);
 
     int QuadraticIteration(double uu, double vv);
 
-    int RealIteration(double & sss, int & flag);
+    int RealIteration(double &sss, int &flag);
 
     int CalcSc();
 
     void NextK(int itype);
 
-    void Newest(int itype, double & uu, double & vv);
+    void Newest(int itype, double &uu, double &vv);
 
     void QuadraticSyntheticDivision(int n_plus_one,
                                     double u,
                                     double v,
-                                    double * p_ptr,
-                                    double * q_ptr,
-                                    double & a,
-                                    double & b);
+                                    double *p_ptr,
+                                    double *q_ptr,
+                                    double &a,
+                                    double &b);
 
     void SolveQuadraticEquation(double a,
                                 double b,
                                 double c,
-                                double & sr,
-                                double & si,
-                                double & lr,
-                                double & li);
+                                double &sr,
+                                double &si,
+                                double &lr,
+                                double &li);
 
     //==================================================================
     //  Declare the copy constructor and operator equals to be private
@@ -146,9 +148,9 @@ private:
     //  class.
     //==================================================================
 
-    PolynomialRootFinder(const PolynomialRootFinder & that);
+    PolynomialRootFinder(const PolynomialRootFinder &that);
 
-    PolynomialRootFinder operator =(const PolynomialRootFinder & that);
+    PolynomialRootFinder operator =(const PolynomialRootFinder &that);
 };
 
 #endif

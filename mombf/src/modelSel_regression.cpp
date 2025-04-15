@@ -1628,7 +1628,7 @@ void modelSelectionGibbs(int *postSample, double *margpp, int *postMode, double 
   //intptrvec::iterator itlist;
   pt2margFun marginalFunction = NULL, priorFunction = NULL;
   //same as double (*marginalFunction)(int *, int *, struct marginalPars *);
-   modselIntegrals *integrals;
+  modselIntegrals *integrals;
 
   marginalFunction = set_marginalFunction(pars);
   priorFunction    = set_priorFunction(prDelta, prConstr, family);
@@ -6624,8 +6624,31 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
       for (j = i + 1; j <= (*nsel); j++) { coef[3] -= (XtX->at(sel[i - 1] * (*p) + sel[j - 1])) * th[j]; }
       coef[3] = coef[3] / (*phi);
       coef[4] = -(XtX->at(sel[i - 1] * (*p) + sel[i - 1])) / (*phi);
-      poly.SetCoefficients(coef, 4);
-      (*status) = poly.FindRoots(real_vector, imag_vector, &root_count);
+      // poly.SetCoefficients(coef, 4);
+      // (*status) = poly.FindRoots(real_vector, imag_vector, &root_count);
+      //
+      // // Print real_vector
+      // std::cout << "real_vector = [ ";
+      // for (int i = 0; i <= 4; ++i) {
+      //   std::cout << real_vector[i];
+      //   if (i < 4) {
+      //     std::cout << ", ";
+      //   }
+      // }
+      // std::cout << " ]" << std::endl;
+      //
+      // // Print imag_vector
+      // std::cout << "imag_vector = [ ";
+      // for (int i = 0; i <= 4; ++i) {
+      //   std::cout << imag_vector[i];
+      //   if (i < 4) {
+      //     std::cout << ", ";
+      //   }
+      // }
+      // std::cout << " ]" << std::endl;
+
+      PolynomialRootFinder finder;
+      (*status) = finder.FindRootsNewton(coef, 4, real_vector, imag_vector, &root_count);
 
       j     = 0;
       found = false;
@@ -6669,9 +6692,9 @@ void imomIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doub
   inv_posdef_upper(V, *nsel, Vinv, &posdef);
   // Asym_xsel(Vinv, *nsel, ytX, sel, thopt); //product Vinv * selected elements in ytX
 
-  if (model_thopt_mapping.count(current_model) >0) {
+  if (model_thopt_mapping.count(current_model) > 0) {
     for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
-      thopt[i+1] = model_thopt_mapping[current_model][i];
+      thopt[i + 1] = model_thopt_mapping[current_model][i];
     }
   } else {
     Asym_xsel(Vinv, *nsel, ytX, sel, thopt);

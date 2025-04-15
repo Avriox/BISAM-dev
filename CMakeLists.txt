@@ -10,37 +10,37 @@ add_compile_definitions(DEV)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # macOS-specific compiler approach
-if(APPLE)
+if (APPLE)
     # First try to find OpenMP normally
     find_package(OpenMP QUIET)
 
     # If not found, use the macOS-specific approach
-    if(NOT OpenMP_FOUND)
+    if (NOT OpenMP_FOUND)
         # Check if Homebrew's libomp is installed
-        if(EXISTS "/opt/homebrew/opt/libomp")
+        if (EXISTS "/opt/homebrew/opt/libomp")
             # For macOS, we add the flags directly rather than using OpenMP_* variables
             add_compile_options(-Xpreprocessor -fopenmp)
             include_directories("/opt/homebrew/opt/libomp/include")
             link_directories("/opt/homebrew/opt/libomp/lib")
             set(OPENMP_ENABLED TRUE)
             message(STATUS "OpenMP enabled with Homebrew libomp")
-        else()
+        else ()
             message(STATUS "OpenMP not found - building without parallel support")
-        endif()
-    else()
+        endif ()
+    else ()
         message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
         set(OPENMP_ENABLED TRUE)
-    endif()
-else()
+    endif ()
+else ()
     # For non-macOS systems, use standard OpenMP detection
     find_package(OpenMP)
-    if(OpenMP_CXX_FOUND)
+    if (OpenMP_CXX_FOUND)
         message(STATUS "OpenMP found: ${OpenMP_CXX_VERSION}")
         set(OPENMP_ENABLED TRUE)
-    else()
+    else ()
         message(STATUS "OpenMP not found - building without parallel support")
-    endif()
-endif()
+    endif ()
+endif ()
 
 # Find Rscript (more suitable for scripting than R)
 find_program(RSCRIPT_EXECUTABLE Rscript)
@@ -115,6 +115,7 @@ add_executable(BISAM main.cpp
         src/modelselection_strategy.cpp
         src/utils.cpp
         include/global_storage.h
+        include/newton_solver.h
 )
 
 # Include all necessary directories for header lookup
@@ -135,16 +136,16 @@ target_link_libraries(BISAM PRIVATE
 )
 
 # Add OpenMP-related settings
-if(OPENMP_ENABLED)
+if (OPENMP_ENABLED)
     # If using standard OpenMP detection
-    if(OpenMP_CXX_FOUND)
+    if (OpenMP_CXX_FOUND)
         target_compile_options(BISAM PRIVATE ${OpenMP_CXX_FLAGS})
         target_link_libraries(BISAM PRIVATE ${OpenMP_CXX_LIBRARIES})
         # If using macOS direct approach
-    elseif(APPLE)
+    elseif (APPLE)
         target_link_libraries(BISAM PRIVATE -lomp)
-    endif()
+    endif ()
 
     # Add a definition so the C++ code can check if OpenMP is enabled
     target_compile_definitions(BISAM PRIVATE HAVE_OPENMP)
-endif()
+endif ()
