@@ -36,6 +36,9 @@
 
 #include "PolynomialRootFinder.h"
 
+#include <iostream>
+#include <ostream>
+
 //======================================================================
 //  Local constants.
 //======================================================================
@@ -154,6 +157,12 @@ PolynomialRootFinder::RootStatus_T PolynomialRootFinder::FindRoots(
     //--------------------------------------------------------------
 
     PolynomialRootFinder::RootStatus_T status;
+
+    std::cout << "Coef: ";
+    for (int i = 0; i < degree+1; i++) {
+        std::cout << coefficient_vector_ptr[i] << ", ";
+    }
+    std::cout << std::endl;
 
     if (degree == 0)
     {

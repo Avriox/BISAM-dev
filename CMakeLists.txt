@@ -114,6 +114,7 @@ add_executable(BISAM main.cpp
         src/mombf_bridge.cpp
         src/modelselection_strategy.cpp
         src/utils.cpp
+        include/global_storage.h
 )
 
 # Include all necessary directories for header lookup

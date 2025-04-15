@@ -16,6 +16,9 @@
 // Bleiben Konstant
 //
 
+// re-use of th/thop for calculating the coeeffients for the root finder improved the performance by only 1s (probably only because of saving on matrix multiplications)
+// coefs are very similar between runs of the root finder (in pairs of 2 if nsel = 2)
+
 int main() {
     arma::mat data = {
         {1, 1, -23.45266676, -2.30936055, -0.55970183, 1.34953562},
@@ -154,44 +157,44 @@ int main() {
                                                        bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
 
     timer.end_section("Split Sequential");
-    timer.start_section("Split Parallel");
-
-    bisam::BisamResult result3 = bisam::estimate_model(data,
-                                                       0,
-                                                       1,
-                                                       2,
-                                                       5000,
-                                                       500,
-                                                       "g",
-                                                       100.0,
-                                                       0.001,
-                                                       0.001,
-                                                       1.0,
-                                                       1.0,
-                                                       1.0,
-                                                       true,
-                                                       false,
-                                                       false,
-                                                       false,
-                                                       true,
-                                                       true,
-                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
-    timer.end_section("Split Parallel");
+    // timer.start_section("Split Parallel");
+    //
+    // bisam::BisamResult result3 = bisam::estimate_model(data,
+    //                                                    0,
+    //                                                    1,
+    //                                                    2,
+    //                                                    5000,
+    //                                                    500,
+    //                                                    "g",
+    //                                                    100.0,
+    //                                                    0.001,
+    //                                                    0.001,
+    //                                                    1.0,
+    //                                                    1.0,
+    //                                                    1.0,
+    //                                                    true,
+    //                                                    false,
+    //                                                    false,
+    //                                                    false,
+    //                                                    true,
+    //                                                    true,
+    //                                                    bisam::ComputationStrategy::SPLIT_PARALLEL);
+    // timer.end_section("Split Parallel");
 
     timer.print_section_summary();
 
-    // // Print the results
-    // std::cout << "Column means of w_store:" << std::endl;
-    // std::cout << result.indicator_means.t() << std::endl;
-    //
-    //
-    // // Print the results
-    // std::cout << "Column means of b_store:" << std::endl;
-    // std::cout << result.beta_samples.t() << std::endl;
-    //
-    // // Print the results
-    // std::cout << "Column means of s2_store:" << std::endl;
-    // std::cout << result.sigma2_means.t() << std::endl;
+    // Print the results
+    std::cout << "Column means of w_store:" << std::endl;
+    std::cout << result2.indicator_means.t() << std::endl;
+
+
+    // Print the results
+    std::cout << "Column means of b_store:" << std::endl;
+    std::cout << result2.beta_samples.t() << std::endl;
+
+    // Print the results
+    std::cout << "Column means of s2_store:" << std::endl;
+    std::cout << result2.sigma2_means.t() << std::endl;
 
     return 0;
 }

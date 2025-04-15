@@ -6,6 +6,16 @@
 #include "modelselection_strategy.h"
 
 namespace bisam {
+    // TODO bisam_regression
+    //  * include_indiv_fixed_eff
+    //  * improve variable names
+    //  * use_phiinit -> sample phi extra
+    //  * lambda_b -> prio_coef_var
+    //
+    // Store values in model selection:
+    //
+
+
     BisamResult estimate_model(arma::mat &data, int i_index, int t_index, int y_index, long long num_draws,
                                long long num_burnin, std::string b_prior, double lambda_b, double c0, double C0,
                                double va,
@@ -187,17 +197,21 @@ namespace bisam {
 
         /* ---------------------------- Starting Values ----------------------------- */
 
-        arma::vec b_i(p, arma::fill::ones);
+        // arma::vec b_i(p, arma::fill::ones);
+        // TODO reuse value from before
+        arma::vec b_i = arma::solve(XX, arma::trans(X) * y);
         arma::vec g_i(r, arma::fill::zeros);
         // Init g_incl_i using ridge regression to avoide zeros in the first iteration (invalid starting position)
+        // TODO make this a parameter so that g_incl_i can be provided
         arma::vec g_incl_i = (Z.t() * Z + 10 * arma::eye(r, r)).i() * Z.t() * y;
 
         double s2_i = 1.0;
 
+        // TODO make this a parameter so that w_i can be initialized with a given vector
         arma::Col<int> w_i(r, arma::fill::zeros);
 
-        // TODO z_cols will be a sequence from 0 to ncol(z) - 1 compared to Rs 1 to ncol(z) because of 0 based indexing
-        //  verify that this is correct
+        // TODO "Force include" vector as parameter -> geht als includevars in model selection
+
         arma::ivec z_cols_temp(z.n_cols);
         for (int i = 0; i < z.n_cols; ++i) {
             z_cols_temp(i) = i;
@@ -207,7 +221,6 @@ namespace bisam {
             z_cols.subvec(i * z.n_cols, (i + 1) * z.n_cols - 1) = z_cols_temp;
         }
 
-        // TODO we should just be able to init this with zeros since w_i is always zero
         arma::vec w_1 = arma::conv_to<arma::vec>::from(z_cols) % w_i; // element-wise multiplication
 
         /* --------------------- Starting Values for HS-Plug-In --------------------- */
@@ -219,7 +232,9 @@ namespace bisam {
         /* --------------------------- Prep Calculations ---------------------------- */
         double cN        = c0 + N / 2.0;
         arma::mat XX_inv = arma::inv(XX);
-        arma::vec Pr_g(n * (t - 2)); // NA in R can be represented by uninitialized values or a specific value if needed
+
+        // TODO this is never used. Comment it out for now
+        // arma::vec Pr_g(n * (t - 2)); // NA in R can be represented by uninitialized values or a specific value if needed
 
 
         /* --------------------------------- Store ---------------------------------- */
@@ -240,71 +255,8 @@ namespace bisam {
 
         arma::Mat<int> w_store(Nstore, r);
 
-
-        arma::vec g_i_n0 = g_i;
-#ifdef DEBUG_PRINTING
-        printf("Simulated Data: \n");
-        std::cout << data << '\n';
-
-        printf("Extracted y: \n");
-        std::cout << y << std::endl;
-
-        printf("Extracted X: \n");
-        std::cout << X << std::endl;
-
-        printf("z: \n");
-        std::cout << z << '\n';
-
-        printf("Z: \n");
-        std::cout << Z << std::endl;
-
-        printf("XX (X'X): \n");
-        std::cout << XX << std::endl;
-
-        printf("ZZ (Z'Z): \n");
-        std::cout << ZZ << std::endl;
-
-        printf("Prior parameter b0: \n");
-        std::cout << b0 << std::endl;
-
-        printf("B0: \n");
-        std::cout << B0 << std::endl;
-
-        printf("B0_inv: \n");
-        std::cout << B0_inv << std::endl;
-
-        printf("Starting values:\n");
-        printf("b_i: \n");
-        std::cout << b_i << std::endl;
-        printf("g_i: \n");
-        std::cout << g_i << std::endl;
-        printf("g_incl_i: \n");
-        std::cout << g_incl_i << std::endl;
-        printf("s2_i: %f\n", s2_i);
-        printf("w_i: \n");
-        std::cout << w_i << std::endl;
-        printf("z_cols: \n");
-        std::cout << z_cols << std::endl;
-        printf("w_1: \n");
-        std::cout << w_1 << std::endl;
-
-        printf("cN: %f\n", cN);
-        printf("XX_inv: \n");
-        std::cout << XX_inv << std::endl;
-        printf("Pr_g (first 10 elements): \n");
-        if (Pr_g.n_elem > 10) {
-            std::cout << Pr_g.head(10) << std::endl;
-        } else {
-            std::cout << Pr_g << std::endl;
-        }
-
-        printf("Nstore: %ld\n", Nstore);
-
-        printf("b_store dimensions: %zu x %d\n", b_store.n_rows, b_store.n_cols);
-        printf("g_store dimensions: %zu x %d\n", g_store.n_rows, g_store.n_cols);
-        printf("s2_store dimensions: %zu x %d\n", s2_store.n_rows, s2_store.n_cols);
-        printf("w_store dimensions: %zu x %d\n", w_store.n_rows, w_store.n_cols);
-#endif
+        // TODO never used. Commented out for now
+        // arma::vec g_i_n0 = g_i;
 
 
         /* -------------------------------------------------------------------------- */
@@ -414,7 +366,30 @@ namespace bisam {
                 thinit = g_incl_i;
             }
 
+            // TODO Make everything that is hardcoded a parameter.
+            // TODO tau = step variance
+            //  * priorDelta -> betabinom or bbprior.
+            // priorDelta -> binary 1 -> modelbinomprior     2 -> modelbbprior
+            //      -> wenn 1 -> prDelta.p -> prDeltap
+            //      -> wenn 2 -> prDelta.a & .b -> vector in parprDeltap
+            //      -> use defaults otherwise (0.5) (1,1)
 
+            // TODO we need:
+            // method
+            // hesstype
+            // optimmethod
+            // optim maxit
+            // B
+            // knownhi
+            // r
+            // logscale
+            // alpha
+            // lambda
+            // include vars (force include)
+
+
+            // prior skew = TAU! ES GIBT NUR IN TAU
+            // prDeltap = prConstrp & same for parprDeltap
             arma::Col<int> post_sample = model_selection_with_strategy(y_hat,
                                                                        Z,
                                                                        nn,
@@ -466,6 +441,7 @@ namespace bisam {
                     // use_phiinit = true;
                 }
 
+                // TODO can be parallelized probably
                 rnlpPost_lm(ans.memptr(),
                             1,
                             0,

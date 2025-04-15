@@ -21,6 +21,7 @@ modselIntegrals::modselIntegrals(pt2margFun marfun, pt2margFun priorfun, int nva
   this->zerochar = (char *) calloc(nvars+1, sizeof(char));
   for (i=0; i<nvars; i++) this->zerochar[i]= '0';
 
+
 }
 
 modselIntegrals::~modselIntegrals() {
@@ -42,7 +43,12 @@ double modselIntegrals::getJoint(int *sel, int *nsel, struct marginalPars *pars)
   double ans;
 
   for (i=0; i< *nsel; i++) zerochar[sel[i]]= '1';
+
   std::string s (zerochar);
+
+  current_model = s;
+
+  // std::cout << s << std::endl;
 
   if (logjointSaved.count(s) > 0) {
     ans= logjointSaved[s];
@@ -50,7 +56,9 @@ double modselIntegrals::getJoint(int *sel, int *nsel, struct marginalPars *pars)
     ans= marginalFunction(sel,nsel,pars);
     ans+= priorFunction(sel,nsel,pars);
     double d= maxIntegral - ans;
-    if (d<10 || maxVars<=16 || logjointSaved.size() <= maxsave) logjointSaved[s]= ans;
+    if (d<10 || maxVars<=16 || logjointSaved.size() <= maxsave) {
+      logjointSaved[s]= ans;
+    }
     if (d<0) {
       maxIntegral= ans;
       maxModel= s;

@@ -77,7 +77,7 @@ data <- matrix(c(
 
 # Call the b_ism function with the same parameters
 # Note: In R, indexing starts at 1, so I've adjusted the column indices
-result <- BISAM::b_ism(
+result <- BISAM::estimate_model(
   data,         # data matrix
   1,            # column index for group (0 in C++ becomes 1 in R)
   2,            # column index for time (1 in C++ becomes 2 in R)

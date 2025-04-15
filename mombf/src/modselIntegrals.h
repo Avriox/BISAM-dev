@@ -8,12 +8,14 @@
 #include "modelSel_regression.h"
 #include "ggm.h"
 #include "cstat.h"
+#include "global_storage.h"
 using namespace std;
 
 
 /***********************************************************************************/
 /* Integrated likelihoods for regression models                                    */
 /***********************************************************************************/
+
 
 class modselIntegrals {
 
@@ -37,6 +39,7 @@ private:
   pt2margFun priorFunction;     //Function computing log(model prior)
   std::map<string, double> logjointSaved; //Saves previously computed logjoint
   long unsigned int maxsave;
+
 
 };
 

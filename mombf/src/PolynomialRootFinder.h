@@ -39,6 +39,7 @@
 #include <vector>
 #include <math.h>
 #include <float.h>
+#include "global_storage.h"
 
 //======================================================================
 //  Class definition.

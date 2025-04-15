@@ -1628,7 +1628,7 @@ void modelSelectionGibbs(int *postSample, double *margpp, int *postMode, double 
   //intptrvec::iterator itlist;
   pt2margFun marginalFunction = NULL, priorFunction = NULL;
   //same as double (*marginalFunction)(int *, int *, struct marginalPars *);
-  modselIntegrals *integrals;
+   modselIntegrals *integrals;
 
   marginalFunction = set_marginalFunction(pars);
   priorFunction    = set_priorFunction(prDelta, prConstr, family);
@@ -6643,6 +6643,8 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
     niter++;
   }
 
+  model_thopt_mapping[current_model] = std::vector<double>(th + 1, th + 1 + *nsel);
+
   free_dvector(coef, 0, 4);
   free_dvector(real_vector, 0, 4);
   free_dvector(imag_vector, 0, 4);
@@ -6665,9 +6667,19 @@ void imomIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doub
   //Initialize
   addct2XtX(tau, XtX, sel, nsel, p, V); //add tau to XtX diagonal, store in V
   inv_posdef_upper(V, *nsel, Vinv, &posdef);
-  Asym_xsel(Vinv, *nsel, ytX, sel, thopt); //product Vinv * selected elements in ytX
+  // Asym_xsel(Vinv, *nsel, ytX, sel, thopt); //product Vinv * selected elements in ytX
+
+  if (model_thopt_mapping.count(current_model) >0) {
+    for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
+      thopt[i+1] = model_thopt_mapping[current_model][i];
+    }
+  } else {
+    Asym_xsel(Vinv, *nsel, ytX, sel, thopt);
+  }
+
   //Minimization
   imomModeK(thopt, &status, XtX, ytX, phi, tau, sel, nsel, p);
+
   set_f2opt_pars(&emptydouble, emptymatrix, &emptydouble, XtX, ytX, &emptydouble, &emptydouble, phi, tau, &emptyint, n,
                  p, sel, nsel);
   if (status == PolynomialRootFinder::SUCCESS) {
@@ -6736,6 +6748,7 @@ SEXP pimomMarginalKI(SEXP Ssel, SEXP Snsel, SEXP Sn, SEXP Sp, SEXP Sy, SEXP Ssum
   return ans;
 }
 
+// [BISAM] store thopt
 
 double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
   int one = 1, hessian;
