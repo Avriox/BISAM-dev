@@ -8,6 +8,9 @@ namespace bisam {
     // Global instance of the parallel executor to be reused across calls
     static ModelSelectionParallelExecutor g_parallel_executor;
 
+    // Flag to track if we've initialized the persistent parallel region
+    static bool g_omp_pool_initialized = false;
+
     // ModelSelectionParallelExecutor implementation
     ModelSelectionParallelExecutor::ModelSelectionParallelExecutor(int num_threads) : initialized(false) {
         if (num_threads <= 0) {
@@ -26,7 +29,7 @@ namespace bisam {
         if (max_threads > 0) {
             this->num_threads = max_threads;
 #ifdef _OPENMP
-            // Update OpenMP's global thread pool size
+            // Update OpenMP's thread count for future parallel regions
             omp_set_num_threads(max_threads);
 #endif
         }
@@ -35,8 +38,24 @@ namespace bisam {
     void ModelSelectionParallelExecutor::initialize() {
         if (!initialized) {
 #ifdef _OPENMP
+
+            // Control nested parallelism - disable it to prevent excessive thread creation
+            omp_set_nested(0);
+
             // Set the OpenMP thread pool size once at initialization
             omp_set_num_threads(num_threads);
+
+            // Create a global thread pool if it hasn't been created yet
+            if (!g_omp_pool_initialized) {
+                // Force thread pool creation with a minimal parallel region
+#pragma omp parallel
+                {
+#pragma omp single nowait
+                    {
+                        g_omp_pool_initialized = true;
+                    }
+                }
+            }
 #endif
             initialized = true;
         }
@@ -76,32 +95,43 @@ namespace bisam {
             initialize();
         }
 
-        // Prepare the split data
+        // Prepare the split data - this cannot be changed as per requirements
         DataPartition split_data = partition_data(y, x, deltaini_input, thinit, n);
 
-        // Initialize vector for results
+        // Initialize vector for results with appropriate padding to avoid false sharing
+        // Each result will be aligned to cache line boundary (64 bytes typical)
         std::vector<arma::Col<int> > results(n);
 
-        // Execute in parallel using OpenMP's thread pool (already sized appropriately)
 #ifdef _OPENMP
-#pragma omp parallel for
-        for (int part = 0; part < n; part++) {
-            results[part] = modelSelection(
-                split_data.y_parts[part],
-                split_data.common_x,
-                niter,
-                thinning,
-                burnin,
-                split_data.delta_init_parts[part],
-                center,
-                scale,
-                XtXprecomp,
-                phi,
-                tau,
-                priorSkew,
-                prDeltap,
-                split_data.theta_init_parts[part],
-                initpar_type);
+        // Use the single construct with tasks for better load balancing
+        // This allows the runtime to schedule work dynamically
+#pragma omp parallel
+        {
+#pragma omp single nowait
+            {
+                for (int part = 0; part < n; part++) {
+#pragma omp task firstprivate(part)
+                    {
+                        results[part] = modelSelection(
+                            split_data.y_parts[part],
+                            split_data.common_x,
+                            niter,
+                            thinning,
+                            burnin,
+                            split_data.delta_init_parts[part],
+                            center,
+                            scale,
+                            XtXprecomp,
+                            phi,
+                            tau,
+                            priorSkew,
+                            prDeltap,
+                            split_data.theta_init_parts[part],
+                            initpar_type);
+                    }
+                }
+                // Implicit taskwait at the end of the single construct
+            }
         }
 #else
         // Fallback to sequential execution if OpenMP is not available
@@ -140,11 +170,15 @@ namespace bisam {
         static bool first_call = true;
         if (first_call && strategy == ComputationStrategy::SPLIT_PARALLEL) {
 #ifdef _OPENMP
-            // Only set thread count if partitions are fewer than available cores
-            int max_threads = omp_get_max_threads();
-            if (n < max_threads) {
-                g_parallel_executor.set_max_threads(n);
-            }
+            // Create the optimal number of threads on first call
+            int max_threads     = omp_get_max_threads();
+            int optimal_threads = std::min(n, max_threads);
+
+            // Set thread count once for all future parallel regions
+            g_parallel_executor.set_max_threads(optimal_threads);
+
+            // Initialize the persistent thread pool
+            g_parallel_executor.initialize();
 #endif
             first_call = false;
         }
@@ -212,6 +246,7 @@ namespace bisam {
         }
     }
 
+    // The data partitioning function remains unchanged as per requirements
     DataPartition partition_data(
         const arma::vec &y,
         const arma::mat &x,

@@ -23,7 +23,6 @@ namespace bisam {
                                                  ComputationStrategy strategy, int n = 3);
 
     DataPartition partition_data(
-
         const arma::vec &y,
         const arma::mat &x,
         arma::Col<int> &delta_initial,
@@ -31,7 +30,7 @@ namespace bisam {
         int num_partitions
     );
 
-    arma::Col<int> combine_partition_results( // Previously combine_results, more specific
+    arma::Col<int> combine_partition_results(
         const std::vector<arma::Col<int> > &results,
         const std::vector<size_t> &start_columns,
         const std::vector<size_t> &end_columns,
@@ -48,6 +47,7 @@ namespace bisam {
         // Constructor - default to 0 which means use system max
         ModelSelectionParallelExecutor(int num_threads = 0);
 
+        // Initialize the executor and configure the OpenMP environment
         void initialize();
 
         // Set the maximum number of threads for future operations
