@@ -42,9 +42,8 @@
 //======================================================================
 
 Polynomial::Polynomial()
-  : m_degree(-1)
-  , m_coefficient_vector_ptr(NULL)
-{
+    : m_degree(-1)
+      , m_coefficient_vector_ptr(NULL) {
     SetToScalar(0.0);
 }
 
@@ -58,9 +57,8 @@ Polynomial::Polynomial()
 //======================================================================
 
 Polynomial::Polynomial(double scalar)
-  : m_degree(-1)
-  , m_coefficient_vector_ptr(NULL)
-{
+    : m_degree(-1)
+      , m_coefficient_vector_ptr(NULL) {
     SetToScalar(scalar);
 }
 
@@ -83,9 +81,8 @@ Polynomial::Polynomial(double scalar)
 //======================================================================
 
 Polynomial::Polynomial(double x_coefficient, double scalar)
-  : m_degree(-1)
-  , m_coefficient_vector_ptr(NULL)
-{
+    : m_degree(-1)
+      , m_coefficient_vector_ptr(NULL) {
     SetToFirstOrderPolynomial(x_coefficient, scalar);
 }
 
@@ -112,9 +109,8 @@ Polynomial::Polynomial(double x_coefficient, double scalar)
 //======================================================================
 
 Polynomial::Polynomial(double x_squared_coefficient, double x_coefficient, double scalar)
-  : m_degree(-1)
-  , m_coefficient_vector_ptr(NULL)
-{
+    : m_degree(-1)
+      , m_coefficient_vector_ptr(NULL) {
     SetToQuadraticPolynomial(x_squared_coefficient, x_coefficient, scalar);
 }
 
@@ -130,10 +126,9 @@ Polynomial::Polynomial(double x_squared_coefficient, double x_coefficient, doubl
 //
 //======================================================================
 
-Polynomial::Polynomial(double * coefficient_vector_ptr, int degree)
-  : m_degree(-1)
-  , m_coefficient_vector_ptr(NULL)
-{
+Polynomial::Polynomial(double *coefficient_vector_ptr, int degree)
+    : m_degree(-1)
+      , m_coefficient_vector_ptr(NULL) {
     SetCoefficients(coefficient_vector_ptr, degree);
 }
 
@@ -141,10 +136,9 @@ Polynomial::Polynomial(double * coefficient_vector_ptr, int degree)
 //  Copy Constructor: Polynomial::Polynomial
 //======================================================================
 
-Polynomial::Polynomial(const Polynomial & polynomial)
-  : m_degree(-1)
-  , m_coefficient_vector_ptr(NULL)
-{
+Polynomial::Polynomial(const Polynomial &polynomial)
+    : m_degree(-1)
+      , m_coefficient_vector_ptr(NULL) {
     Copy(polynomial);
 }
 
@@ -152,8 +146,7 @@ Polynomial::Polynomial(const Polynomial & polynomial)
 //  Destructor: Polynomial::~Polynomial
 //======================================================================
 
-Polynomial::~Polynomial()
-{
+Polynomial::~Polynomial() {
 }
 
 //======================================================================
@@ -178,18 +171,15 @@ Polynomial::~Polynomial()
 //
 //======================================================================
 
-void Polynomial::SetCoefficients(double * coefficient_vector_ptr,
-                                 int degree)
-{
-
+void Polynomial::SetCoefficients(double *coefficient_vector_ptr,
+                                 int degree) {
     m_degree = degree;
 
     SetLength(m_degree + 1, false);
 
     int ii = 0;
 
-    for (ii = 0; ii <= m_degree; ++ii)
-    {
+    for (ii = 0; ii <= m_degree; ++ii) {
         m_coefficient_vector_ptr[ii] = coefficient_vector_ptr[ii];
     }
 
@@ -215,8 +205,7 @@ void Polynomial::SetCoefficients(double * coefficient_vector_ptr,
 //
 //======================================================================
 
-void Polynomial::SetToScalar(double scalar)
-{
+void Polynomial::SetToScalar(double scalar) {
     SetCoefficients(&scalar, 0);
 }
 
@@ -238,8 +227,7 @@ void Polynomial::SetToScalar(double scalar)
 //
 //======================================================================
 
-void Polynomial::SetToFirstOrderPolynomial(double x_coefficient, double scalar)
-{
+void Polynomial::SetToFirstOrderPolynomial(double x_coefficient, double scalar) {
     double coefficient_array[2];
     coefficient_array[0] = scalar;
     coefficient_array[1] = x_coefficient;
@@ -270,8 +258,7 @@ void Polynomial::SetToFirstOrderPolynomial(double x_coefficient, double scalar)
 
 void Polynomial::SetToQuadraticPolynomial(double x_squared_coefficient,
                                           double x_coefficient,
-                                          double scalar)
-{
+                                          double scalar) {
     double coefficient_array[3];
     coefficient_array[0] = scalar;
     coefficient_array[1] = x_coefficient;
@@ -300,15 +287,13 @@ void Polynomial::SetToQuadraticPolynomial(double x_squared_coefficient,
 //
 //======================================================================
 
-double Polynomial::EvaluateReal(double xr) const
-{
-  //assert(m_degree >= 0);
+double Polynomial::EvaluateReal(double xr) const {
+    //assert(m_degree >= 0);
 
     double pr = m_coefficient_vector_ptr[m_degree];
-    int i = 0;
+    int i     = 0;
 
-    for (i = m_degree - 1; i >= 0; --i)
-    {
+    for (i = m_degree - 1; i >= 0; --i) {
         pr = pr * xr + m_coefficient_vector_ptr[i];
     }
 
@@ -338,17 +323,15 @@ double Polynomial::EvaluateReal(double xr) const
 //
 //======================================================================
 
-double Polynomial::EvaluateReal(double xr, double & dr) const
-{
+double Polynomial::EvaluateReal(double xr, double &dr) const {
     //assert(m_degree >= 0);
 
     double pr = m_coefficient_vector_ptr[m_degree];
-    dr = pr;
+    dr        = pr;
 
     int i = 0;
 
-    for (i = m_degree - 1; i > 0; --i)
-    {
+    for (i = m_degree - 1; i > 0; --i) {
         pr = pr * xr + m_coefficient_vector_ptr[i];
         dr = dr * xr + pr;
     }
@@ -388,9 +371,8 @@ double Polynomial::EvaluateReal(double xr, double & dr) const
 //======================================================================
 
 void Polynomial::EvaluateImaginary(double xi,
-                                   double & pr,
-                                   double & pi) const
-{
+                                   double &pr,
+                                   double &pi) const {
     //assert(m_degree >= 0);
 
     pr = m_coefficient_vector_ptr[m_degree];
@@ -398,11 +380,10 @@ void Polynomial::EvaluateImaginary(double xi,
 
     int i = 0;
 
-    for (i = m_degree - 1; i >= 0; --i)
-    {
+    for (i = m_degree - 1; i >= 0; --i) {
         double temp = -pi * xi + m_coefficient_vector_ptr[i];
-        pi = pr * xi;
-        pr = temp;
+        pi          = pr * xi;
+        pr          = temp;
     }
 
     return;
@@ -442,9 +423,8 @@ void Polynomial::EvaluateImaginary(double xi,
 
 void Polynomial::EvaluateComplex(double xr,
                                  double xi,
-                                 double & pr,
-                                 double & pi) const
-{
+                                 double &pr,
+                                 double &pi) const {
     //assert(m_degree >= 0);
 
     pr = m_coefficient_vector_ptr[m_degree];
@@ -452,11 +432,10 @@ void Polynomial::EvaluateComplex(double xr,
 
     int i = 0;
 
-    for (i = m_degree - 1; i >= 0; --i)
-    {
+    for (i = m_degree - 1; i >= 0; --i) {
         double temp = pr * xr - pi * xi + m_coefficient_vector_ptr[i];
-        pi = pr * xi + pi * xr;
-        pr = temp;
+        pi          = pr * xi + pi * xr;
+        pr          = temp;
     }
 
     return;
@@ -504,11 +483,10 @@ void Polynomial::EvaluateComplex(double xr,
 
 void Polynomial::EvaluateComplex(double xr,
                                  double xi,
-                                 double & pr,
-                                 double & pi,
-                                 double & dr,
-                                 double & di) const
-{
+                                 double &pr,
+                                 double &pi,
+                                 double &dr,
+                                 double &di) const {
     //assert(m_degree >= 0);
 
     pr = m_coefficient_vector_ptr[m_degree];
@@ -517,22 +495,21 @@ void Polynomial::EvaluateComplex(double xr,
     di = 0;
 
     double temp = 0.0;
-    int i = 0;
+    int i       = 0;
 
-    for (i = m_degree - 1; i > 0; --i)
-    {
+    for (i = m_degree - 1; i > 0; --i) {
         temp = pr * xr - pi * xi + m_coefficient_vector_ptr[i];
-        pi = pr * xi + pi * xr;
-        pr = temp;
+        pi   = pr * xi + pi * xr;
+        pr   = temp;
 
         temp = dr * xr - di * xi + pr;
-        di = dr * xi + di * xr + pi;
-        dr = temp;
+        di   = dr * xi + di * xr + pi;
+        dr   = temp;
     }
 
     temp = pr * xr - pi * xi + m_coefficient_vector_ptr[0];
-    pi = pr * xi + pi * xr;
-    pr = temp;
+    pi   = pr * xi + pi * xr;
+    pr   = temp;
 
     return;
 }
@@ -556,8 +533,7 @@ void Polynomial::EvaluateComplex(double xr,
 //
 //======================================================================
 
-Polynomial Polynomial::Derivative() const
-{
+Polynomial Polynomial::Derivative() const {
     Polynomial derivative_polynomial;
 
     //------------------------------------------------------------------
@@ -567,8 +543,7 @@ Polynomial Polynomial::Derivative() const
 
     //assert(m_degree >= 0);
 
-    if (m_degree > 0)
-    {
+    if (m_degree > 0) {
         //--------------------------------------------------------------
         //  Set the size of the buffer for the derivative polynomial.
         //--------------------------------------------------------------
@@ -585,15 +560,12 @@ Polynomial Polynomial::Derivative() const
         //  Calculate the derivative polynomial.
         //--------------------------------------------------------------
 
-        double * temp_ptr = derivative_polynomial.m_coefficient_vector_ptr;
+        double *temp_ptr = derivative_polynomial.m_coefficient_vector_ptr;
 
-        for (int i = m_degree; i > 0; --i)
-        {
-            temp_ptr[i - 1] = (double)(i) * m_coefficient_vector_ptr[i];
+        for (int i = m_degree; i > 0; --i) {
+            temp_ptr[i - 1] = (double) (i) * m_coefficient_vector_ptr[i];
         }
-    }
-    else
-    {
+    } else {
         derivative_polynomial = 0.0;
     }
 
@@ -619,8 +591,7 @@ Polynomial Polynomial::Derivative() const
 //
 //======================================================================
 
-Polynomial Polynomial::Integral() const
-{
+Polynomial Polynomial::Integral() const {
     Polynomial integral_polynomial;
 
     //------------------------------------------------------------------
@@ -641,12 +612,11 @@ Polynomial Polynomial::Integral() const
     //  Calculate the integral polynomial.
     //------------------------------------------------------------------
 
-    double * temp_ptr = integral_polynomial.m_coefficient_vector_ptr;
-    int i = 0;
+    double *temp_ptr = integral_polynomial.m_coefficient_vector_ptr;
+    int i            = 0;
 
-    for (i = m_degree; i > 0; --i)
-    {
-        temp_ptr[i + 1] = m_coefficient_vector_ptr[i] / (double)(i + 1);
+    for (i = m_degree; i > 0; --i) {
+        temp_ptr[i + 1] = m_coefficient_vector_ptr[i] / (double) (i + 1);
     }
 
     return integral_polynomial;
@@ -672,8 +642,7 @@ Polynomial Polynomial::Integral() const
 //
 //======================================================================
 
-int Polynomial::Degree() const
-{
+int Polynomial::Degree() const {
     return m_degree;
 }
 
@@ -713,28 +682,61 @@ int Polynomial::Degree() const
 //
 //======================================================================
 
-PolynomialRootFinder::RootStatus_T Polynomial::FindRoots(double * real_zero_vector_ptr,
-                                                         double * imaginary_zero_vector_ptr,
-                                                         int * roots_found_ptr) const
-{
+PolynomialRootFinder::RootStatus_T Polynomial::FindRoots(double *real_zero_vector_ptr,
+                                                         double *imaginary_zero_vector_ptr,
+                                                         int *roots_found_ptr
+) const {
     //assert(m_degree >= 0);
 
-    PolynomialRootFinder * polynomial_root_finder_ptr = new PolynomialRootFinder;
+    if constexpr (root_finding_algo == JENKINS_TRAUB) {
+        PolynomialRootFinder *polynomial_root_finder_ptr = new PolynomialRootFinder;
 
-    if (polynomial_root_finder_ptr == NULL)
-    {
-        throw std::bad_alloc();
+        if (polynomial_root_finder_ptr == NULL) {
+            throw std::bad_alloc();
+        }
+
+        std::unique_ptr<PolynomialRootFinder> root_finder_ptr(polynomial_root_finder_ptr);
+        //std::auto_ptr<PolynomialRootFinder> root_finder_ptr(polynomial_root_finder_ptr);  //auto_ptr deprecated and replaced by unique_ptr
+
+        PolynomialRootFinder::RootStatus_T status = root_finder_ptr->FindRoots(m_coefficient_vector_ptr,
+                                                                               m_degree,
+                                                                               real_zero_vector_ptr,
+                                                                               imaginary_zero_vector_ptr,
+                                                                               roots_found_ptr);
+        return status;
+    } else if constexpr (root_finding_algo == NEWTON_MADSEN) {
+        double reversed_coeffs[MAX_COEFF];
+        for (int i = 0; i < m_degree + 1; i++) {
+            reversed_coeffs[i] = m_coefficient_vector_ptr[m_degree - i];
+        }
+
+        // Call our optimized implementation directly
+        *roots_found_ptr = PolynomialRootsNewton(
+            reversed_coeffs,
+            m_degree,
+            real_zero_vector_ptr,
+            imaginary_zero_vector_ptr
+        );
+
+
+        return PolynomialRootFinder::RootStatus_T::SUCCESS;
+    } else if constexpr (root_finding_algo == ABERTH_EHRLICH) {
+        double reversed_coeffs[MAX_COEFF];
+        for (int i = 0; i < m_degree + 1; i++) {
+            reversed_coeffs[i] = m_coefficient_vector_ptr[m_degree - i];
+        }
+
+        // Call our optimized implementation directly
+        *roots_found_ptr = PolynomialRootsAberth(
+            reversed_coeffs,
+            m_degree,
+            real_zero_vector_ptr,
+            imaginary_zero_vector_ptr
+        );
+
+
+        return PolynomialRootFinder::RootStatus_T::SUCCESS;
     }
-
-    std::unique_ptr<PolynomialRootFinder> root_finder_ptr(polynomial_root_finder_ptr);
-    //std::auto_ptr<PolynomialRootFinder> root_finder_ptr(polynomial_root_finder_ptr);  //auto_ptr deprecated and replaced by unique_ptr
-
-    PolynomialRootFinder::RootStatus_T status = root_finder_ptr->FindRoots(m_coefficient_vector_ptr,
-                                                                           m_degree,
-                                                                           real_zero_vector_ptr,
-                                                                           imaginary_zero_vector_ptr,
-                                                                           roots_found_ptr);
-    return status;
 }
 
 //======================================================================
@@ -757,10 +759,8 @@ PolynomialRootFinder::RootStatus_T Polynomial::FindRoots(double * real_zero_vect
 //
 //======================================================================
 
-void Polynomial::IncludeRealRoot(double real_value)
-{
-    if ((m_degree == 0) && (m_coefficient_vector_ptr[0] == 0.0))
-    {
+void Polynomial::IncludeRealRoot(double real_value) {
+    if ((m_degree == 0) && (m_coefficient_vector_ptr[0] == 0.0)) {
         SetToScalar(1.0);
     }
 
@@ -794,10 +794,8 @@ void Polynomial::IncludeRealRoot(double real_value)
 //
 //======================================================================
 
-void Polynomial::IncludeComplexConjugateRootPair(double real_value, double imag_value)
-{
-    if ((m_degree == 0) && (m_coefficient_vector_ptr[0] == 0.0))
-    {
+void Polynomial::IncludeComplexConjugateRootPair(double real_value, double imag_value) {
+    if ((m_degree == 0) && (m_coefficient_vector_ptr[0] == 0.0)) {
         SetToScalar(1.0);
     }
 
@@ -840,10 +838,9 @@ void Polynomial::IncludeComplexConjugateRootPair(double real_value, double imag_
 //
 //======================================================================
 
-bool Polynomial::Divide(const Polynomial & divisor_polynomial,
-                        Polynomial & quotient_polynomial,
-                        Polynomial & remainder_polynomial) const
-{
+bool Polynomial::Divide(const Polynomial &divisor_polynomial,
+                        Polynomial &quotient_polynomial,
+                        Polynomial &remainder_polynomial) const {
     //------------------------------------------------------------------
     //  If the divisor is zero then fail.
     //------------------------------------------------------------------
@@ -851,25 +848,24 @@ bool Polynomial::Divide(const Polynomial & divisor_polynomial,
     int divisor_degree = divisor_polynomial.Degree();
 
     bool non_zero_divisor_flag = ((divisor_polynomial.Degree() != 0)
-                                     || (divisor_polynomial[0] != 0.0));
+                                  || (divisor_polynomial[0] != 0.0));
 
-    if (non_zero_divisor_flag)
-    {
+    if (non_zero_divisor_flag) {
         //--------------------------------------------------------------
         //  If this dividend polynomial's degree is not greater than
         //  or equal to the divisor polynomial's degree then do the division.
         //--------------------------------------------------------------
 
-        remainder_polynomial = *this;
-        int dividend_degree = Degree();
-        quotient_polynomial = 0.0;
+        remainder_polynomial        = *this;
+        int dividend_degree         = Degree();
+        quotient_polynomial         = 0.0;
         int quotient_maximum_degree = dividend_degree - divisor_degree + 1;
         quotient_polynomial.SetLength(quotient_maximum_degree);
-        quotient_polynomial.m_degree = -1;
-        double * quotient_coefficient_ptr =
-            quotient_polynomial.m_coefficient_vector_ptr;
-        double * dividend_coefficient_ptr =
-            remainder_polynomial.m_coefficient_vector_ptr;
+        quotient_polynomial.m_degree     = -1;
+        double *quotient_coefficient_ptr =
+                quotient_polynomial.m_coefficient_vector_ptr;
+        double *dividend_coefficient_ptr =
+                remainder_polynomial.m_coefficient_vector_ptr;
         double leading_divisor_coefficient = divisor_polynomial[divisor_degree];
 
         //--------------------------------------------------------------
@@ -881,8 +877,7 @@ bool Polynomial::Divide(const Polynomial & divisor_polynomial,
 
         for (dividend_index = dividend_degree;
              dividend_index >= divisor_degree;
-             --dividend_index)
-        {
+             --dividend_index) {
             //----------------------------------------------------------
             //  Subtract the scaled divisor from the dividend.
             //----------------------------------------------------------
@@ -896,8 +891,7 @@ bool Polynomial::Divide(const Polynomial & divisor_polynomial,
             quotient_polynomial.m_degree += 1;
             int j = 0;
 
-            for (j = quotient_polynomial.m_degree; j >= 1; --j)
-            {
+            for (j = quotient_polynomial.m_degree; j >= 1; --j) {
                 quotient_coefficient_ptr[j] = quotient_coefficient_ptr[j - 1];
             }
 
@@ -909,8 +903,7 @@ bool Polynomial::Divide(const Polynomial & divisor_polynomial,
 
             int dividend_degree_index = dividend_index;
 
-            for (j = divisor_degree; j >=0; --j)
-            {
+            for (j = divisor_degree; j >= 0; --j) {
                 dividend_coefficient_ptr[dividend_degree_index] -= divisor_polynomial[j] * scale_value;
                 --dividend_degree_index;
             }
@@ -923,10 +916,8 @@ bool Polynomial::Divide(const Polynomial & divisor_polynomial,
 
         remainder_polynomial.AdjustPolynomialDegree();
         quotient_polynomial.AdjustPolynomialDegree();
-    }
-    else
-    {
-        quotient_polynomial = DBL_MAX;
+    } else {
+        quotient_polynomial  = DBL_MAX;
         remainder_polynomial = 0.0;
     }
 
@@ -953,16 +944,14 @@ bool Polynomial::Divide(const Polynomial & divisor_polynomial,
 //
 //======================================================================
 
-double Polynomial::operator [](int power_index) const
-{
+double Polynomial::operator [](int power_index) const {
     //------------------------------------------------------------------
     //  Ensure that the index is within range.
     //------------------------------------------------------------------
 
     //assert(m_degree >= 0);
 
-    if ((power_index < 0) || (power_index > m_degree))
-    {
+    if ((power_index < 0) || (power_index > m_degree)) {
         Rf_error("Polynomial index out of range");
     }
 
@@ -989,16 +978,14 @@ double Polynomial::operator [](int power_index) const
 //
 //======================================================================
 
-double & Polynomial::operator [](int power_index)
-{
+double &Polynomial::operator [](int power_index) {
     //------------------------------------------------------------------
     //  Ensure that the index is within range.
     //------------------------------------------------------------------
 
     //assert(m_degree >= 0);
 
-    if ((power_index < 0) || (power_index > m_degree))
-    {
+    if ((power_index < 0) || (power_index > m_degree)) {
         Rf_error("Polynomial index out of range");
     }
 
@@ -1024,30 +1011,23 @@ double & Polynomial::operator [](int power_index)
 //
 //======================================================================
 
-Polynomial Polynomial::operator +=(const Polynomial & polynomial)
-{
+Polynomial Polynomial::operator +=(const Polynomial &polynomial) {
     //assert(m_degree >= 0);
 
     int i = 0;
 
-    if (m_degree >= polynomial.m_degree)
-    {
-        for (i = 0; i <= polynomial.m_degree; ++i)
-        {
+    if (m_degree >= polynomial.m_degree) {
+        for (i = 0; i <= polynomial.m_degree; ++i) {
             m_coefficient_vector_ptr[i] += polynomial.m_coefficient_vector_ptr[i];
         }
-    }
-    else
-    {
+    } else {
         SetLength(polynomial.m_degree + 1, true);
 
-        for (i = 0; i <= m_degree; ++i)
-        {
+        for (i = 0; i <= m_degree; ++i) {
             m_coefficient_vector_ptr[i] += polynomial.m_coefficient_vector_ptr[i];
         }
 
-        for (i = m_degree + 1; i <= polynomial.m_degree; ++i)
-        {
+        for (i = m_degree + 1; i <= polynomial.m_degree; ++i) {
             m_coefficient_vector_ptr[i] = polynomial.m_coefficient_vector_ptr[i];
         }
 
@@ -1083,8 +1063,7 @@ Polynomial Polynomial::operator +=(const Polynomial & polynomial)
 //
 //======================================================================
 
-Polynomial Polynomial::operator +=(double scalar)
-{
+Polynomial Polynomial::operator +=(double scalar) {
     //assert(m_degree >= 0);
 
     m_coefficient_vector_ptr[0] += scalar;
@@ -1111,30 +1090,23 @@ Polynomial Polynomial::operator +=(double scalar)
 //
 //======================================================================
 
-Polynomial Polynomial::operator -=(const Polynomial & polynomial)
-{
+Polynomial Polynomial::operator -=(const Polynomial &polynomial) {
     //assert(m_degree >= 0);
 
     int i = 0;
 
-    if (m_degree >= polynomial.m_degree)
-    {
-        for (i = 0; i <= polynomial.m_degree; ++i)
-        {
+    if (m_degree >= polynomial.m_degree) {
+        for (i = 0; i <= polynomial.m_degree; ++i) {
             m_coefficient_vector_ptr[i] -= polynomial.m_coefficient_vector_ptr[i];
         }
-    }
-    else
-    {
+    } else {
         SetLength(polynomial.m_degree + 1, true);
 
-        for (i = 0; i <= m_degree; ++i)
-        {
+        for (i = 0; i <= m_degree; ++i) {
             m_coefficient_vector_ptr[i] -= polynomial.m_coefficient_vector_ptr[i];
         }
 
-        for (i = m_degree + 1; i <= polynomial.m_degree; ++i)
-        {
+        for (i = m_degree + 1; i <= polynomial.m_degree; ++i) {
             m_coefficient_vector_ptr[i] = -polynomial.m_coefficient_vector_ptr[i];
         }
 
@@ -1170,8 +1142,7 @@ Polynomial Polynomial::operator -=(const Polynomial & polynomial)
 //
 //======================================================================
 
-Polynomial Polynomial::operator -=(double scalar)
-{
+Polynomial Polynomial::operator -=(double scalar) {
     //assert(m_degree >= 0);
 
     m_coefficient_vector_ptr[0] -= scalar;
@@ -1198,8 +1169,7 @@ Polynomial Polynomial::operator -=(double scalar)
 //
 //======================================================================
 
-Polynomial Polynomial::operator *=(const Polynomial & polynomial)
-{
+Polynomial Polynomial::operator *=(const Polynomial &polynomial) {
     //------------------------------------------------------------------
     //  Create a temporary buffer to hold the product of the two
     //  polynomials.
@@ -1211,7 +1181,7 @@ Polynomial Polynomial::operator *=(const Polynomial & polynomial)
 
     std::vector<double> temp_vector;
     temp_vector.resize(convolution_length + 1);
-    double * temp_vector_ptr = &temp_vector[0];
+    double *temp_vector_ptr = &temp_vector[0];
 
     //------------------------------------------------------------------
     //  Zero the temporary buffer.
@@ -1219,8 +1189,7 @@ Polynomial Polynomial::operator *=(const Polynomial & polynomial)
 
     int i = 0;
 
-    for (i = 0; i < convolution_length; ++i)
-    {
+    for (i = 0; i < convolution_length; ++i) {
         temp_vector_ptr[i] = 0.0;
     }
 
@@ -1228,10 +1197,8 @@ Polynomial Polynomial::operator *=(const Polynomial & polynomial)
     //  Calculate the convolution in the temporary buffer.
     //------------------------------------------------------------------
 
-    for (i = 0; i <= m_degree; ++i)
-    {
-        for (int j = 0; j <= polynomial.m_degree; ++j)
-        {
+    for (i = 0; i <= m_degree; ++i) {
+        for (int j = 0; j <= polynomial.m_degree; ++j) {
             temp_vector_ptr[i + j] += m_coefficient_vector_ptr[i] * polynomial.m_coefficient_vector_ptr[j];
         }
     }
@@ -1240,7 +1207,7 @@ Polynomial Polynomial::operator *=(const Polynomial & polynomial)
     //  Make sure this buffer is large enough for the product.
     //------------------------------------------------------------------
 
-    SetLength((unsigned int)(convolution_length), false);
+    SetLength((unsigned int) (convolution_length), false);
 
     //------------------------------------------------------------------
     //  Store the result in this instance.
@@ -1248,8 +1215,7 @@ Polynomial Polynomial::operator *=(const Polynomial & polynomial)
 
     m_degree = convolution_length - 1;
 
-    for (i = 0; i <= m_degree; ++i)
-    {
+    for (i = 0; i <= m_degree; ++i) {
         m_coefficient_vector_ptr[i] = temp_vector_ptr[i];
     }
 
@@ -1282,14 +1248,12 @@ Polynomial Polynomial::operator *=(const Polynomial & polynomial)
 //
 //======================================================================
 
-Polynomial Polynomial::operator *=(double scalar)
-{
+Polynomial Polynomial::operator *=(double scalar) {
     //assert(m_degree >= 0);
 
     int i = 0;
 
-    for (i = 0; i <= m_degree; ++i)
-    {
+    for (i = 0; i <= m_degree; ++i) {
         m_coefficient_vector_ptr[i] *= scalar;
     }
 
@@ -1322,14 +1286,12 @@ Polynomial Polynomial::operator *=(double scalar)
 //
 //======================================================================
 
-Polynomial Polynomial::operator /=(double scalar)
-{
+Polynomial Polynomial::operator /=(double scalar) {
     //assert(m_degree >= 0);
 
     int i = 0;
 
-    for (i = 0; i <= m_degree; ++i)
-    {
+    for (i = 0; i <= m_degree; ++i) {
         m_coefficient_vector_ptr[i] /= scalar;
     }
 
@@ -1355,8 +1317,7 @@ Polynomial Polynomial::operator /=(double scalar)
 //
 //======================================================================
 
-Polynomial Polynomial::operator +()
-{
+Polynomial Polynomial::operator +() {
     //assert(m_degree >= 0);
     return *this;
 }
@@ -1383,12 +1344,10 @@ Polynomial Polynomial::operator +()
 //
 //======================================================================
 
-Polynomial Polynomial::operator -()
-{
+Polynomial Polynomial::operator -() {
     //assert(m_degree >= 0);
 
-    for (int i = 0; i <= m_degree; ++i)
-    {
+    for (int i = 0; i <= m_degree; ++i) {
         m_coefficient_vector_ptr[i] = -m_coefficient_vector_ptr[i];
     }
 
@@ -1414,8 +1373,7 @@ Polynomial Polynomial::operator -()
 //
 //======================================================================
 
-Polynomial Polynomial::operator =(double scalar)
-{
+Polynomial Polynomial::operator =(double scalar) {
     SetCoefficients(&scalar, 0);
     return *this;
 }
@@ -1439,10 +1397,8 @@ Polynomial Polynomial::operator =(double scalar)
 //
 //======================================================================
 
-Polynomial Polynomial::operator =(const Polynomial & polynomial)
-{
-    if (this != &polynomial)
-    {
+Polynomial Polynomial::operator =(const Polynomial &polynomial) {
+    if (this != &polynomial) {
         Copy(polynomial);
     }
 
@@ -1469,16 +1425,14 @@ Polynomial Polynomial::operator =(const Polynomial & polynomial)
 //
 //======================================================================
 
-void Polynomial::AdjustPolynomialDegree()
-{
+void Polynomial::AdjustPolynomialDegree() {
     //------------------------------------------------------------------
     //  Any leading coefficient with a magnitude less than DBL_EPSILON
     //  is treated as if it was zero.
     //------------------------------------------------------------------
 
     while ((m_degree > 0)
-        && (fabs(m_coefficient_vector_ptr[m_degree]) < DBL_EPSILON))
-    {
+           && (fabs(m_coefficient_vector_ptr[m_degree]) < DBL_EPSILON)) {
         m_coefficient_vector_ptr[m_degree] = 0.0;
         m_degree--;
     }
@@ -1505,14 +1459,12 @@ void Polynomial::AdjustPolynomialDegree()
 //
 //======================================================================
 
-void Polynomial::Copy(const Polynomial & polynomial)
-{
+void Polynomial::Copy(const Polynomial &polynomial) {
     SetLength(polynomial.m_degree + 1);
 
     m_degree = polynomial.m_degree;
 
-    for (int i = 0; i <= m_degree; ++i)
-    {
+    for (int i = 0; i <= m_degree; ++i) {
         m_coefficient_vector_ptr[i] = polynomial.m_coefficient_vector_ptr[i];
     }
 
@@ -1551,28 +1503,22 @@ void Polynomial::Copy(const Polynomial & polynomial)
 //======================================================================
 
 void Polynomial::SetLength(unsigned int number_of_coefficients,
-                           bool copy_data_flag)
-{
-
+                           bool copy_data_flag) {
     // If m_degree is equal to -1, then this is a new polynomial and the
     // caller will set m_degree.
-    if ((!copy_data_flag) || (m_degree == -1))
-    {
+    if ((!copy_data_flag) || (m_degree == -1)) {
         // Clear and resize the coefficient vector.
         m_coefficient_vector.clear();
         m_coefficient_vector.resize(number_of_coefficients);
         m_coefficient_vector_ptr = &m_coefficient_vector[0];
-    }
-    else
-    {
+    } else {
         // Save the polynomial values in a temporary vector.
         std::vector<double> temp_vector;
         temp_vector.resize(m_degree + 1);
 
         int i = 0;
 
-        for (i = 0; i <= m_degree; ++i)
-        {
+        for (i = 0; i <= m_degree; ++i) {
             temp_vector[i] = m_coefficient_vector_ptr[i];
         }
 
@@ -1583,23 +1529,17 @@ void Polynomial::SetLength(unsigned int number_of_coefficients,
 
         // Restore the coefficients for the new vector size.
         // Was the polynomial size increased?
-        if (number_of_coefficients > (unsigned int)(m_degree + 1))
-        {
+        if (number_of_coefficients > (unsigned int) (m_degree + 1)) {
             // The polynomial size was increased.
-            for (i = 0; i <= m_degree; ++i)
-            {
+            for (i = 0; i <= m_degree; ++i) {
                 m_coefficient_vector_ptr[i] = temp_vector[i];
             }
 
-            for (i = m_degree + 1; i < (int)(number_of_coefficients); ++i)
-            {
+            for (i = m_degree + 1; i < (int) (number_of_coefficients); ++i) {
                 m_coefficient_vector_ptr[i] = 0.0;
             }
-        }
-        else
-        {
-            for (int i = 0; i < (int)(number_of_coefficients); ++i)
-            {
+        } else {
+            for (int i = 0; i < (int) (number_of_coefficients); ++i) {
                 m_coefficient_vector_ptr[i] = temp_vector[i];
             }
         }
@@ -1616,9 +1556,8 @@ void Polynomial::SetLength(unsigned int number_of_coefficients,
 //  Addition of two instances of this class.
 //======================================================================
 
-Polynomial operator +(const Polynomial & polynomial_0,
-                      const Polynomial & polynomial_1)
-{
+Polynomial operator +(const Polynomial &polynomial_0,
+                      const Polynomial &polynomial_1) {
     return Polynomial(polynomial_0) += polynomial_1;
 }
 
@@ -1626,15 +1565,13 @@ Polynomial operator +(const Polynomial & polynomial_0,
 //  Addition of an instance of the Polynomial class and a scalar.
 //======================================================================
 
-Polynomial operator +(const Polynomial & polynomial,
-                      double scalar)
-{
+Polynomial operator +(const Polynomial &polynomial,
+                      double scalar) {
     return Polynomial(polynomial) += scalar;
 }
 
 Polynomial operator +(double scalar,
-                      const Polynomial & polynomial)
-{
+                      const Polynomial &polynomial) {
     return Polynomial(polynomial) += scalar;
 }
 
@@ -1642,9 +1579,8 @@ Polynomial operator +(double scalar,
 //  Subtraction of two instances of this class.
 //======================================================================
 
-Polynomial operator -(const Polynomial & minuend_polynomial,
-                      const Polynomial & subtrahend_polynomial)
-{
+Polynomial operator -(const Polynomial &minuend_polynomial,
+                      const Polynomial &subtrahend_polynomial) {
     return Polynomial(minuend_polynomial) -= subtrahend_polynomial;
 }
 
@@ -1652,15 +1588,13 @@ Polynomial operator -(const Polynomial & minuend_polynomial,
 //  Subtraction with an instance of the Polynomial class and a scalar.
 //======================================================================
 
-Polynomial operator -(const Polynomial & minuend_polynomial,
-                      double scalar)
-{
+Polynomial operator -(const Polynomial &minuend_polynomial,
+                      double scalar) {
     return Polynomial(minuend_polynomial) -= scalar;
 }
 
 Polynomial operator -(double scalar,
-                      const Polynomial & polynomial)
-{
+                      const Polynomial &polynomial) {
     return (-Polynomial(polynomial)) + scalar;
 }
 
@@ -1668,9 +1602,8 @@ Polynomial operator -(double scalar,
 //  Multiplication of two instances of this class.
 //======================================================================
 
-Polynomial operator *(const Polynomial & polynomial_0,
-                      const Polynomial & polynomial_1)
-{
+Polynomial operator *(const Polynomial &polynomial_0,
+                      const Polynomial &polynomial_1) {
     return Polynomial(polynomial_0) *= polynomial_1;
 }
 
@@ -1678,15 +1611,13 @@ Polynomial operator *(const Polynomial & polynomial_0,
 //  Multiplication of an instance of the Polynomial class and a scalar.
 //======================================================================
 
-Polynomial operator *(const Polynomial & polynomial,
-                      double scalar)
-{
+Polynomial operator *(const Polynomial &polynomial,
+                      double scalar) {
     return Polynomial(polynomial) *= scalar;
 }
 
 Polynomial operator *(double scalar,
-                      const Polynomial & polynomial)
-{
+                      const Polynomial &polynomial) {
     return Polynomial(polynomial) *= scalar;
 }
 
@@ -1694,8 +1625,7 @@ Polynomial operator *(double scalar,
 //  Division with an instance of the Polynomial class and a scalar.
 //======================================================================
 
-Polynomial operator /(const Polynomial & polynomial,
-                      double scalar)
-{
+Polynomial operator /(const Polynomial &polynomial,
+                      double scalar) {
     return Polynomial(polynomial) /= scalar;
 }

@@ -6624,8 +6624,8 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
       for (j = i + 1; j <= (*nsel); j++) { coef[3] -= (XtX->at(sel[i - 1] * (*p) + sel[j - 1])) * th[j]; }
       coef[3] = coef[3] / (*phi);
       coef[4] = -(XtX->at(sel[i - 1] * (*p) + sel[i - 1])) / (*phi);
-      // poly.SetCoefficients(coef, 4);
-      // (*status) = poly.FindRoots(real_vector, imag_vector, &root_count);
+      poly.SetCoefficients(coef, 4);
+      (*status) = poly.FindRoots(real_vector, imag_vector, &root_count);
       //
       // // Print real_vector
       // std::cout << "real_vector = [ ";
@@ -6647,9 +6647,9 @@ void imomModeK(double *th, PolynomialRootFinder::RootStatus_T *status, crossprod
       // }
       // std::cout << " ]" << std::endl;
 
-      PolynomialRootFinder finder;
-      // (*status) = finder.FindRootsNewton(coef, 4, real_vector, imag_vector, &root_count);
-      (*status) = finder.FindRootsAberth(coef, 4, real_vector, imag_vector, &root_count);
+      // PolynomialRootFinder finder;
+      // // (*status) = finder.FindRootsNewton(coef, 4, real_vector, imag_vector, &root_count);
+      // (*status) = finder.FindRootsAberth(coef, 4, real_vector, imag_vector, &root_count);
 
       j     = 0;
       found = false;

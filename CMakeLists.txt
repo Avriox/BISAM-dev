@@ -116,9 +116,11 @@ add_executable(BISAM main.cpp
         src/mombf_bridge.cpp
         src/modelselection_strategy.cpp
         src/utils.cpp
-        include/global_storage.h
+        include/globals.h
         include/newton_solver.h
         include/aberth_solver.h
+        include/fast_polynomial_solver.h
+        src/fast_polynomial_solver.cpp
 )
 
 # Include all necessary directories for header lookup

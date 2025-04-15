@@ -8,7 +8,7 @@
 #include "modelSel_regression.h"
 #include "ggm.h"
 #include "cstat.h"
-#include "global_storage.h"
+#include "globals.h"
 using namespace std;
 
 

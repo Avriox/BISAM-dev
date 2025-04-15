@@ -39,8 +39,8 @@
 #include <vector>
 #include <math.h>
 #include <float.h>
-#include "global_storage.h"
-#include "newton_solver.h"
+#include "globals.h"
+#include "fast_polynomial_solver.h"
 
 //======================================================================
 //  Class definition.
@@ -97,6 +97,7 @@ public:
         FAILED_TO_CONVERGE
     };
 
+
     PolynomialRootFinder();
 
     virtual ~PolynomialRootFinder();
@@ -107,17 +108,17 @@ public:
                                                  double *imaginary_zero_vector_ptr,
                                                  int *number_of_roots_found_ptr = 0);
 
-    PolynomialRootFinder::RootStatus_T FindRootsNewton(double *coefficient_ptr,
-                                                       int degree,
-                                                       double *real_zero_vector_ptr,
-                                                       double *imaginary_zero_vector_ptr,
-                                                       int *number_of_roots_found_ptr = 0);
-
-    PolynomialRootFinder::RootStatus_T FindRootsAberth(double *coefficient_ptr,
-                                                       int degree,
-                                                       double *real_zero_vector_ptr,
-                                                       double *imaginary_zero_vector_ptr,
-                                                       int *number_of_roots_found_ptr = 0);
+    // PolynomialRootFinder::RootStatus_T FindRootsNewton(double *coefficient_ptr,
+    //                                                    int degree,
+    //                                                    double *real_zero_vector_ptr,
+    //                                                    double *imaginary_zero_vector_ptr,
+    //                                                    int *number_of_roots_found_ptr = 0);
+    //
+    // PolynomialRootFinder::RootStatus_T FindRootsAberth(double *coefficient_ptr,
+    //                                                    int degree,
+    //                                                    double *real_zero_vector_ptr,
+    //                                                    double *imaginary_zero_vector_ptr,
+    //                                                    int *number_of_roots_found_ptr = 0);
 
 private:
     int Fxshfr(int l2var);
