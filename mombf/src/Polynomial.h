@@ -55,7 +55,9 @@
 
 class Polynomial {
 protected:
-    std::vector<double> m_coefficient_vector;
+    // [BISAM] init vector with correct length to minimnize resizing
+    std::vector<double> m_coefficient_vector = std::vector<double>(5);
+
     int m_degree;
     double *m_coefficient_vector_ptr;
 

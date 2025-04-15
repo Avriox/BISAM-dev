@@ -5,6 +5,9 @@
 
 #include "fast_polynomial_solver.h"
 
+#include <iostream>
+#include <ostream>
+
 // ===== Common helper functions =====
 
 // Ultra-fast hashing function specialized for our specific polynomial structure
@@ -83,6 +86,9 @@ static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, double z_re, do
     return e;
 }
 
+// Precomputed constant for machine epsilon (calculate once at startup)
+static constexpr double MACHINE_EPSILON = 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
+
 // Calculate upper bound for rounding errors (Adam's test)
 static double CalculateUpperBound(const double a[MAX_COEFF], int n, double z_re, double z_im) {
     double p = -2.0 * z_re;
@@ -102,8 +108,11 @@ static double CalculateUpperBound(const double a[MAX_COEFF], int n, double z_re,
 
     t = a[n] + z_re * r - q * s;
     e = u * e + fabs(t);
+    // e = (4.5 * e - 3.5 * (fabs(t) + fabs(r) * u) +
+    //      fabs(z_re) * fabs(r)) * 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
     e = (4.5 * e - 3.5 * (fabs(t) + fabs(r) * u) +
-         fabs(z_re) * fabs(r)) * 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
+         fabs(z_re) * fabs(r)) * MACHINE_EPSILON;
+
 
     return e;
 }

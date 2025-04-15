@@ -682,6 +682,7 @@ int Polynomial::Degree() const {
 //
 //======================================================================
 
+// [BISAM] added switch to switch between algos
 PolynomialRootFinder::RootStatus_T Polynomial::FindRoots(double *real_zero_vector_ptr,
                                                          double *imaginary_zero_vector_ptr,
                                                          int *roots_found_ptr
