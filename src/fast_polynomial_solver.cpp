@@ -58,8 +58,11 @@ static double ComputeStartPoint(const double a[MAX_COEFF], int n) {
         }
     }
 
-    return min * 0.5;
+    double result = min * 0.5;
+
+    return result;
 }
+
 
 // Evaluate a polynomial with real coefficients using Horner's method
 // Directly calculates real and imaginary parts without using complex numbers
@@ -356,6 +359,7 @@ int PolynomialRootsNewton(
         r     = rprev *= Max_stepsize; // Make a reasonable radius of the maximum step size allowed
 
         // Preliminary eps computed at point P(0) by a crude estimation
+        // TODO Epsislon can be pre computed!
         eps = 2 * n * pzprev.apz * pow((double) _DBL_RADIX, -DBL_MANT_DIG);
 
         // Start iteration
