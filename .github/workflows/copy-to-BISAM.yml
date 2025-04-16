@@ -26,9 +26,26 @@ jobs:
           mkdir -p "$TEMP_DIR/src"
           echo "Created $TEMP_DIR/src directory"
 
-          echo "Searching for .cpp and .h files (excluding main.cpp)..."
+          echo "Searching for source files..."
+          # First copy all .cpp and .h files (excluding main.cpp)
           find . -path ./$TEMP_DIR -prune -o -type f \( -name '*.cpp' -o -name '*.h' \) -not -name 'main.cpp' -print -exec cp {} "$TEMP_DIR/src/" \;
-          echo "Copied C++/H files to $TEMP_DIR/src/"
+          
+          # Also copy Makevars and Makevars.win if they exist
+          if [ -f "src/Makevars" ]; then
+            cp src/Makevars "$TEMP_DIR/src/"
+            echo "Copied src/Makevars"
+          else
+            echo "No src/Makevars file found."
+          fi
+          
+          if [ -f "src/Makevars.win" ]; then
+            cp src/Makevars.win "$TEMP_DIR/src/"
+            echo "Copied src/Makevars.win"
+          else
+            echo "No src/Makevars.win file found."
+          fi
+          
+          echo "Copied source files to $TEMP_DIR/src/"
 
           echo "Copying standard R package components..."
           # Copy directories if they exist

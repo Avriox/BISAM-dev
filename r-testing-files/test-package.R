@@ -5,9 +5,9 @@ remove.packages(c("BISAM", "bisam"))
 
 library(Rcpp)
 # 
-setwd("/Users/jakobgoldmann/Documents/Uni/WU/BISAM/")
+setwd("~/uni/wu/BISAM/")
 Rcpp::compileAttributes(verbose = TRUE)
-install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean=TRUE)
+install.packages("./", repos = NULL, type = "source", verbose = TRUE)
 
 library(BISAM)
 
