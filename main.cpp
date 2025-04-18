@@ -146,6 +146,10 @@ int main() {
     int r           = 1;
     double alpha    = 0.01;
     double lambda   = 0.01;
+    arma::Col<int> new_par_include_vars;
+
+    // = arma::Col<int>(51, arma::fill::zeros);
+    // new_par_include_vars[0]             = 1;
 
     bisam::BisamResult result2 = bisam::estimate_model(data,
                                                        0,
@@ -166,6 +170,7 @@ int main() {
                                                        false,
                                                        true,
                                                        true,
+                                                       new_par_include_vars,
                                                        method,
                                                        hesstype,
                                                        optimMethod,
@@ -175,7 +180,7 @@ int main() {
                                                        r,
                                                        alpha,
                                                        lambda,
-                                                       bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
+                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
 
     timer.end_section("Split Sequential");
     // timer.start_section("Split Parallel");

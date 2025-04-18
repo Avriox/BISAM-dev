@@ -26,6 +26,7 @@ namespace bisam {
                                   double prDeltap,
                                   arma::vec thinit,
                                   InitType initpar_type,
+                                  arma::Col<int> include_vars,
                                   int method      = 0,
                                   int hesstype    = 1,
                                   int optimMethod = 2,
@@ -34,7 +35,8 @@ namespace bisam {
                                   int knownphi    = 1,
                                   int r           = 1,
                                   double alpha    = 0.01,
-                                  double lambda   = 0.01);
+                                  double lambda   = 0.01
+    );
 
     arma::Col<int> modelSelectionGibbsCI(const arma::vec &SpostModeini,
                                          double SpostModeiniProb,

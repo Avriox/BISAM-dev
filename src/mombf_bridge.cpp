@@ -26,6 +26,7 @@ namespace bisam {
                                   double prDeltap,
                                   arma::vec thinit,
                                   InitType initpar_type,
+                                  arma::Col<int> include_vars,
                                   int method,
                                   int hesstype,
                                   int optimMethod,
@@ -67,11 +68,11 @@ namespace bisam {
         // Translation of the respective R code:
         // ndeltaini <- as.integer(sum(deltaini | includevars))
         // deltaini <- as.integer(which(deltaini | includevars) - 1)
-        arma::Col<int> includevars(p); // = arma::vec().zeros(p);
-        includevars.fill(arma::fill::zeros);
+        // arma::Col<int> includevars(p); // = arma::vec().zeros(p);
+        // includevars.fill(arma::fill::zeros);
 
-        int ndeltaini           = arma::sum(deltaini_input || includevars);
-        arma::uvec indices      = arma::find(deltaini_input || includevars);
+        int ndeltaini           = arma::sum(deltaini_input || include_vars);
+        arma::uvec indices      = arma::find(deltaini_input || include_vars);
         arma::Col<int> deltaini = arma::conv_to<arma::Col<int> >::from(indices);
 
         /* ------------------- ystd, sumy2, sumy, xstd, colsumsx -------------------- */
@@ -327,7 +328,7 @@ namespace bisam {
                                                       burnin,
                                                       ndeltaini,
                                                       deltaini,
-                                                      includevars,
+                                                      include_vars,
                                                       n,
                                                       p,
                                                       ystd,

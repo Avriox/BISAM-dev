@@ -56,6 +56,7 @@ namespace bisam {
         arma::mat common_x;
         std::vector<arma::vec> y_parts;
         std::vector<arma::Col<int> > delta_init_parts;
+        std::vector<arma::Col<int> > include_vars_parts;
         std::vector<arma::vec> theta_init_parts;
         std::vector<size_t> start_columns;
         std::vector<size_t> end_columns;

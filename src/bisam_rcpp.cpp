@@ -41,7 +41,8 @@ Rcpp::List rcpp_estimate_model(
     int new_par_r,
     double new_par_alpha,
     double new_par_lambda,
-    int computation_strategy
+    int computation_strategy,
+    arma::Col<int> new_par_include_vars
 ) {
     // Call the C++ function
 
@@ -65,6 +66,7 @@ Rcpp::List rcpp_estimate_model(
         tfe,
         iis,
         sis,
+        new_par_include_vars,
         new_par_method,
         new_par_hesstype,
         new_par_optim_method,
