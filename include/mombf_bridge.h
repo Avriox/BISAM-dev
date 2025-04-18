@@ -26,7 +26,7 @@ namespace bisam {
                                   double prDeltap,
                                   arma::vec thinit,
                                   InitType initpar_type,
-                                  arma::Col<int> include_vars,
+                                  // arma::Col<int> include_vars,
                                   int method      = 0,
                                   int hesstype    = 1,
                                   int optimMethod = 2,

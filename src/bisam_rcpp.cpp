@@ -70,7 +70,7 @@ Rcpp::List rcpp_estimate_model(
         tfe,
         iis,
         sis,
-        new_par_include_vars,
+        // new_par_include_vars,
         new_par_method,
         new_par_hesstype,
         new_par_optim_method,

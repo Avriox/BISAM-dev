@@ -35,7 +35,7 @@ namespace bisam {
                                bool tfe,
                                bool iis,
                                bool sis,
-                               arma::Col<int> new_par_include_vars,
+                               // arma::Col<int> new_par_include_vars,
                                int new_par_method,
                                int new_par_hesstype,
                                int new_par_optim_method,
@@ -235,9 +235,9 @@ namespace bisam {
         arma::Col<int> w_i(r, arma::fill::zeros);
 
         // If includevars is null, make sure it has the same length as w_i
-        if (new_par_include_vars.empty()) {
-            new_par_include_vars = arma::Col<int>(r, arma::fill::zeros);
-        }
+        // if (new_par_include_vars.empty()) {
+        //     new_par_include_vars = arma::Col<int>(r, arma::fill::zeros);
+        // }
 
         // TODO Catch include vars length error mismatch
 
@@ -436,7 +436,7 @@ namespace bisam {
                                                                        0.5,
                                                                        thinit,
                                                                        initpar_type,
-                                                                       new_par_include_vars,
+                                                                       // new_par_include_vars,
                                                                        new_par_method,
                                                                        new_par_hesstype,
                                                                        new_par_optim_method,

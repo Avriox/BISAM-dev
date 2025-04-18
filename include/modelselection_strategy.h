@@ -31,7 +31,7 @@ namespace bisam {
                                                  arma::vec thinit,
                                                  InitType initpar_type,
                                                  // NEW PARAMETERS
-                                                 arma::Col<int> &include_vars,
+                                                 // arma::Col<int> &include_vars,
                                                  int method      = 0,
                                                  int hesstype    = 1,
                                                  int optimMethod = 2,
@@ -51,7 +51,7 @@ namespace bisam {
         const arma::mat &x,
         arma::Col<int> &delta_initial,
         arma::vec &theta_init,
-        arma::Col<int> &include_vars, // Added parameter to match deltaini_input handling
+        // arma::Col<int> &include_vars, // Added parameter to match deltaini_input handling
         int num_partitions
     );
 
@@ -95,7 +95,7 @@ namespace bisam {
             double prDeltap,
             arma::vec thinit,
             InitType initpar_type,
-            arma::Col<int> &include_vars,
+            // arma::Col<int> &include_vars,
             int method,
             int hesstype,
             int optimMethod,

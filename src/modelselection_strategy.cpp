@@ -78,7 +78,7 @@ namespace bisam {
         double prDeltap,
         arma::vec thinit,
         InitType initpar_type,
-        arma::Col<int> &include_vars,
+        // arma::Col<int> &include_vars,
         int method,
         int hesstype,
         int optimMethod,
@@ -106,7 +106,9 @@ namespace bisam {
         }
 
         // Prepare the split data - updated to pass include_vars to partition_data
-        DataPartition split_data = partition_data(y, x, deltaini_input, thinit, include_vars, n);
+        DataPartition split_data = partition_data(y, x, deltaini_input, thinit
+                                                  // , include_vars
+                                                  , n);
 
         // Initialize vector for results with appropriate padding to avoid false sharing
         // Each result will be aligned to cache line boundary (64 bytes typical)
@@ -138,7 +140,7 @@ namespace bisam {
                             prDeltap,
                             split_data.theta_init_parts[part],
                             initpar_type,
-                            split_data.include_vars_parts[part], // Use partitioned include_vars
+                            // split_data.include_vars_parts[part], // Use partitioned include_vars
                             method,
                             hesstype,
                             optimMethod,
@@ -205,7 +207,7 @@ namespace bisam {
                                                  arma::vec thinit,
                                                  InitType initpar_type,
                                                  // NEW PARAMETERS
-                                                 arma::Col<int> &include_vars,
+                                                 // arma::Col<int> &include_vars,
                                                  int method,
                                                  int hesstype,
                                                  int optimMethod,
@@ -255,7 +257,7 @@ namespace bisam {
                                       prDeltap,
                                       thinit,
                                       initpar_type,
-                                      include_vars,
+                                      // include_vars,
                                       method,
                                       hesstype,
                                       optimMethod,
@@ -268,7 +270,9 @@ namespace bisam {
 
             case ComputationStrategy::SPLIT_SEQUENTIAL: {
                 // Prepare the split data - updated to pass include_vars
-                DataPartition split_data = partition_data(y, x, deltaini_input, thinit, include_vars, n);
+                DataPartition split_data = partition_data(y, x, deltaini_input, thinit
+                                                          // ,                    include_vars
+                                                          , n);
 
                 // Process each part sequentially
                 std::vector<arma::Col<int> > results(n);
@@ -289,7 +293,7 @@ namespace bisam {
                         prDeltap,
                         split_data.theta_init_parts[part],
                         initpar_type,
-                        split_data.include_vars_parts[part], // Use partitioned include_vars
+                        // split_data.include_vars_parts[part], // Use partitioned include_vars
                         method,
                         hesstype,
                         optimMethod,
@@ -311,7 +315,8 @@ namespace bisam {
                 return g_parallel_executor.execute_parallel(
                     y, x, niter, thinning, burnin, deltaini_input,
                     center, scale, XtXprecomp, phi, tau, priorSkew,
-                    prDeltap, thinit, initpar_type, include_vars,
+                    prDeltap, thinit, initpar_type,
+                    // include_vars,
                     method,
                     hesstype,
                     optimMethod,
@@ -335,15 +340,15 @@ namespace bisam {
         const arma::mat &x,
         arma::Col<int> &delta_initial,
         arma::vec &theta_init,
-        arma::Col<int> &include_vars, // Added parameter
+        // arma::Col<int> &include_vars, // Added parameter
         int num_partitions
     ) {
         DataPartition data;
 
-        size_t n_rows            = y.size();
-        size_t n_cols            = x.n_cols;
-        size_t thinit_size       = theta_init.size();   // Check the actual size of thinit
-        size_t include_vars_size = include_vars.size(); // Check the size of include_vars
+        size_t n_rows      = y.size();
+        size_t n_cols      = x.n_cols;
+        size_t thinit_size = theta_init.size(); // Check the actual size of thinit
+        // size_t include_vars_size = include_vars.size(); // Check the size of include_vars
 
         // Calculate sizes for each part
         size_t rows_per_part  = n_rows / num_partitions;
@@ -365,7 +370,7 @@ namespace bisam {
         data.y_parts.resize(num_partitions);
         data.delta_init_parts.resize(num_partitions);
         data.theta_init_parts.resize(num_partitions);
-        data.include_vars_parts.resize(num_partitions); // Added for include_vars
+        // data.include_vars_parts.resize(num_partitions); // Added for include_vars
         data.start_columns.resize(num_partitions);
         data.end_columns.resize(num_partitions);
 
@@ -373,7 +378,7 @@ namespace bisam {
         bool split_thinit = (thinit_size == n_cols);
 
         // Check if include_vars needs to be split
-        bool split_include_vars = (include_vars_size == n_cols);
+        // bool split_include_vars = (include_vars_size == n_cols);
 
         // Split y, deltaini_input, and include_vars
         for (int part = 0; part < num_partitions; part++) {
@@ -392,16 +397,16 @@ namespace bisam {
             data.delta_init_parts[part] = delta_initial.subvec(start_col, end_col);
 
             // Handle include_vars appropriately based on its size
-            if (split_include_vars) {
-                // If include_vars has the same length as x.n_cols, split it accordingly
-                data.include_vars_parts[part] = include_vars.subvec(start_col, end_col);
-            } else if (include_vars_size > 0) {
-                // If include_vars is not empty but doesn't match x.n_cols, use the full vector
-                data.include_vars_parts[part] = include_vars;
-            } else {
-                // If include_vars is empty, create an empty vector
-                data.include_vars_parts[part] = arma::Col<int>();
-            }
+            // if (split_include_vars) {
+            //     // If include_vars has the same length as x.n_cols, split it accordingly
+            //     data.include_vars_parts[part] = include_vars.subvec(start_col, end_col);
+            // } else if (include_vars_size > 0) {
+            //     // If include_vars is not empty but doesn't match x.n_cols, use the full vector
+            //     data.include_vars_parts[part] = include_vars;
+            // } else {
+            //     // If include_vars is empty, create an empty vector
+            //     data.include_vars_parts[part] = arma::Col<int>();
+            // }
 
             // Handle thinit appropriately based on its size
             if (split_thinit) {

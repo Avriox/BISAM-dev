@@ -7,7 +7,7 @@ library(Rcpp)
 # 
 setwd("~/uni/wu/BISAM/")
 Rcpp::compileAttributes(verbose = TRUE)
-install.packages("./", repos = NULL, type = "source", verbose = TRUE)
+install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean = TRUE)
 
 library(BISAM)
 
@@ -97,7 +97,7 @@ result <- BISAM::estimate_model(
   tfe = FALSE,
   iis = TRUE,
   sis = TRUE,
-  new_par_include_vars = rep(0,51),
+  # new_par_include_vars = rep(0,51),
   new_par_method = 1,
   new_par_hesstype = 1,
   new_par_optim_method = 1,
