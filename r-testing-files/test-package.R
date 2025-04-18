@@ -97,6 +97,7 @@ result <- BISAM::estimate_model(
   tfe = FALSE,
   iis = TRUE,
   sis = TRUE,
+  new_par_include_vars = rep(0,51),
   new_par_method = 1,
   new_par_hesstype = 1,
   new_par_optim_method = 1,
