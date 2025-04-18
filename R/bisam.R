@@ -14,7 +14,7 @@
 #' @param vb Parameter
 #' @param tau Parameter for model selection
 #' @param geweke Boolean for Geweke test
-#' @param use_phiinit Boolean for using initial phi values
+#' @param use_phiinit Boolean for using initial phi values. TRUE -> Use our sampling, FALSE use rnlp sampling
 #' @param const_val Boolean for including a constant
 #' @param ife Boolean for individual fixed effects
 #' @param tfe Boolean for time fixed effects
