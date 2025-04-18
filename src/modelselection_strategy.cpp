@@ -159,12 +159,34 @@ namespace bisam {
         return combine_partition_results(results, split_data.start_columns, split_data.end_columns, x.n_cols);
     }
 
-    arma::Col<int> model_selection_with_strategy(const arma::vec &y, const arma::mat &x, int niter, int thinning,
-                                                 int burnin, arma::Col<int> &deltaini_input, bool center, bool scale,
-                                                 bool XtXprecomp, double phi, double tau, double priorSkew,
-                                                 double prDeltap, arma::vec thinit,
+    arma::Col<int> model_selection_with_strategy(const arma::vec &y,
+                                                 const arma::mat &x,
+                                                 int niter,
+                                                 int thinning,
+                                                 int burnin,
+                                                 arma::Col<int> &deltaini_input,
+                                                 bool center,
+                                                 bool scale,
+                                                 bool XtXprecomp,
+                                                 double phi,
+                                                 double tau,
+                                                 double priorSkew,
+                                                 double prDeltap,
+                                                 arma::vec thinit,
                                                  InitType initpar_type,
-                                                 ComputationStrategy strategy, int n) {
+                                                 // NEW PARAMETERS
+                                                 int method,
+                                                 int hesstype,
+                                                 int optimMethod,
+                                                 int optim_maxit,
+                                                 int B,
+                                                 int knownphi,
+                                                 int r,
+                                                 double alpha,
+                                                 double lambda,
+                                                 // /NEW PARAMETERS
+                                                 ComputationStrategy strategy,
+                                                 int n) {
         // Important: Set the thread pool size based on partition count BEFORE the first parallel region
         // This ensures the OpenMP thread pool is created with the optimal size and reused for all iterations
         static bool first_call = true;

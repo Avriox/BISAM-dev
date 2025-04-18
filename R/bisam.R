@@ -20,6 +20,16 @@
 #' @param tfe Boolean for time fixed effects
 #' @param iis Boolean for indicator saturation
 #' @param sis Boolean for stepshift saturation
+#' @param computation_strategy Computation strategy (STANDARD, SPLIT_SEQUENTIAL, SPLIT_PARALLEL)
+#' @param new_par_method New parameter method
+#' @param new_par_hesstype New parameter hessian type
+#' @param new_par_optim_method New parameter optimization method
+#' @param new_par_optim_maxit New parameter optimization max iterations
+#' @param new_par_B New parameter B
+#' @param new_par_knownphi New parameter known phi
+#' @param new_par_r New parameter r
+#' @param new_par_alpha New parameter alpha
+#' @param new_par_lambda New parameter lambda
 #'
 #' @return A list containing MCMC results and summary statistics
 #' @export
@@ -43,7 +53,17 @@ estimate_model <- function(
     ife = FALSE,
     tfe = FALSE,
     iis = TRUE,
-    sis = TRUE
+    sis = TRUE,
+    new_par_method = 1,
+    new_par_hesstype = 1,
+    new_par_optim_method = 1,
+    new_par_optim_maxit = 100,
+    new_par_B = 10,
+    new_par_knownphi = 0,
+    new_par_r = 1,
+    new_par_alpha = 0.05,
+    new_par_lambda = 1.0,
+    computation_strategy = SPLIT_SEQUENTIAL  # Default to SPLIT_SEQUENTIAL
 ) {
     # Convert data to matrix if it's a data frame
     if (is.data.frame(data)) {
@@ -59,8 +79,22 @@ estimate_model <- function(
     result <- rcpp_estimate_model(
         data, i_index_cpp, t_index_cpp, y_index_cpp, Ndraw, Nburn, b_prior,
         lambda_b, c0, C0, va, vb, tau, use_phiinit,
-        const_val, ife, tfe, iis, sis
+        const_val, ife, tfe, iis, sis,
+        new_par_method, new_par_hesstype, new_par_optim_method, new_par_optim_maxit,
+        new_par_B, new_par_knownphi, new_par_r, new_par_alpha, new_par_lambda,
+        computation_strategy
     )
 
     return(result)
 }
+
+#' Constants for computation strategy
+#'
+#' @export
+STANDARD <- comp_strategy_standard()
+
+#' @export
+SPLIT_SEQUENTIAL <- comp_strategy_split_sequential()
+
+#' @export
+SPLIT_PARALLEL <- comp_strategy_split_parallel()

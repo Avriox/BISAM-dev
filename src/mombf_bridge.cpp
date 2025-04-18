@@ -25,7 +25,16 @@ namespace bisam {
                                   double priorSkew,
                                   double prDeltap,
                                   arma::vec thinit,
-                                  InitType initpar_type) {
+                                  InitType initpar_type,
+                                  int method,
+                                  int hesstype,
+                                  int optimMethod,
+                                  int optim_maxit,
+                                  int B,
+                                  int knownphi,
+                                  int r,
+                                  double alpha,
+                                  double lambda) {
         int p = x.n_cols;
         int n = y.n_elem;
 
@@ -39,7 +48,8 @@ namespace bisam {
         /* -------------------------------- knownphi -------------------------------- */
         // We give phi as parameter -> phi is known
         // TODO potentially change to bool
-        int knownphi = 1;
+        // Replaced with smiple Parameter
+        // int knownphi = 1;
 
         /* ------------------------------- familyint -------------------------------- */
         // Set to 1 since we have family == "normal" and !issurvival (in formatFamily())
@@ -178,7 +188,8 @@ namespace bisam {
 
         /* --------------------------------- method --------------------------------- */
         // Fixed to int 0 in formats method. Because opti method = auto and outcome type = glm
-        int method = 0;
+        // Replaced with simple input parameter
+        // int method = 0;
 
         /* ------------------------------ adj_overdisp ------------------------------ */
         // Fixed to 1 because of formats method. adj.overdisp <- as.integer(ifelse(adj.overdisp == "none", 0,
@@ -187,16 +198,19 @@ namespace bisam {
 
         /* -------------------------------- hesstype -------------------------------- */
         // Fixed to 1 because of formats method. hesstype <- as.integer(ifelse(hess == "asympDiagAdj", 2, 1))
-        int hesstype = 1;
+        // Replace with simple input parameter
+        // int hesstype = 1;
 
         /* ------------------------------ optimMethod ------------------------------- */
         // Fixed to 2 because of formats method. We set optimMethod="auto".
-        int optimMethod = 2;
+        // Replaced with simple Paramter
+        // int optimMethod = 2;
 
         /* ------------------------------ optim_maxit ------------------------------- */
         // Default is set to 10? Not really a default but we set it in our list of "default" parameters?
         // Review mit Lucas: setzen wir mal auf 0
-        int optim_maxit = 0;
+        // Replaced with simple parameter
+        // int optim_maxit = 0;
 
         /* -------------------------- thinit and usethinit -------------------------- */
         // Thinit uses a lasso for initialization - put into its own function for clearity
@@ -209,15 +223,18 @@ namespace bisam {
 
         /* ----------------------------------- B ------------------------------------ */
         // Default parameter set to 100000
-        int B = 100000;
+        // Replace with simple Parameter
+        // int B = 100000;
 
         /* --------------------------------- alpha ---------------------------------- */
         // Fixed to 0.01 - parameter set by us. alpha <- as.double(priorVar@priorPars["alpha"])
-        double alpha = 0.01;
+        // Replace with simple paramater
+        // double alpha = 0.01;
 
         /* --------------------------------- lambda --------------------------------- */
         // Fixed to 0.01 - parameter set by us. lambda <- as.double(priorVar@priorPars["lambda"])
-        double lambda = 0.01;
+        // Replaced with simple parameter
+        // double lambda = 0.01;
 
         /* ---------------------------------- phi ----------------------------------- */
         // Set to be s2_i by us. Parameter of this function no further calculations.
@@ -240,7 +257,8 @@ namespace bisam {
 
         /* ----------------------------------- r ------------------------------------ */
         // Fixed to 1. In formatmsPriorsMarg for piMom
-        int r = 1;
+        // Replaced with simple parameter
+        // int r = 1;
 
         /* -------------------------------- prDelta --------------------------------- */
         int prDelta = 1;
