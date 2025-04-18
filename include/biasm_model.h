@@ -30,6 +30,16 @@ namespace bisam {
         bool tfe,
         bool iis,
         bool sis,
+        // arma::Col<int> new_par_include_vars,
+        int new_par_method,
+        int new_par_hesstype,
+        int new_par_optim_method,
+        int new_par_optim_maxit,
+        int new_par_B,
+        int new_par_knownphi,
+        int new_par_r,
+        double new_par_alpha,
+        double new_par_lambda,
         ComputationStrategy strategy
     );
 }

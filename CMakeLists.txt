@@ -9,7 +9,9 @@ add_compile_definitions(DEV)
 # Special settings to show full command line during build (optional)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -mtune=native -flto -funroll-loops -fomit-frame-pointer")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -mtune=native -funroll-loops -fomit-frame-pointer") # -flto Link time optimizations
+
+
 
 # macOS-specific compiler approach
 if (APPLE)

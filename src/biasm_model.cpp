@@ -16,11 +16,35 @@ namespace bisam {
     //
 
 
-    BisamResult estimate_model(arma::mat &data, int i_index, int t_index, int y_index, long long num_draws,
-                               long long num_burnin, std::string b_prior, double lambda_b, double c0, double C0,
+    BisamResult estimate_model(arma::mat &data,
+                               int i_index,
+                               int t_index,
+                               int y_index,
+                               long long num_draws,
+                               long long num_burnin,
+                               std::string b_prior,
+                               double lambda_b,
+                               double c0,
+                               double C0,
                                double va,
-                               double vb, double tau,
-                               bool use_phiinit, bool const_val, bool ife, bool tfe, bool iis, bool sis,
+                               double vb,
+                               double tau,
+                               bool use_phiinit,
+                               bool const_val,
+                               bool ife,
+                               bool tfe,
+                               bool iis,
+                               bool sis,
+                               // arma::Col<int> new_par_include_vars,
+                               int new_par_method,
+                               int new_par_hesstype,
+                               int new_par_optim_method,
+                               int new_par_optim_maxit,
+                               int new_par_B,
+                               int new_par_knownphi,
+                               int new_par_r,
+                               double new_par_alpha,
+                               double new_par_lambda,
                                ComputationStrategy strategy) {
         // [DEV]
         // This sets up a "random device" for development purposes. We need it because RcppArmadillo tries to
@@ -209,6 +233,13 @@ namespace bisam {
 
         // TODO make this a parameter so that w_i can be initialized with a given vector
         arma::Col<int> w_i(r, arma::fill::zeros);
+
+        // If includevars is null, make sure it has the same length as w_i
+        // if (new_par_include_vars.empty()) {
+        //     new_par_include_vars = arma::Col<int>(r, arma::fill::zeros);
+        // }
+
+        // TODO Catch include vars length error mismatch
 
         // TODO "Force include" vector as parameter -> geht als includevars in model selection
 
@@ -405,6 +436,16 @@ namespace bisam {
                                                                        0.5,
                                                                        thinit,
                                                                        initpar_type,
+                                                                       // new_par_include_vars,
+                                                                       new_par_method,
+                                                                       new_par_hesstype,
+                                                                       new_par_optim_method,
+                                                                       new_par_optim_maxit,
+                                                                       new_par_B,
+                                                                       new_par_knownphi,
+                                                                       new_par_r,
+                                                                       new_par_alpha,
+                                                                       new_par_lambda,
                                                                        strategy,
                                                                        n
             );

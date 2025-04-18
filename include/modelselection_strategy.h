@@ -15,18 +15,43 @@
 #endif
 
 namespace bisam {
-    arma::Col<int> model_selection_with_strategy(const arma::vec &y, const arma::mat &x, int niter, int thinning,
-                                                 int burnin, arma::Col<int> &deltaini_input, bool center, bool scale,
-                                                 bool XtXprecomp, double phi, double tau, double priorSkew,
-                                                 double prDeltap, arma::vec thinit,
+    arma::Col<int> model_selection_with_strategy(const arma::vec &y,
+                                                 const arma::mat &x,
+                                                 int niter,
+                                                 int thinning,
+                                                 int burnin,
+                                                 arma::Col<int> &deltaini_input,
+                                                 bool center,
+                                                 bool scale,
+                                                 bool XtXprecomp,
+                                                 double phi,
+                                                 double tau,
+                                                 double priorSkew,
+                                                 double prDeltap,
+                                                 arma::vec thinit,
                                                  InitType initpar_type,
-                                                 ComputationStrategy strategy, int n = 3);
+                                                 // NEW PARAMETERS
+                                                 // arma::Col<int> &include_vars,
+                                                 int method      = 0,
+                                                 int hesstype    = 1,
+                                                 int optimMethod = 2,
+                                                 int optim_maxit = 0,
+                                                 int B           = 100000,
+                                                 int knownphi    = 1,
+                                                 int r           = 1,
+                                                 double alpha    = 0.01,
+                                                 double lambda   = 0.01,
+
+                                                 // /NEW PARAMETERS
+                                                 ComputationStrategy strategy = ComputationStrategy::SPLIT_SEQUENTIAL,
+                                                 int n                        = 3);
 
     DataPartition partition_data(
         const arma::vec &y,
         const arma::mat &x,
         arma::Col<int> &delta_initial,
         arma::vec &theta_init,
+        // arma::Col<int> &include_vars, // Added parameter to match deltaini_input handling
         int num_partitions
     );
 
@@ -70,6 +95,16 @@ namespace bisam {
             double prDeltap,
             arma::vec thinit,
             InitType initpar_type,
+            // arma::Col<int> &include_vars,
+            int method,
+            int hesstype,
+            int optimMethod,
+            int optim_maxit,
+            int B,
+            int knownphi,
+            int r,
+            double alpha,
+            double lambda,
             int n
         );
     };

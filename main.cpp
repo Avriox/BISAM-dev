@@ -136,12 +136,27 @@ int main() {
     // timer.end_section("Standard");
     timer.start_section("Split Sequential");
 
+
+    int method      = 0;
+    int hesstype    = 1;
+    int optimMethod = 2;
+    int optim_maxit = 0;
+    int B           = 100000;
+    int knownphi    = 1;
+    int r           = 1;
+    double alpha    = 0.01;
+    double lambda   = 0.01;
+    // arma::Col<int> new_par_include_vars;
+
+    // = arma::Col<int>(51, arma::fill::zeros);
+    // new_par_include_vars[0]             = 1;
+
     bisam::BisamResult result2 = bisam::estimate_model(data,
                                                        0,
                                                        1,
                                                        2,
+                                                       5000,
                                                        500,
-                                                       100,
                                                        "g",
                                                        100.0,
                                                        0.001,
@@ -155,7 +170,17 @@ int main() {
                                                        false,
                                                        true,
                                                        true,
-                                                       bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
+                                                       // new_par_include_vars,
+                                                       method,
+                                                       hesstype,
+                                                       optimMethod,
+                                                       optim_maxit,
+                                                       B,
+                                                       knownphi,
+                                                       r,
+                                                       alpha,
+                                                       lambda,
+                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
 
     timer.end_section("Split Sequential");
     // timer.start_section("Split Parallel");

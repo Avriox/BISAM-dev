@@ -1,0 +1,132 @@
+name: Prepare and Push Checkpoint to BISAM Repo
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read # Read access to BISAM-dev repo
+
+jobs:
+  prepare-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout BISAM-dev code
+        uses: actions/checkout@v4
+        with:
+          ref: 'checkpoint'
+
+      # --- Step: Prepare R Package Structure ---
+      # (This step remains largely the same)
+      - name: Prepare R Package Structure in Temp Dir
+        id: prepare
+        run: |
+          echo "Starting R package structure preparation..."
+          TEMP_DIR="../r_package_clean_build" # Use a path outside the checkout
+          mkdir -p "$TEMP_DIR"
+          echo "Created temporary build directory: $TEMP_DIR"
+          mkdir -p "$TEMP_DIR/src"
+          echo "Created $TEMP_DIR/src directory"
+
+          echo "Searching for source files..."
+          # First copy all .cpp and .h files (excluding main.cpp)
+          find . -path ./$TEMP_DIR -prune -o -type f \( -name '*.cpp' -o -name '*.h' \) -not -name 'main.cpp' -print -exec cp {} "$TEMP_DIR/src/" \;
+          
+          # Also copy Makevars and Makevars.win if they exist
+          if [ -f "src/Makevars" ]; then
+            cp src/Makevars "$TEMP_DIR/src/"
+            echo "Copied src/Makevars"
+          else
+            echo "No src/Makevars file found."
+          fi
+          
+          if [ -f "src/Makevars.win" ]; then
+            cp src/Makevars.win "$TEMP_DIR/src/"
+            echo "Copied src/Makevars.win"
+          else
+            echo "No src/Makevars.win file found."
+          fi
+          
+          echo "Copied source files to $TEMP_DIR/src/"
+
+          echo "Copying standard R package components..."
+          # Copy directories if they exist
+          [ -d "R" ] && rsync -av R/ "$TEMP_DIR/R/" || echo "No R directory found."
+          [ -d "man" ] && rsync -av man/ "$TEMP_DIR/man/" || echo "No man directory found."
+          [ -d "data" ] && rsync -av data/ "$TEMP_DIR/data/" || echo "No data directory found."
+          [ -d "inst" ] && rsync -av inst/ "$TEMP_DIR/inst/" || echo "No inst directory found."
+          [ -d "vignettes" ] && rsync -av vignettes/ "$TEMP_DIR/vignettes/" || echo "No vignettes directory found."
+          [ -d "tests" ] && rsync -av tests/ "$TEMP_DIR/tests/" || echo "No tests directory found."
+          [ -d "img" ] && rsync -av img/ "$TEMP_DIR/img/" || echo "No img directory found."
+          
+          # Copy files if they exist
+          [ -f "DESCRIPTION" ] && cp DESCRIPTION "$TEMP_DIR/" || echo "No DESCRIPTION file found."
+          [ -f "NAMESPACE" ] && cp NAMESPACE "$TEMP_DIR/" || echo "No NAMESPACE file found."
+          [ -f "README.md" ] && cp README.md "$TEMP_DIR/" || echo "No README.md file found."
+          find . -maxdepth 1 -name 'LICENSE*' -exec cp {} "$TEMP_DIR/" \; 2>/dev/null || echo "No LICENSE file(s) found."
+          [ -f ".Rbuildignore" ] && cp .Rbuildignore "$TEMP_DIR/" || echo "No .Rbuildignore file found."
+
+          echo "Prepared structure in $TEMP_DIR:"
+          ls -laR "$TEMP_DIR"
+          # Set output for the next step
+          echo "temp_dir_path=$TEMP_DIR" >> $GITHUB_OUTPUT
+
+      # --- Step: Push Prepared Structure to BISAM Repository ---
+      - name: Initialize Git Repo, Add Files, and Push to BISAM candidate branch
+        env:
+          # Make PAT available to the script
+          BISAM_REPO_PAT: ${{ secrets.BISAM_REPO_PAT }}
+          # Define target repo info
+          TARGET_REPO_OWNER: ${{ github.repository_owner }} # Assumes same owner
+          TARGET_REPO_NAME: BISAM
+          TARGET_BRANCH: candidate
+        run: |
+          PREPARED_DIR="${{ steps.prepare.outputs.temp_dir_path }}"
+          PUSH_DIR="../bisam_push_temp" # New temporary directory for push operation
+
+          echo "Setting up temporary directory for push: $PUSH_DIR"
+          mkdir "$PUSH_DIR"
+          cd "$PUSH_DIR"
+
+          echo "Initializing Git repository..."
+          # Initialize repo and set the desired branch name upfront
+          git init -b "$TARGET_BRANCH"
+          git config user.name "GitHub Action (via BISAM-dev)"
+          git config user.email "action@github.com"
+
+          echo "Adding BISAM repository as remote origin..."
+          # Add the remote using the PAT for authentication
+          git remote add origin "https://x-access-token:$BISAM_REPO_PAT@github.com/$TARGET_REPO_OWNER/$TARGET_REPO_NAME.git"
+
+          echo "Copying prepared files from $PREPARED_DIR..."
+          # Copy all contents, including hidden files (like .Rbuildignore)
+          # Using cp -a preserves file attributes and handles dotfiles correctly
+          cp -a "$PREPARED_DIR/." .
+
+          echo "Staging files..."
+          git add .
+
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes detected compared to an empty repository (or previous state if branch existed). Nothing to commit."
+            # Optionally: If you want to ensure the branch exists even with no changes,
+            # you could try pushing an empty commit, but typically it's fine to do nothing.
+            # git commit --allow-empty -m "Ensure candidate branch exists [skip ci]"
+            # git push --force origin "$TARGET_BRANCH"
+          else
+            echo "Committing changes..."
+            # Add [skip ci] to prevent triggering workflows in BISAM if commit message is checked
+            git commit -m "Update $TARGET_BRANCH branch from BISAM-dev [skip ci]"
+
+            echo "Force-pushing to $TARGET_REPO_NAME/$TARGET_BRANCH..."
+            # Force push the current HEAD (local candidate branch) to the remote candidate branch.
+            # This command handles both creating the branch if it doesn't exist
+            # and overwriting it if it does.
+            git push --force origin HEAD:"refs/heads/$TARGET_BRANCH"
+            echo "Push complete."
+          fi
+
+          echo "Cleaning up temporary directories..."
+          cd ..
+          rm -rf "$PUSH_DIR"
+          rm -rf "$PREPARED_DIR"

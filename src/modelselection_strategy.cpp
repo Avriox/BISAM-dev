@@ -78,6 +78,16 @@ namespace bisam {
         double prDeltap,
         arma::vec thinit,
         InitType initpar_type,
+        // arma::Col<int> &include_vars,
+        int method,
+        int hesstype,
+        int optimMethod,
+        int optim_maxit,
+        int B,
+        int knownphi,
+        int r,
+        double alpha,
+        double lambda,
         int n
     ) {
         // Make sure we're initialized with appropriate thread count
@@ -95,8 +105,10 @@ namespace bisam {
             initialize();
         }
 
-        // Prepare the split data - this cannot be changed as per requirements
-        DataPartition split_data = partition_data(y, x, deltaini_input, thinit, n);
+        // Prepare the split data - updated to pass include_vars to partition_data
+        DataPartition split_data = partition_data(y, x, deltaini_input, thinit
+                                                  // , include_vars
+                                                  , n);
 
         // Initialize vector for results with appropriate padding to avoid false sharing
         // Each result will be aligned to cache line boundary (64 bytes typical)
@@ -127,7 +139,17 @@ namespace bisam {
                             priorSkew,
                             prDeltap,
                             split_data.theta_init_parts[part],
-                            initpar_type);
+                            initpar_type,
+                            // split_data.include_vars_parts[part], // Use partitioned include_vars
+                            method,
+                            hesstype,
+                            optimMethod,
+                            optim_maxit,
+                            B,
+                            knownphi,
+                            r,
+                            alpha,
+                            lambda);
                     }
                 }
                 // Implicit taskwait at the end of the single construct
@@ -151,7 +173,17 @@ namespace bisam {
                 priorSkew,
                 prDeltap,
                 split_data.theta_init_parts[part],
-                initpar_type);
+                initpar_type,
+                split_data.include_vars_parts[part], // Use partitioned include_vars
+                method,
+                hesstype,
+                optimMethod,
+                optim_maxit,
+                B,
+                knownphi,
+                r,
+                alpha,
+                lambda);
         }
 #endif
 
@@ -159,12 +191,36 @@ namespace bisam {
         return combine_partition_results(results, split_data.start_columns, split_data.end_columns, x.n_cols);
     }
 
-    arma::Col<int> model_selection_with_strategy(const arma::vec &y, const arma::mat &x, int niter, int thinning,
-                                                 int burnin, arma::Col<int> &deltaini_input, bool center, bool scale,
-                                                 bool XtXprecomp, double phi, double tau, double priorSkew,
-                                                 double prDeltap, arma::vec thinit,
+    arma::Col<int> model_selection_with_strategy(const arma::vec &y,
+                                                 const arma::mat &x,
+                                                 int niter,
+                                                 int thinning,
+                                                 int burnin,
+                                                 arma::Col<int> &deltaini_input,
+                                                 bool center,
+                                                 bool scale,
+                                                 bool XtXprecomp,
+                                                 double phi,
+                                                 double tau,
+                                                 double priorSkew,
+                                                 double prDeltap,
+                                                 arma::vec thinit,
                                                  InitType initpar_type,
-                                                 ComputationStrategy strategy, int n) {
+                                                 // NEW PARAMETERS
+                                                 // arma::Col<int> &include_vars,
+                                                 int method,
+                                                 int hesstype,
+                                                 int optimMethod,
+                                                 int optim_maxit,
+                                                 int B,
+                                                 int knownphi,
+                                                 int r,
+                                                 double alpha,
+                                                 double lambda,
+
+                                                 // /NEW PARAMETERS
+                                                 ComputationStrategy strategy,
+                                                 int n) {
         // Important: Set the thread pool size based on partition count BEFORE the first parallel region
         // This ensures the OpenMP thread pool is created with the optimal size and reused for all iterations
         static bool first_call = true;
@@ -200,11 +256,23 @@ namespace bisam {
                                       priorSkew,
                                       prDeltap,
                                       thinit,
-                                      initpar_type);
+                                      initpar_type,
+                                      // include_vars,
+                                      method,
+                                      hesstype,
+                                      optimMethod,
+                                      optim_maxit,
+                                      B,
+                                      knownphi,
+                                      r,
+                                      alpha,
+                                      lambda);
 
             case ComputationStrategy::SPLIT_SEQUENTIAL: {
-                // Prepare the split data
-                DataPartition split_data = partition_data(y, x, deltaini_input, thinit, n);
+                // Prepare the split data - updated to pass include_vars
+                DataPartition split_data = partition_data(y, x, deltaini_input, thinit
+                                                          // ,                    include_vars
+                                                          , n);
 
                 // Process each part sequentially
                 std::vector<arma::Col<int> > results(n);
@@ -224,7 +292,17 @@ namespace bisam {
                         priorSkew,
                         prDeltap,
                         split_data.theta_init_parts[part],
-                        initpar_type);
+                        initpar_type,
+                        // split_data.include_vars_parts[part], // Use partitioned include_vars
+                        method,
+                        hesstype,
+                        optimMethod,
+                        optim_maxit,
+                        B,
+                        knownphi,
+                        r,
+                        alpha,
+                        lambda);
                 }
 
                 // Combine and return results
@@ -237,7 +315,17 @@ namespace bisam {
                 return g_parallel_executor.execute_parallel(
                     y, x, niter, thinning, burnin, deltaini_input,
                     center, scale, XtXprecomp, phi, tau, priorSkew,
-                    prDeltap, thinit, initpar_type, n
+                    prDeltap, thinit, initpar_type,
+                    // include_vars,
+                    method,
+                    hesstype,
+                    optimMethod,
+                    optim_maxit,
+                    B,
+                    knownphi,
+                    r,
+                    alpha,
+                    lambda, n
                 );
             }
 
@@ -246,12 +334,13 @@ namespace bisam {
         }
     }
 
-    // The data partitioning function remains unchanged as per requirements
+    // Updated to handle include_vars splitting
     DataPartition partition_data(
         const arma::vec &y,
         const arma::mat &x,
         arma::Col<int> &delta_initial,
         arma::vec &theta_init,
+        // arma::Col<int> &include_vars, // Added parameter
         int num_partitions
     ) {
         DataPartition data;
@@ -259,6 +348,7 @@ namespace bisam {
         size_t n_rows      = y.size();
         size_t n_cols      = x.n_cols;
         size_t thinit_size = theta_init.size(); // Check the actual size of thinit
+        // size_t include_vars_size = include_vars.size(); // Check the size of include_vars
 
         // Calculate sizes for each part
         size_t rows_per_part  = n_rows / num_partitions;
@@ -280,13 +370,17 @@ namespace bisam {
         data.y_parts.resize(num_partitions);
         data.delta_init_parts.resize(num_partitions);
         data.theta_init_parts.resize(num_partitions);
+        // data.include_vars_parts.resize(num_partitions); // Added for include_vars
         data.start_columns.resize(num_partitions);
         data.end_columns.resize(num_partitions);
 
         // Check if thinit needs to be split
         bool split_thinit = (thinit_size == n_cols);
 
-        // Split y and deltaini_input
+        // Check if include_vars needs to be split
+        // bool split_include_vars = (include_vars_size == n_cols);
+
+        // Split y, deltaini_input, and include_vars
         for (int part = 0; part < num_partitions; part++) {
             // Calculate row range for this part
             size_t start_row = part * rows_per_part + std::min(static_cast<size_t>(part), rows_remainder);
@@ -301,6 +395,18 @@ namespace bisam {
 
             // Extract the corresponding part of deltaini_input
             data.delta_init_parts[part] = delta_initial.subvec(start_col, end_col);
+
+            // Handle include_vars appropriately based on its size
+            // if (split_include_vars) {
+            //     // If include_vars has the same length as x.n_cols, split it accordingly
+            //     data.include_vars_parts[part] = include_vars.subvec(start_col, end_col);
+            // } else if (include_vars_size > 0) {
+            //     // If include_vars is not empty but doesn't match x.n_cols, use the full vector
+            //     data.include_vars_parts[part] = include_vars;
+            // } else {
+            //     // If include_vars is empty, create an empty vector
+            //     data.include_vars_parts[part] = arma::Col<int>();
+            // }
 
             // Handle thinit appropriately based on its size
             if (split_thinit) {
