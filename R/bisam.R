@@ -63,7 +63,7 @@ estimate_model <- function(
     new_par_r = 1,
     new_par_alpha = 0.05,
     new_par_lambda = 1.0,
-    computation_strategy = SPLIT_SEQUENTIAL  # Default to SPLIT_SEQUENTIAL
+    computation_strategy = SPLIT_SEQUENTIAL()  # Default to SPLIT_SEQUENTIAL
 ) {
     # Convert data to matrix if it's a data frame
     if (is.data.frame(data)) {
@@ -91,10 +91,16 @@ estimate_model <- function(
 #' Constants for computation strategy
 #'
 #' @export
-STANDARD <- comp_strategy_standard()
+STANDARD <- function() {
+  comp_strategy_standard()
+}
 
 #' @export
-SPLIT_SEQUENTIAL <- comp_strategy_split_sequential()
+SPLIT_SEQUENTIAL <- function() {
+  comp_strategy_split_sequential()
+}
 
 #' @export
-SPLIT_PARALLEL <- comp_strategy_split_parallel()
+SPLIT_PARALLEL <- function() {
+  comp_strategy_split_parallel()
+}
