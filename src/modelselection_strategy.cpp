@@ -78,6 +78,15 @@ namespace bisam {
         double prDeltap,
         arma::vec thinit,
         InitType initpar_type,
+        int method,
+        int hesstype,
+        int optimMethod,
+        int optim_maxit,
+        int B,
+        int knownphi,
+        int r,
+        double alpha,
+        double lambda,
         int n
     ) {
         // Make sure we're initialized with appropriate thread count
@@ -222,7 +231,16 @@ namespace bisam {
                                       priorSkew,
                                       prDeltap,
                                       thinit,
-                                      initpar_type);
+                                      initpar_type,
+                                      method,
+                                      hesstype,
+                                      optimMethod,
+                                      optim_maxit,
+                                      B,
+                                      knownphi,
+                                      r,
+                                      alpha,
+                                      lambda);
 
             case ComputationStrategy::SPLIT_SEQUENTIAL: {
                 // Prepare the split data
@@ -246,7 +264,16 @@ namespace bisam {
                         priorSkew,
                         prDeltap,
                         split_data.theta_init_parts[part],
-                        initpar_type);
+                        initpar_type,
+                        method,
+                        hesstype,
+                        optimMethod,
+                        optim_maxit,
+                        B,
+                        knownphi,
+                        r,
+                        alpha,
+                        lambda);
                 }
 
                 // Combine and return results
@@ -259,7 +286,16 @@ namespace bisam {
                 return g_parallel_executor.execute_parallel(
                     y, x, niter, thinning, burnin, deltaini_input,
                     center, scale, XtXprecomp, phi, tau, priorSkew,
-                    prDeltap, thinit, initpar_type, n
+                    prDeltap, thinit, initpar_type, method,
+                    hesstype,
+                    optimMethod,
+                    optim_maxit,
+                    B,
+                    knownphi,
+                    r,
+                    alpha,
+                    lambda,
+                    n
                 );
             }
 

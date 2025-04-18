@@ -92,6 +92,15 @@ namespace bisam {
             double prDeltap,
             arma::vec thinit,
             InitType initpar_type,
+            int method,
+            int hesstype,
+            int optimMethod,
+            int optim_maxit,
+            int B,
+            int knownphi,
+            int r,
+            double alpha,
+            double lambda,
             int n
         );
     };

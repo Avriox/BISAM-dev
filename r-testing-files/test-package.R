@@ -7,7 +7,7 @@ library(Rcpp)
 # 
 setwd("~/uni/wu/BISAM/")
 Rcpp::compileAttributes(verbose = TRUE)
-install.packages("./", repos = NULL, type = "source", verbose = TRUE)
+install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean = TRUE)
 
 library(BISAM)
 
@@ -78,26 +78,38 @@ data <- matrix(c(
 # Call the b_ism function with the same parameters
 # Note: In R, indexing starts at 1, so I've adjusted the column indices
 result <- BISAM::estimate_model(
-  data,         # data matrix
-  1,            # column index for group (0 in C++ becomes 1 in R)
-  2,            # column index for time (1 in C++ becomes 2 in R)
-  3,            # column index for response (2 in C++ becomes 3 in R)
-  5000,         # number of iterations
-  500,          # burn-in iterations
-  "g",          # prior type
-  100.0,        # g parameter
-  0.001,        # alpha
-  0.001,        # beta
-  1.0,          # w
-  1.0,          # phi_mu
-  1.0,          # phi_prec
-  FALSE,        # standardize
-  TRUE,         # intercept
-  FALSE,        # output samples
-  FALSE,        # verbose
-  FALSE,        # debug
-  TRUE,         # store_model_size
-  TRUE          # store_model_visit
+  data,
+  i_index = 1,
+  t_index = 2,
+  y_index = 3,
+  Ndraw = 5000,
+  Nburn = 500,
+  b_prior = "g",
+  lambda_b = 100.0,
+  c0 = 0.001,
+  C0 = 0.001,
+  va = 1.0,
+  vb = 1.0,
+  tau = 1.0,
+  geweke = FALSE,
+  use_phiinit = TRUE,
+  const_val = FALSE,
+  ife = FALSE,
+  tfe = FALSE,
+  iis = TRUE,
+  sis = TRUE,
+  new_par_method = 1,
+  new_par_hesstype = 1,
+  new_par_optim_method = 1,
+  new_par_optim_maxit = 100,
+  new_par_B = 10,
+  new_par_knownphi = 0,
+  new_par_r = 1,
+  new_par_alpha = 0.05,
+  new_par_lambda = 1.0,
+  computation_strategy = SPLIT_PARALLEL()  
 )
+
+
 
 print(result$w_store_means)
