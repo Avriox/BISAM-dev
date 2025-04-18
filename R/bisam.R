@@ -54,6 +54,7 @@ estimate_model <- function(
     tfe = FALSE,
     iis = TRUE,
     sis = TRUE,
+    new_par_include_vars = rep(0,ncol(x)),
     new_par_method = 1,
     new_par_hesstype = 1,
     new_par_optim_method = 1,
@@ -79,7 +80,7 @@ estimate_model <- function(
     result <- rcpp_estimate_model(
         data, i_index_cpp, t_index_cpp, y_index_cpp, Ndraw, Nburn, b_prior,
         lambda_b, c0, C0, va, vb, tau, use_phiinit,
-        const_val, ife, tfe, iis, sis,
+        const_val, ife, tfe, iis, sis, new_par_include_vars,
         new_par_method, new_par_hesstype, new_par_optim_method, new_par_optim_maxit,
         new_par_B, new_par_knownphi, new_par_r, new_par_alpha, new_par_lambda,
         computation_strategy
