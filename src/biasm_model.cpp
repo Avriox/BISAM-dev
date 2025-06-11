@@ -402,7 +402,7 @@ namespace bisam {
             //  * priorDelta -> betabinom or bbprior.
             // priorDelta -> binary 1 -> modelbinomprior     2 -> modelbbprior
             //      -> wenn 1 -> prDelta.p -> prDeltap
-            //      -> wenn 2 -> prDelta.a & .b -> vector in parprDeltap
+            //      -> wenn 2 -> prDelta.a & .b -> vector in parprDeltap (va / vb)
             //      -> use defaults otherwise (0.5) (1,1)
 
             // TODO we need:

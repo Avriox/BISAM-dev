@@ -137,7 +137,7 @@ int main() {
     timer.start_section("Split Sequential");
 
 
-    int method      = 0;
+    int method      = 2; // oder 0 (auto)
     int hesstype    = 1;
     int optimMethod = 2;
     int optim_maxit = 0;
@@ -180,7 +180,7 @@ int main() {
                                                        r,
                                                        alpha,
                                                        lambda,
-                                                       bisam::ComputationStrategy::SPLIT_PARALLEL);
+                                                       bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
 
     timer.end_section("Split Sequential");
     // timer.start_section("Split Parallel");

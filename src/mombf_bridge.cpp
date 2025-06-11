@@ -62,7 +62,7 @@ namespace bisam {
 
         /* -------------------------------- priorgr --------------------------------- */
         // Set to 1. Defined in formatmsPriorsMarg. Equal to prior = piMOM
-        int priorgr = 1;
+        int priorgr = prior;
 
         /* -------------------------- ndeltaini & deltaini -------------------------- */
         // Translation of the respective R code:

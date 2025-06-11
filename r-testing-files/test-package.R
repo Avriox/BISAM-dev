@@ -5,7 +5,7 @@ remove.packages(c("BISAM", "bisam"))
 
 library(Rcpp)
 # 
-setwd("~/uni/wu/BISAM/")
+setwd("~/Documents/Uni/WU/BISAM")
 Rcpp::compileAttributes(verbose = TRUE)
 install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean = TRUE)
 
@@ -97,8 +97,7 @@ result <- BISAM::estimate_model(
   tfe = FALSE,
   iis = TRUE,
   sis = TRUE,
-  # new_par_include_vars = rep(0,51),
-  new_par_method = 1,
+  new_par_method = 0,
   new_par_hesstype = 1,
   new_par_optim_method = 1,
   new_par_optim_maxit = 100,
@@ -107,7 +106,7 @@ result <- BISAM::estimate_model(
   new_par_r = 1,
   new_par_alpha = 0.05,
   new_par_lambda = 1.0,
-  computation_strategy = BISAM::SPLIT_PARALLEL()
+  computation_strategy = SPLIT_SEQUENTIAL()
 )
 
 print(result$w_store_means)
