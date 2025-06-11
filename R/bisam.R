@@ -13,6 +13,7 @@
 #' @param va Parameter
 #' @param vb Parameter
 #' @param tau Parameter for model selection
+#' @param priorDelta Prior object for model selection (modelbbprior or modelbinomprior)
 #' @param geweke Boolean for Geweke test
 #' @param use_phiinit Boolean for using initial phi values. TRUE -> Use our sampling, FALSE use rnlp sampling
 #' @param const_val Boolean for including a constant
@@ -47,6 +48,7 @@ estimate_model <- function(
     va = 1.0,
     vb = 1.0,
     tau = 1.0,
+    priorDelta = modelbbprior(1, 1),
     geweke = FALSE,
     use_phiinit = TRUE,
     const_val = FALSE,
@@ -75,6 +77,26 @@ estimate_model <- function(
     i_index_cpp <- i_index - 1
     t_index_cpp <- t_index - 1
     y_index_cpp <- y_index - 1
+
+    a <- NA_real_
+    b <- NA_real_
+    p <- NA_real_
+
+    # Extract the prior variables depending on the type
+    if (inherits(priorDelta, "modelbbprior")) {
+          a = priorDelta$a,
+          b = priorDelta$b,
+          p = NA_real_
+      } else if (inherits(priorDelta, "modelbinomprior")) {
+          a = NA_real_,
+          b = NA_real_,
+          p = priorDelta$p
+      } else {
+        stop("priorDelta must be either a modelbbprior or modelbinomprior object")
+      }
+
+
+
 
     # Call the C++ function
     result <- rcpp_estimate_model(
@@ -105,4 +127,45 @@ SPLIT_SEQUENTIAL <- function() {
 #' @export
 SPLIT_PARALLEL <- function() {
   comp_strategy_split_parallel()
+}
+
+
+
+#' Create a Beta-Binomial prior object
+#'
+#' @param a First parameter of the Beta-Binomial prior (shape1)
+#' @param b Second parameter of the Beta-Binomial prior (shape2)
+#' @return A modelbbprior object
+#' @export
+modelbbprior <- function(a = 1, b = 1) {
+  if (!is.numeric(a) || !is.numeric(b) || length(a) != 1 || length(b) != 1) {
+    stop("Parameters 'a' and 'b' must be single numeric values")
+  }
+  if (a <= 0 || b <= 0) {
+    stop("Parameters 'a' and 'b' must be positive")
+  }
+
+  structure(
+    list(a = as.double(a), b = as.double(b)),
+    class = "modelbbprior"
+  )
+}
+
+#' Create a Binomial prior object
+#'
+#' @param p Probability parameter for the Binomial prior
+#' @return A modelbinomprior object
+#' @export
+modelbinomprior <- function(p = 0.5) {
+  if (!is.numeric(p) || length(p) != 1) {
+    stop("Parameter 'p' must be a single numeric value")
+  }
+  if (p < 0 || p > 1) {
+    stop("Parameter 'p' must be between 0 and 1")
+  }
+
+  structure(
+    list(p = as.double(p)),
+    class = "modelbinomprior"
+  )
 }
