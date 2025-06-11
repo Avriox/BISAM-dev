@@ -84,12 +84,12 @@ estimate_model <- function(
 
     # Extract the prior variables depending on the type
     if (inherits(priorDelta, "modelbbprior")) {
-          a = priorDelta$a,
-          b = priorDelta$b,
+          a = priorDelta$a
+          b = priorDelta$b
           p = NA_real_
       } else if (inherits(priorDelta, "modelbinomprior")) {
-          a = NA_real_,
-          b = NA_real_,
+          a = NA_real_
+          b = NA_real_
           p = priorDelta$p
       } else {
         stop("priorDelta must be either a modelbbprior or modelbinomprior object")
