@@ -168,32 +168,34 @@ namespace bisam {
         // Fallback to sequential execution if OpenMP is not available
         for (int part = 0; part < n; part++) {
             results[part] = modelSelection(
-                        split_data.y_parts[part],
-                        split_data.common_x,
-                        niter,
-                        thinning,
-                        burnin,
-                        split_data.delta_init_parts[part],
-                        center,
-                        scale,
-                        XtXprecomp,
-                        phi,
-                        tau,
-                        priorSkew,
-                        prDeltap,
-                        split_data.theta_init_parts[part],
-                        initpar_type,
-                        // split_data.include_vars_parts[part], // Use partitioned include_vars
-                        method,
-                        hesstype,
-                        optimMethod,
-                        optim_maxit,
-                        B,
-                        knownphi,
-                        r,
-                        alpha,
-                        lambda);
-
+                           split_data.y_parts[part],
+                           split_data.common_x,
+                           niter,
+                           thinning,
+                           burnin,
+                           split_data.delta_init_parts[part],
+                           center,
+                           scale,
+                           XtXprecomp,
+                           phi,
+                           tau,
+                           priorSkew,
+                           prDelta,
+                           prDeltap,
+                           parprDeltap,
+                           split_data.theta_init_parts[part],
+                           initpar_type,
+                           // split_data.include_vars_parts[part], // Use partitioned include_vars
+                           method,
+                           hesstype,
+                           optimMethod,
+                           optim_maxit,
+                           B,
+                           knownphi,
+                           r,
+                           alpha,
+                           lambda
+                       );
 
 
 
