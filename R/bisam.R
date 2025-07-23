@@ -78,19 +78,25 @@ estimate_model <- function(
     t_index_cpp <- t_index - 1
     y_index_cpp <- y_index - 1
 
-    a <- NA_real_
-    b <- NA_real_
-    p <- NA_real_
+    a <- 1
+    b <- 1
+    p <- 0.5
+    # prDelta says whether to use modelbinom or modelbb
+    # modelbinom --> 1
+    # modelbb --> 2
+    #
+    # 1 as default
+
+    prDelta <- 1
 
     # Extract the prior variables depending on the type
     if (inherits(priorDelta, "modelbbprior")) {
-          a = priorDelta$a
-          b = priorDelta$b
-          p = NA_real_
+          a <- priorDelta$a
+          b <- priorDelta$b
+          prDelta <- 2
       } else if (inherits(priorDelta, "modelbinomprior")) {
-          a = NA_real_
-          b = NA_real_
-          p = priorDelta$p
+          p <- priorDelta$p
+          prDelta <- 1
       } else {
         stop("priorDelta must be either a modelbbprior or modelbinomprior object")
       }
@@ -106,6 +112,7 @@ estimate_model <- function(
 #          new_par_include_vars,
         new_par_method, new_par_hesstype, new_par_optim_method, new_par_optim_maxit,
         new_par_B, new_par_knownphi, new_par_r, new_par_alpha, new_par_lambda,
+        prDelta, p, a, b,
         computation_strategy
     )
 

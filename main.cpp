@@ -180,6 +180,9 @@ int main() {
                                                        r,
                                                        alpha,
                                                        lambda,
+                                                       1,
+                                                       0.5,
+                                                       {1, 1},
                                                        bisam::ComputationStrategy::SPLIT_SEQUENTIAL);
 
     timer.end_section("Split Sequential");

@@ -90,6 +90,7 @@ result <- BISAM::estimate_model(
   va = 1.0,
   vb = 1.0,
   tau = 1.0,
+  priorDelta = BISAM::modelbbprior(a=1, b=1),
   geweke = FALSE,
   use_phiinit = TRUE,
   const_val = FALSE,
@@ -106,7 +107,8 @@ result <- BISAM::estimate_model(
   new_par_r = 1,
   new_par_alpha = 0.05,
   new_par_lambda = 1.0,
-  computation_strategy = SPLIT_SEQUENTIAL()
+  computation_strategy = SPLIT_PARALLEL()
 )
+
 
 print(result$w_store_means)

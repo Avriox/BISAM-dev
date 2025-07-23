@@ -23,7 +23,9 @@ namespace bisam {
                                   double phi,
                                   double tau,
                                   double priorSkew,
+                                  int prDelta,
                                   double prDeltap,
+                                  std::vector<double> parprDeltap,
                                   arma::vec thinit,
                                   InitType initpar_type,
                                   // arma::Col<int> include_vars,
@@ -262,7 +264,7 @@ namespace bisam {
         // int r = 1;
 
         /* -------------------------------- prDelta --------------------------------- */
-        int prDelta = 1;
+        // int prDelta = 1;
 
         // TODO INVESTIGATION NEEDED
         // prDelta = 2;
@@ -272,11 +274,12 @@ namespace bisam {
 
         /* ------------------------------ parprDeltap ------------------------------- */
         // parprDeltap <- as.double(length(prDeltap))
-        int parprDeltap = 1;
+        // int parprDeltap = 1;
 
         /* -------------------------------- prConstr -------------------------------- */
         // Fixed to one in formatmsPriorsMarg
-        int prConstr = 1;
+        // Constr family has to be the same as prior
+        int prConstr = prDelta;
 
         // TODO INVESTIGATION NEEDED
         // prConstr = 2;
@@ -285,11 +288,15 @@ namespace bisam {
         // priorConstraints < -defaultpriorConstraints(priorDelta)
         // prConstrp <- as.double(priorConstraints@priorPars[["p"]])
         // Fixed to 0.5 in our case
-        double prConstrp = 0.5;
+
+        // In R code this is basically the same as the prDeltap
+        double prConstrp = prDeltap;
 
         /* ------------------------------ parprConstrp ------------------------------ */
         // parprConstrp <- as.double(length(prConstrp))
-        int parprConstrp = 1;
+
+        // Also basically the same for constr / prior
+        std::vector<double> parprConstrp = parprDeltap;
 
         /* --------------------------------- groups --------------------------------- */
         // Vector with numbers 0 to 20. Groups is modiefied (compared to default parameter) in
@@ -449,10 +456,10 @@ namespace bisam {
                                          int Sr,
                                          int SpriorDelta,
                                          double SprDeltap,
-                                         double SparprDeltap,
+                                         std::vector<double> SparprDeltap,
                                          int SpriorConstr,
                                          double SprConstrp,
-                                         double SparprConstrp,
+                                         std::vector<double> SparprConstrp,
                                          int *Sgroups,
                                          int Sngroups,
                                          arma::Col<int> &Snvaringroup,
@@ -574,9 +581,9 @@ namespace bisam {
                          &Sfixatanhalpha,
                          &Sr,
                          &SprDeltap,
-                         &SparprDeltap,
+                         SparprDeltap.data(),
                          &SprConstrp,
-                         &SparprConstrp,
+                         SparprConstrp.data(),
                          &logscale,
                          &offset,
                          Sgroups,

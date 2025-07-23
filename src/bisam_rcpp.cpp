@@ -42,6 +42,12 @@ Rcpp::List rcpp_estimate_model(
     int new_par_r,
     double new_par_alpha,
     double new_par_lambda,
+
+    int prDelta,
+    double p,
+    double a,
+    double b,
+
     int computation_strategy
 ) {
     // Call the C++ function
@@ -80,6 +86,9 @@ Rcpp::List rcpp_estimate_model(
         new_par_r,
         new_par_alpha,
         new_par_lambda,
+        prDelta,
+        p,
+        {a, b},
         static_cast<bisam::ComputationStrategy>(computation_strategy)
     );
 

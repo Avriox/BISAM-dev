@@ -27,7 +27,6 @@ namespace bisam {
                                                  double phi,
                                                  double tau,
                                                  double priorSkew,
-                                                 double prDeltap,
                                                  arma::vec thinit,
                                                  InitType initpar_type,
                                                  // NEW PARAMETERS
@@ -44,7 +43,10 @@ namespace bisam {
 
                                                  // /NEW PARAMETERS
                                                  ComputationStrategy strategy = ComputationStrategy::SPLIT_SEQUENTIAL,
-                                                 int n                        = 3);
+                                                 int n = 3,
+                                                 int prDelta = 1,
+                                                 double prDeltap = 0.5,
+                                                 std::vector<double> parprDeltap = {1, 1});
 
     DataPartition partition_data(
         const arma::vec &y,
@@ -92,7 +94,9 @@ namespace bisam {
             double phi,
             double tau,
             double priorSkew,
+            int prDelta,
             double prDeltap,
+            std::vector<double> parprDeltap,
             arma::vec thinit,
             InitType initpar_type,
             // arma::Col<int> &include_vars,

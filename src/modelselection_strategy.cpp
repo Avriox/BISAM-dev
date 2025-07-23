@@ -75,7 +75,9 @@ namespace bisam {
         double phi,
         double tau,
         double priorSkew,
+        int prDelta,
         double prDeltap,
+        std::vector<double> parprDeltap,
         arma::vec thinit,
         InitType initpar_type,
         // arma::Col<int> &include_vars,
@@ -106,9 +108,13 @@ namespace bisam {
         }
 
         // Prepare the split data - updated to pass include_vars to partition_data
-        DataPartition split_data = partition_data(y, x, deltaini_input, thinit
+        DataPartition split_data = partition_data(y,
+                                                  x,
+                                                  deltaini_input,
+                                                  thinit
                                                   // , include_vars
-                                                  , n);
+                                                  ,
+                                                  n);
 
         // Initialize vector for results with appropriate padding to avoid false sharing
         // Each result will be aligned to cache line boundary (64 bytes typical)
@@ -137,7 +143,9 @@ namespace bisam {
                             phi,
                             tau,
                             priorSkew,
+                            prDelta,
                             prDeltap,
+                            parprDeltap,
                             split_data.theta_init_parts[part],
                             initpar_type,
                             // split_data.include_vars_parts[part], // Use partitioned include_vars
@@ -149,7 +157,8 @@ namespace bisam {
                             knownphi,
                             r,
                             alpha,
-                            lambda);
+                            lambda
+                        );
                     }
                 }
                 // Implicit taskwait at the end of the single construct
@@ -207,7 +216,6 @@ namespace bisam {
                                                  double phi,
                                                  double tau,
                                                  double priorSkew,
-                                                 double prDeltap,
                                                  arma::vec thinit,
                                                  InitType initpar_type,
                                                  // NEW PARAMETERS
@@ -224,7 +232,12 @@ namespace bisam {
 
                                                  // /NEW PARAMETERS
                                                  ComputationStrategy strategy,
-                                                 int n) {
+                                                 int n,
+
+                                                 int prDelta,
+                                                 double prDeltap,
+                                                 std::vector<double> parprDeltap
+    ) {
         // Important: Set the thread pool size based on partition count BEFORE the first parallel region
         // This ensures the OpenMP thread pool is created with the optimal size and reused for all iterations
         static bool first_call = true;
@@ -258,7 +271,9 @@ namespace bisam {
                                       phi,
                                       tau,
                                       priorSkew,
+                                      prDelta,
                                       prDeltap,
+                                      parprDeltap,
                                       thinit,
                                       initpar_type,
                                       // include_vars,
@@ -274,9 +289,13 @@ namespace bisam {
 
             case ComputationStrategy::SPLIT_SEQUENTIAL: {
                 // Prepare the split data - updated to pass include_vars
-                DataPartition split_data = partition_data(y, x, deltaini_input, thinit
+                DataPartition split_data = partition_data(y,
+                                                          x,
+                                                          deltaini_input,
+                                                          thinit
                                                           // ,                    include_vars
-                                                          , n);
+                                                          ,
+                                                          n);
 
                 // Process each part sequentially
                 std::vector<arma::Col<int> > results(n);
@@ -294,7 +313,9 @@ namespace bisam {
                         phi,
                         tau,
                         priorSkew,
+                        prDelta,
                         prDeltap,
+                        parprDeltap,
                         split_data.theta_init_parts[part],
                         initpar_type,
                         // split_data.include_vars_parts[part], // Use partitioned include_vars
@@ -310,16 +331,32 @@ namespace bisam {
                 }
 
                 // Combine and return results
-                return combine_partition_results(results, split_data.start_columns, split_data.end_columns,
+                return combine_partition_results(results,
+                                                 split_data.start_columns,
+                                                 split_data.end_columns,
                                                  x.n_cols);
             }
 
             case ComputationStrategy::SPLIT_PARALLEL: {
                 // Use the global parallel executor which maintains thread state between calls
                 return g_parallel_executor.execute_parallel(
-                    y, x, niter, thinning, burnin, deltaini_input,
-                    center, scale, XtXprecomp, phi, tau, priorSkew,
-                    prDeltap, thinit, initpar_type,
+                    y,
+                    x,
+                    niter,
+                    thinning,
+                    burnin,
+                    deltaini_input,
+                    center,
+                    scale,
+                    XtXprecomp,
+                    phi,
+                    tau,
+                    priorSkew,
+                    prDelta,
+                    prDeltap,
+                    parprDeltap,
+                    thinit,
+                    initpar_type,
                     // include_vars,
                     method,
                     hesstype,
@@ -329,7 +366,8 @@ namespace bisam {
                     knownphi,
                     r,
                     alpha,
-                    lambda, n
+                    lambda,
+                    n
                 );
             }
 

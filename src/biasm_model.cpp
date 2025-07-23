@@ -45,6 +45,9 @@ namespace bisam {
                                int new_par_r,
                                double new_par_alpha,
                                double new_par_lambda,
+                               int prDelta,
+                               double prDeltap,
+                               std::vector<double> parprDeltap,
                                ComputationStrategy strategy) {
         // [DEV]
         // This sets up a "random device" for development purposes. We need it because RcppArmadillo tries to
@@ -321,7 +324,8 @@ namespace bisam {
                 for (int j = 0; j < nu_b.n_elem; ++j) {
                     lamb_b_new(j) = 1.0 / arma::randg(
                                         arma::distr_param(
-                                            1.0, 1.0 / nu_b(j) + std::pow(b_i(j), 2) / (2.0 * tau_b * s2_i)));
+                                            1.0,
+                                            1.0 / nu_b(j) + std::pow(b_i(j), 2) / (2.0 * tau_b * s2_i)));
                     if (lamb_b_new(j) > 1e+8) lamb_b_new(j) = 1e+8;
                     if (lamb_b_new(j) < 1e-8) lamb_b_new(j) = 1e-8;
                 }
@@ -433,7 +437,6 @@ namespace bisam {
                                                                        s2_i,
                                                                        tau,
                                                                        0.348,
-                                                                       0.5,
                                                                        thinit,
                                                                        initpar_type,
                                                                        // new_par_include_vars,
@@ -447,7 +450,10 @@ namespace bisam {
                                                                        new_par_alpha,
                                                                        new_par_lambda,
                                                                        strategy,
-                                                                       n
+                                                                       n,
+                                                                       prDelta,
+                                                                       prDeltap,
+                                                                       parprDeltap
             );
 
             w_i = post_sample;

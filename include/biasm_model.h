@@ -40,6 +40,9 @@ namespace bisam {
         int new_par_r,
         double new_par_alpha,
         double new_par_lambda,
+        int prDelta,
+        double prDeltap,
+        std::vector<double> parprDeltap,
         ComputationStrategy strategy
     );
 }
