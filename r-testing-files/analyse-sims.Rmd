@@ -1,0 +1,158 @@
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(knitr)
+```
+
+
+```{r}
+experiment_name <- "cumulative_gains_study"
+results_dir <- "cmake-build-release/simulations"
+```
+
+
+```{r}
+# Read the results files
+timing_file <- file.path(results_dir, paste0(experiment_name, "_timing.csv"))
+estimates_file <- file.path(results_dir, paste0(experiment_name, "_estimates.csv"))
+validation_file <- file.path(results_dir, paste0(experiment_name, "_validation.csv"))
+
+cat("Reading results from experiment:", experiment_name, "\n")
+
+# Check if files exist
+if (!file.exists(timing_file)) stop("Timing file not found: ", timing_file)
+if (!file.exists(estimates_file)) stop("Estimates file not found: ", estimates_file)
+if (!file.exists(validation_file)) stop("Validation file not found: ", validation_file)
+
+# Read data
+timing_data <- read_csv(timing_file, show_col_types = FALSE)
+estimates_data <- read_csv(estimates_file, show_col_types = FALSE)
+validation_data <- read_csv(validation_file, show_col_types = FALSE)
+
+cat("Data loaded successfully:\n")
+cat("  Timing entries:", nrow(timing_data), "\n")
+cat("  Estimation entries:", nrow(estimates_data), "\n")
+cat("  Validation entries:", nrow(validation_data), "\n\n")
+```
+
+
+```{r}
+timing_summary <- timing_data %>%
+  group_by(run_name, n, t, nx) %>%
+  summarise(
+    mean_time_ms = mean(execution_time_ms),
+    median_time_ms = median(execution_time_ms),
+    sd_time_ms = sd(execution_time_ms),
+    min_time_ms = min(execution_time_ms),
+    max_time_ms = max(execution_time_ms),
+    n_runs = n(),
+    .groups = "drop"
+  ) %>%
+  arrange(mean_time_ms)
+```
+
+
+```{r}
+# Filter and prepare data
+plot_data <- timing_summary %>%
+  filter(run_name != "cpp_split_newton_parallel_thopt_o3-native-loop") %>%
+  mutate(
+    time_seconds = mean_time_ms / 1000,
+    optimization = case_when(
+      run_name == "cpp_nothing_else" ~ "C++ Translation",
+      run_name == "cpp_split" ~ "Matrix Splitting", 
+      run_name == "cpp_split_newton" ~ "Newton Root Finding",
+      run_name == "cpp_split_newton_parallel" ~ "Parallelization",
+      run_name == "cpp_split_newton_parallel_thopt" ~ "Model Caching",
+      run_name == "cpp_split_newton_parallel_thopt_o3-native-loop_flto" ~ "Compiler Optimizations"
+    ),
+    optimization = factor(optimization, levels = c(
+      "C++ Translation", "Matrix Splitting", "Newton Root Finding", 
+      "Parallelization", "Model Caching", "Compiler Optimizations"
+    ))
+  ) %>%
+  arrange(desc(time_seconds))
+```
+
+
+```{r}
+# Create the plot
+ggplot(plot_data, aes(x = optimization, y = time_seconds)) +
+  geom_col(fill = "#2c3e50", width = 0.7, alpha = 0.8) +
+  geom_text(aes(label = sprintf("%.2f s", time_seconds)), 
+            vjust = -0.5, size = 3.5, color = "#2c3e50") +
+  scale_y_continuous(
+    limits = c(0, max(plot_data$time_seconds) * 1.15),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title = "Cumulative Performance Improvements",
+    subtitle = "BISAM Framework Optimization (n=5, t=15)",
+    x = NULL,
+    y = "Execution Time (seconds)"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
+    axis.text.y = element_text(size = 10),
+    axis.title.y = element_text(size = 11, margin = margin(r = 15)),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
+    plot.margin = margin(20, 20, 20, 20)
+  )
+```
+
+
+```{r}
+# Calculate speedup factors
+baseline_time <- plot_data$time_seconds[plot_data$optimization == "C++ Translation"]
+final_time <- plot_data$time_seconds[plot_data$optimization == "Compiler Optimizations"]
+speedup <- baseline_time / final_time
+
+cat(sprintf("Overall speedup: %.1fx faster (from %.2f to %.2f seconds)", 
+            speedup, baseline_time, final_time))
+```
+
+```{r}
+# Create speedup table
+speedup_data <- plot_data %>%
+  arrange(desc(time_seconds)) %>%
+  mutate(
+    baseline_time = first(time_seconds),
+    speedup_factor = baseline_time / time_seconds,
+    cumulative_improvement = paste0(round((1 - time_seconds/baseline_time) * 100, 1), "%")
+  ) %>%
+  select(optimization, time_seconds, speedup_factor, cumulative_improvement)
+
+# Generate LaTeX table
+latex_table <- speedup_data %>%
+  mutate(
+    # optimization = str_replace_all(optimization, "\n", " "),
+    time_formatted = paste0(round(time_seconds, 2), "s"),
+    speedup_formatted = paste0(round(speedup_factor, 1), "×")
+  ) %>%
+  select(
+    "Optimization Step" = optimization,
+    "Execution Time" = time_formatted, 
+    "Speedup Factor" = speedup_formatted,
+    "Total Improvement" = cumulative_improvement
+  )
+
+kable(latex_table, format = "latex", booktabs = TRUE, 
+      caption = "Performance improvements from cumulative optimizations") %>%
+  cat()
+```
+
+
+```{r}
+  # Display the final speedup summary
+final_speedup <- round(max(speedup_data$speedup_factor), 1)
+cat(paste0("Overall speedup achieved: ", final_speedup, "× faster\n"))
+cat(paste0("Execution time reduced from ", round(max(speedup_data$time_seconds), 2), 
+           "s to ", round(min(speedup_data$time_seconds), 2), "s"))
+```

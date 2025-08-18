@@ -17,7 +17,7 @@ library(mombf)
 # setwd("~/uni/wu/sis_project")
 
 source("./contr_sim_breaks_fun.R")
-# library(BISAM)
+# library(BISAM)a
 # source("./non_local_ism_fun.R")
 
 set.seed(192837612)
@@ -66,6 +66,8 @@ data_filepath <- "sim_data2.RData"
 
 # Simulate or load data
 sim <- simulate_or_load_data(data_filepath)
+
+# sim <- readRDS('r-testing-files/simulation_data/sim_small_b_n05_t15_nx02.rds')$sim_data
 
 data <- sim$data
 const <- FALSE
@@ -210,7 +212,7 @@ pb <- txtProgressBar(min = 0, max = Ndraw, style = 3)
 
 #$$$$$$$$$$$$$$$$$$$$$ START LOOP $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 for(i in (1-Nburn):Nstore){
-  #i = (1-Nburn)
+  # i = (1-Nburn)
   
   #================ Geweke Test =================.====
   if(geweke){

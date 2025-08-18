@@ -26,7 +26,8 @@ class BisamValidator {
 public:
     static ValidationResults validate_results(const bisam::BisamResult &result,
                                               const DatasetInfo &dataset,
-                                              double detection_threshold = 0.5) {
+                                              double detection_threshold = 0.5,
+                                              bool print_output = true) {
         ValidationResults val;
         val.detection_threshold        = detection_threshold;
         val.beta_mse                   = 0.0;
@@ -39,9 +40,9 @@ public:
         val.has_false_positive         = false;
         val.break_magnitude_error      = 0.0;
 
-        validate_betas(val, result, dataset);
-        validate_constant(val, result, dataset);
-        validate_breaks(val, result, dataset);
+        validate_betas(val, result, dataset, print_output);
+        validate_constant(val, result, dataset, print_output);
+        validate_breaks(val, result, dataset, print_output);
 
         return val;
     }
@@ -149,7 +150,7 @@ private:
         return arma::mean(beta_samples, 0).t(); // transpose to get column vector
     }
 
-    static void validate_betas(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset) {
+    static void validate_betas(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset, bool print_output) {
         if (dataset.true_beta.n_elem > 0 && result.beta_samples.n_cols > 0) {
             arma::vec estimated_betas = compute_beta_means(result.beta_samples);
 
@@ -159,25 +160,29 @@ private:
                 val.beta_mse          = arma::mean(arma::square(beta_errors));
                 val.beta_max_error    = arma::max(beta_errors);
 
-                std::cout << "\n=== BETA VALIDATION ===" << std::endl;
-                std::cout << "True betas:      ";
-                dataset.true_beta.t().raw_print(std::cout);
-                std::cout << "Estimated betas: ";
-                estimated_betas.t().raw_print(std::cout);
-                std::cout << "Errors:          ";
-                beta_errors.t().raw_print(std::cout);
-                std::cout << "Beta MSE: " << std::fixed << std::setprecision(6) << val.beta_mse << std::endl;
-                std::cout << "Beta Max Error: " << val.beta_max_error << std::endl;
+                if (print_output) {
+                    std::cout << "\n=== BETA VALIDATION ===" << std::endl;
+                    std::cout << "True betas:      ";
+                    dataset.true_beta.t().raw_print(std::cout);
+                    std::cout << "Estimated betas: ";
+                    estimated_betas.t().raw_print(std::cout);
+                    std::cout << "Errors:          ";
+                    beta_errors.t().raw_print(std::cout);
+                    std::cout << "Beta MSE: " << std::fixed << std::setprecision(6) << val.beta_mse << std::endl;
+                    std::cout << "Beta Max Error: " << val.beta_max_error << std::endl;
+                }
             } else {
-                std::cout << "\n=== BETA VALIDATION ERROR ===" << std::endl;
-                std::cout << "Dimension mismatch - True: " << dataset.true_beta.n_elem
-                        << ", Estimated: " << estimated_betas.n_elem << std::endl;
+                if (print_output) {
+                    std::cout << "\n=== BETA VALIDATION ERROR ===" << std::endl;
+                    std::cout << "Dimension mismatch - True: " << dataset.true_beta.n_elem
+                            << ", Estimated: " << estimated_betas.n_elem << std::endl;
+                }
             }
         }
     }
 
     static void validate_constant(ValidationResults &val, const bisam::BisamResult &result,
-                                  const DatasetInfo &dataset) {
+                                  const DatasetInfo &dataset, bool print_output) {
         if (dataset.has_const) {
             // Assuming constant is the last column in beta_samples if present
             if (result.beta_samples.n_cols > dataset.true_beta.n_elem) {
@@ -185,36 +190,42 @@ private:
                 double estimated_const    = estimated_betas(estimated_betas.n_elem - 1);
                 val.constant_error        = std::abs(estimated_const - dataset.true_const);
 
-                std::cout << "\n=== CONSTANT VALIDATION ===" << std::endl;
-                std::cout << "True constant: " << dataset.true_const << std::endl;
-                std::cout << "Estimated constant: " << estimated_const << std::endl;
-                std::cout << "Constant error: " << val.constant_error << std::endl;
+                if (print_output) {
+                    std::cout << "\n=== CONSTANT VALIDATION ===" << std::endl;
+                    std::cout << "True constant: " << dataset.true_const << std::endl;
+                    std::cout << "Estimated constant: " << estimated_const << std::endl;
+                    std::cout << "Constant error: " << val.constant_error << std::endl;
+                }
             }
         }
     }
 
-    static void validate_breaks(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset) {
+    static void validate_breaks(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset, bool print_output) {
         // Find the position with highest indicator probability
         if (result.indicator_means.n_elem > 0) {
             val.detected_break_probability = arma::max(result.indicator_means);
             val.detected_break_position    = arma::index_max(result.indicator_means);
 
-            std::cout << "\n=== BREAK VALIDATION ===" << std::endl;
+            if (print_output) {
+                std::cout << "\n=== BREAK VALIDATION ===" << std::endl;
+            }
 
             if (dataset.true_breaks.n_rows > 0) {
                 // There should be a break
                 val.true_break_position = static_cast<int>(dataset.true_breaks(0, 1)); // index column
                 double true_magnitude   = dataset.true_breaks(0, 0);                   // size column
 
-                std::cout << "True break info:" << std::endl;
-                std::cout << "  Position (raw index): " << val.true_break_position << std::endl;
-                std::cout << "  Magnitude: " << true_magnitude << std::endl;
-                std::cout << "  Step mean parameter: " << dataset.step_mean << std::endl;
+                if (print_output) {
+                    std::cout << "True break info:" << std::endl;
+                    std::cout << "  Position (raw index): " << val.true_break_position << std::endl;
+                    std::cout << "  Magnitude: " << true_magnitude << std::endl;
+                    std::cout << "  Step mean parameter: " << dataset.step_mean << std::endl;
 
-                std::cout << "Detected break info:" << std::endl;
-                std::cout << "  Position: " << val.detected_break_position
-                        << " (probability: " << std::fixed << std::setprecision(4)
-                        << val.detected_break_probability << ")" << std::endl;
+                    std::cout << "Detected break info:" << std::endl;
+                    std::cout << "  Position: " << val.detected_break_position
+                            << " (probability: " << std::fixed << std::setprecision(4)
+                            << val.detected_break_probability << ")" << std::endl;
+                }
 
                 // Break is correctly detected if probability exceeds threshold
                 val.break_detected_correctly = (val.detected_break_probability > val.detection_threshold);
@@ -223,32 +234,38 @@ private:
                 val.break_magnitude_error = std::abs(true_magnitude - dataset.step_mean);
             } else {
                 // No true breaks - check for false positives
-                std::cout << "No true breaks in dataset" << std::endl;
-                std::cout << "Highest indicator probability: " << val.detected_break_probability
-                        << " at position " << val.detected_break_position << std::endl;
+                if (print_output) {
+                    std::cout << "No true breaks in dataset" << std::endl;
+                    std::cout << "Highest indicator probability: " << val.detected_break_probability
+                            << " at position " << val.detected_break_position << std::endl;
+                }
 
                 val.has_false_positive       = (val.detected_break_probability > val.detection_threshold);
                 val.break_detected_correctly = !val.has_false_positive;
 
-                if (val.has_false_positive) {
-                    std::cout << "WARNING: Potential false positive break detection!" << std::endl;
-                } else {
-                    std::cout << "Correctly identified no significant breaks" << std::endl;
+                if (print_output) {
+                    if (val.has_false_positive) {
+                        std::cout << "WARNING: Potential false positive break detection!" << std::endl;
+                    } else {
+                        std::cout << "Correctly identified no significant breaks" << std::endl;
+                    }
                 }
             }
 
             // Show indicator probabilities around the detected break
-            std::cout << "\nIndicator probabilities around detected position:" << std::endl;
-            int start = std::max(0, val.detected_break_position - 5);
-            int end   = std::min(static_cast<int>(result.indicator_means.n_elem),
-                               val.detected_break_position + 6);
+            if (print_output) {
+                std::cout << "\nIndicator probabilities around detected position:" << std::endl;
+                int start = std::max(0, val.detected_break_position - 5);
+                int end   = std::min(static_cast<int>(result.indicator_means.n_elem),
+                                   val.detected_break_position + 6);
 
-            for (int i = start; i < end; i++) {
-                std::cout << "  Position " << std::setw(2) << i << ": "
-                        << std::fixed << std::setprecision(4) << result.indicator_means(i);
-                if (i == val.detected_break_position) std::cout << " <-- DETECTED";
-                if (dataset.true_breaks.n_rows > 0 && i == val.true_break_position) std::cout << " <-- TRUE";
-                std::cout << std::endl;
+                for (int i = start; i < end; i++) {
+                    std::cout << "  Position " << std::setw(2) << i << ": "
+                            << std::fixed << std::setprecision(4) << result.indicator_means(i);
+                    if (i == val.detected_break_position) std::cout << " <-- DETECTED";
+                    if (dataset.true_breaks.n_rows > 0 && i == val.true_break_position) std::cout << " <-- TRUE";
+                    std::cout << std::endl;
+                }
             }
         }
     }

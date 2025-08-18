@@ -1,43 +1,53 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 #include <RcppArmadillo.h>
 
 #include "include/biasm_model.h"
 #include "r-testing-files/simulation_data/simulation_datasets.h"
 #include "validation.h"
+#include "result_storage.h"
 
 // ========================================================================
 // CONFIGURATION SECTION
 // ========================================================================
 const bool ENABLE_VALIDATION_OUTPUT = false; // Set to false to disable all validation printing
-const int RUNS_PER_DATASET          = 20;    // Number of times to run each dataset for timing
-const bool SHOW_DETAILED_RESULTS    = false; // Set to false for cleaner output
+const int RUNS_PER_DATASET          = 10;     // Number of times to run each dataset for timing
+const bool APPEND_TO_EXISTING_FILES  = true; // Set to true to append to existing result files
 
 // MCMC Settings
 const int MCMC_ITERATIONS = 5000; // Total MCMC iterations
 const int MCMC_BURNIN     = 500;  // Burn-in period
 
+// Results Storage Configuration
+const std::string EXPERIMENT_NAME = "cumulative_gains_study"; // File name base
+const std::string RUN_NAME = "cpp_split_newton_parallel_thopt_o3-native-loop_flto";   // This run's identifier - CHANGE THIS FOR EACH RUN
+
+// Select which datasets to test (comment/uncomment as needed)
+std::vector<std::string> test_datasets = {
+    // "tiny",    // Very small for quick testing
+    // "small_a", // Small for detailed analysis
+    "small_b", // Another small dataset
+    // "med_a",     // Medium size
+    // "large_a"    // Large size - takes longer
+};
+
 int main() {
-    bisam::FunctionTimer timer;
+    // Initialize results storage
+    bisam::ResultsStorage results_storage(EXPERIMENT_NAME, APPEND_TO_EXISTING_FILES);
 
     // Get all available datasets
     auto datasets = get_all_datasets();
 
-    // Select which datasets to test (comment/uncomment as needed)
-    std::vector<std::string> test_datasets = {
-        "tiny",    // Very small for quick testing
-        "small_a", // Small for detailed analysis
-        "small_b", // Another small dataset
-        // "med_a",     // Medium size
-        // "large_a"    // Large size - takes longer
-    };
-
-    std::cout << "BISAM Performance and Validation Testing" << std::endl;
-    std::cout << "Testing " << test_datasets.size() << " datasets with " << RUNS_PER_DATASET << " runs each" <<
-            std::endl;
-    std::cout << "MCMC Settings: " << MCMC_ITERATIONS << " iterations, " << MCMC_BURNIN << " burn-in" << std::endl;
-    std::cout << "Validation output: " << (ENABLE_VALIDATION_OUTPUT ? "ENABLED" : "DISABLED") << std::endl;
+    if (!ENABLE_VALIDATION_OUTPUT) {
+        std::cout << "BISAM Performance Testing" << std::endl;
+        std::cout << "Experiment: " << EXPERIMENT_NAME << std::endl;
+        std::cout << "Run: " << RUN_NAME << std::endl;
+        std::cout << "Testing " << test_datasets.size() << " datasets with " << RUNS_PER_DATASET << " runs each" << std::endl;
+        std::cout << "MCMC: " << MCMC_ITERATIONS << " iterations, " << MCMC_BURNIN << " burn-in" << std::endl;
+        std::cout << "Append mode: " << (APPEND_TO_EXISTING_FILES ? "ON" : "OFF") << std::endl;
+    }
 
     for (const auto &dataset: datasets) {
         // Skip datasets not in test list
@@ -45,14 +55,11 @@ int main() {
             continue;
         }
 
-        // Print dataset information once per dataset
+        // Print dataset information
         if (ENABLE_VALIDATION_OUTPUT) {
             BisamValidator::print_dataset_info(dataset);
         } else {
-            std::cout << "\n" << std::string(50, '=') << std::endl;
-            std::cout << "DATASET: " << dataset.name
-                    << " (n=" << dataset.n << ", t=" << dataset.t << ", nx=" << dataset.nx << ")" << std::endl;
-            std::cout << std::string(50, '=') << std::endl;
+            std::cout << "\n" << dataset.name << " (n=" << dataset.n << ", t=" << dataset.t << ", nx=" << dataset.nx << "): ";
         }
 
         // Variables to store validation results from first run
@@ -61,118 +68,113 @@ int main() {
 
         // Run the dataset multiple times for timing
         for (int run = 0; run < RUNS_PER_DATASET; run++) {
-            std::cout << "\nRun " << (run + 1) << "/" << RUNS_PER_DATASET << " for dataset " << dataset.name;
-            if (!ENABLE_VALIDATION_OUTPUT) {
-                std::cout << "...";
+            if (ENABLE_VALIDATION_OUTPUT) {
+                std::cout << "\nRun " << (run + 1) << "/" << RUNS_PER_DATASET << " for dataset " << dataset.name << std::endl;
             }
-            std::cout << std::endl;
 
-            // Start timing
-            timer.start_section("BISAM_" + dataset.name);
-
+            // Start timing for this individual run
+            auto start_time = std::chrono::high_resolution_clock::now();
 
             // Run BISAM with optimized settings
             bisam::BisamResult result = bisam::estimate_model(
                 dataset.data,
-                0,
-                1,
-                2,
-                // column indices: unit, time, y
+                0, 1, 2, // column indices: unit, time, y
                 MCMC_ITERATIONS,
                 MCMC_BURNIN,
-                // use configuration values
-                "g",
-                // prior type
-                100.0,
-                // prior scale
-                0.001,
-                0.001,
-                // tolerances
-                1.0,
-                1.0,
-                1.0,
-                // prior parameters
-                true,
-                // include indicators
-                false,
-                false,
-                false,
-                // no fixed effects for performance testing
-                true,
-                true,
-                // IIS, SIS
-                2,
-                1,
-                2,
-                0,
-                // method parameters
-                100000,
-                1,
-                1,
-                // MCMC parameters
-                0.01,
-                0.01,
-                // alpha, lambda
-                1,
-                0.5,
-                {1, 1},
-                // additional parameters
-                bisam::ComputationStrategy::SPLIT_SEQUENTIAL // Use optimized strategy
+                "g",      // prior type
+                100.0,    // prior scale
+                0.001, 0.001, // tolerances
+                1.0, 1.0, 1.0, // prior parameters
+                true,     // include indicators
+                false, false, false, // no fixed effects for performance testing
+                true, true,   // IIS, SIS
+                2, 1, 2, 0,   // method parameters
+                100000, 1, 1, // MCMC parameters
+                0.01, 0.01,   // alpha, lambda
+                1, 0.5, {1, 1}, // additional parameters
+                bisam::ComputationStrategy::SPLIT_PARALLEL // Use optimized strategy
             );
 
-            timer.end_section("BISAM_" + dataset.name);
+            // End timing for this individual run
+            auto end_time = std::chrono::high_resolution_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+            double execution_time_ms = duration.count() / 1000.0; // Convert to milliseconds
 
-            // Only do validation on the first run and only if enabled
-            if (ENABLE_VALIDATION_OUTPUT && run == 0) {
-                first_run_validation = BisamValidator::validate_results(result, dataset, 0.5);
-                BisamValidator::print_validation_summary(first_run_validation, dataset.name);
+            // Store timing result
+            results_storage.add_timing_result(dataset.name, RUN_NAME, run + 1, execution_time_ms,
+                                            dataset.n, dataset.t, dataset.nx);
 
-                if (SHOW_DETAILED_RESULTS) {
-                    BisamValidator::print_detailed_results(result, dataset);
+            // Store estimation results
+            results_storage.add_estimation_results(dataset.name, RUN_NAME, run + 1, result, dataset);
+
+            // Always do validation but control printing
+            ValidationResults validation = BisamValidator::validate_results(result, dataset, 0.5, ENABLE_VALIDATION_OUTPUT);
+            results_storage.add_validation_summary(dataset.name, RUN_NAME, run + 1, validation);
+
+            // Handle output based on setting
+            if (ENABLE_VALIDATION_OUTPUT) {
+                if (run == 0) {
+                    first_run_validation = validation;
+                    BisamValidator::print_validation_summary(first_run_validation, dataset.name);
+                    validation_done = true;
                 }
-                validation_done = true;
-            } else if (!ENABLE_VALIDATION_OUTPUT && run == 0) {
-                // At least validate silently to check correctness
-                first_run_validation = BisamValidator::validate_results(result, dataset, 0.5);
-                validation_done      = true;
-
-                // Print brief summary without detailed output
-                std::cout << "  Beta accuracy: "
-                        << (first_run_validation.beta_max_error < 0.5 ? "GOOD" : "NEEDS ATTENTION")
-                        << " (max error: " << std::fixed << std::setprecision(4)
-                        << first_run_validation.beta_max_error << ")" << std::endl;
-                std::cout << "  Break detection: "
-                        << (first_run_validation.break_detected_correctly ? "CORRECT" : "INCORRECT")
-                        << " (prob: " << first_run_validation.detected_break_probability << ")" << std::endl;
+            } else {
+                // Just show timing - no validation output
+                if (run == 0) {
+                    std::cout << std::fixed << std::setprecision(1) << execution_time_ms << "ms";
+                    first_run_validation = validation;
+                    validation_done = true;
+                } else {
+                    std::cout << ", " << std::fixed << std::setprecision(1) << execution_time_ms << "ms";
+                }
             }
 
-            if (!ENABLE_VALIDATION_OUTPUT) {
-                std::cout << "  Run " << (run + 1) << " completed successfully" << std::endl;
-            }
+
         }
 
-        // Print summary for this dataset
-        if (validation_done && !ENABLE_VALIDATION_OUTPUT) {
-            std::cout << "\nDataset " << dataset.name << " summary:" << std::endl;
-            std::cout << "  Completed " << RUNS_PER_DATASET << " runs successfully" << std::endl;
-            std::cout << "  Beta estimation: "
-                    << (first_run_validation.beta_max_error < 0.5 ? "GOOD" : "NEEDS ATTENTION") << std::endl;
-            std::cout << "  Break detection: "
-                    << (first_run_validation.break_detected_correctly ? "CORRECT" : "INCORRECT") << std::endl;
+        // Print brief summary for this dataset
+        if (!ENABLE_VALIDATION_OUTPUT && validation_done) {
+            std::cout << " | Beta: " << (first_run_validation.beta_max_error < 0.5 ? "OK" : "FAIL")
+                      << " | Break: " << (first_run_validation.break_detected_correctly ? "OK" : "FAIL") << std::endl;
         }
     }
 
-    // Print timing summary
-    std::cout << "\n" << std::string(70, '=') << std::endl;
-    std::cout << "PERFORMANCE SUMMARY (" << RUNS_PER_DATASET << " runs per dataset)" << std::endl;
-    std::cout << std::string(70, '=') << std::endl;
-    timer.print_section_summary();
+    // Save all results to files
+    std::cout << "\nSaving results..." << std::endl;
+    results_storage.save_results();
 
-    // Print configuration summary
-    std::cout << "\nConfiguration used:" << std::endl;
-    std::cout << "  MCMC: " << MCMC_ITERATIONS << " iterations, " << MCMC_BURNIN << " burn-in" << std::endl;
-    std::cout << "  Runs per dataset: " << RUNS_PER_DATASET << std::endl;
-    std::cout << "  Validation output: " << (ENABLE_VALIDATION_OUTPUT ? "ENABLED" : "DISABLED") << std::endl;
+    std::cout << "Completed run: " << RUN_NAME << std::endl;
 
     return 0;
 }
+
+// ========================================================================
+// USAGE INSTRUCTIONS
+// ========================================================================
+
+/*
+SIMPLE USAGE:
+
+1. Set EXPERIMENT_NAME to the study name (this determines file names)
+2. Set RUN_NAME to identify this specific run/version
+3. Set APPEND_TO_EXISTING_FILES = true to add to existing files
+4. Choose your datasets in test_datasets
+5. Compile and run
+
+For cumulative gains study:
+- Keep EXPERIMENT_NAME = "cumulative_gains_study"
+- Change RUN_NAME for each version: "R_original", "cpp_basic", "cpp_optimized", etc.
+- Set APPEND_TO_EXISTING_FILES = true
+- Results go to cumulative_gains_study_timing.csv with RUN_NAME stored in each row
+
+For root finding comparison:
+- Set EXPERIMENT_NAME = "root_finding_comparison"
+- Change RUN_NAME for each algorithm: "jenkins_traub", "newton_raphson", etc.
+- Recompile with different algorithms and run
+- Results append to root_finding_comparison_timing.csv
+
+For parallelization study:
+- Set EXPERIMENT_NAME = "parallelization_study"
+- Change RUN_NAME for each core count: "1_core", "4_cores", "8_cores", etc.
+- Results append to parallelization_study_timing.csv
+*/

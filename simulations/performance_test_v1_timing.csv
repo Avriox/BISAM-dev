@@ -1,0 +1,10 @@
+experiment_name,dataset_name,run_number,execution_time_ms,n,t,nx
+performance_test_v1,tiny,1,2392.842,3,15,2
+performance_test_v1,tiny,2,2340.810,3,15,2
+performance_test_v1,tiny,3,2292.481,3,15,2
+performance_test_v1,small_a,1,6200.266,3,20,3
+performance_test_v1,small_a,2,6653.038,3,20,3
+performance_test_v1,small_a,3,6177.861,3,20,3
+performance_test_v1,small_b,1,3372.775,5,15,2
+performance_test_v1,small_b,2,3403.056,5,15,2
+performance_test_v1,small_b,3,3406.559,5,15,2

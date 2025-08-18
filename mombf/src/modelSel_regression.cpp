@@ -6695,9 +6695,9 @@ void imomIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doub
 
   // TODO MODEL STORAGE DOES NOT WORK FOR PARALLEL RUNS!
   if (model_thopt_mapping.count(current_model) > 0) {
-    for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
-      thopt[i + 1] = model_thopt_mapping[current_model][i];
-    }
+  for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
+  thopt[i + 1] = model_thopt_mapping[current_model][i];
+  }
   } else {
     Asym_xsel(Vinv, *nsel, ytX, sel, thopt);
   }

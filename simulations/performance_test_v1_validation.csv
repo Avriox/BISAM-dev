@@ -1,0 +1,10 @@
+experiment_name,dataset_name,run_number,beta_mse,beta_max_error,break_detected_correctly,true_break_position,detected_break_position,detected_break_probability,constant_error,detection_threshold
+performance_test_v1,tiny,1,3.72537191,2.70580920,TRUE,23,0,0.73822222,0.00000000,0.50000000
+performance_test_v1,tiny,2,3.61194184,2.66311526,TRUE,23,0,0.76266667,0.00000000,0.50000000
+performance_test_v1,tiny,3,3.67153357,2.68355238,TRUE,23,0,0.74955556,0.00000000,0.50000000
+performance_test_v1,small_a,1,0.02528289,0.23905885,TRUE,50,41,1.00000000,0.00000000,0.50000000
+performance_test_v1,small_a,2,0.02594276,0.23695016,TRUE,50,41,1.00000000,0.00000000,0.50000000
+performance_test_v1,small_a,3,0.02598817,0.24085177,TRUE,50,41,1.00000000,0.00000000,0.50000000
+performance_test_v1,small_b,1,0.07387619,0.35440826,TRUE,23,17,1.00000000,0.00000000,0.50000000
+performance_test_v1,small_b,2,0.07301550,0.34639815,TRUE,23,17,1.00000000,0.00000000,0.50000000
+performance_test_v1,small_b,3,0.06618556,0.33412217,TRUE,23,17,1.00000000,0.00000000,0.50000000
