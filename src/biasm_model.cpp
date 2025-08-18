@@ -16,7 +16,7 @@ namespace bisam {
     //
 
 
-    BisamResult estimate_model(arma::mat &data,
+    BisamResult estimate_model(arma::mat data,
                                int i_index,
                                int t_index,
                                int y_index,

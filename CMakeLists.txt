@@ -121,6 +121,7 @@ add_executable(BISAM main.cpp
         include/globals.h
         include/fast_polynomial_solver.h
         src/fast_polynomial_solver.cpp
+        include/validation.h
 )
 
 # Include all necessary directories for header lookup

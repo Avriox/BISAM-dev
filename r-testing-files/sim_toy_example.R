@@ -9,14 +9,15 @@ rm(list = ls())
 #  install.packages("BiocManager")
 # BiocManager::install("sparseMatrixStats", force = TRUE)
 
-#remove.packages("mombf")
-#devtools::install("../mombf/mombf")
-
+# remove.packages("mombf")
+# install.packages("mombf")
+# devtools::install("../mombf/mombf")
+library(mombf)
 
 # setwd("~/uni/wu/sis_project")
 
 source("./contr_sim_breaks_fun.R")
-
+# library(BISAM)
 # source("./non_local_ism_fun.R")
 
 set.seed(192837612)

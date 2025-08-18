@@ -258,6 +258,9 @@ namespace bisam {
             first_call = false;
         }
 
+        // std::cout << "y: " << y << std::endl << std::endl;
+        // std::cout << "x: " << x << std::endl << std::endl;
+
         switch (strategy) {
             case ComputationStrategy::STANDARD:
                 // Simple passthrough to modelSelection
