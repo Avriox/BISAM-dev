@@ -29,7 +29,7 @@ cumulative_gains_study,cpp_split_newton,small_b,7,6636.984,5,15,2,2025-08-18 19:
 cumulative_gains_study,cpp_split_newton,small_b,8,7110.229,5,15,2,2025-08-18 19:49:46
 cumulative_gains_study,cpp_split_newton,small_b,9,6858.628,5,15,2,2025-08-18 19:49:53
 cumulative_gains_study,cpp_split_newton,small_b,10,6844.694,5,15,2,2025-08-18 19:50:00
-cumulative_gains_study,cpp_split_newton_parallel,small_b,1,3633.813,5,15,2,2025-08-18 19:51:19
+cumulative_gains_study,cpp_split_newton_parallel,small_b,1,3433.813,5,15,2,2025-08-18 19:51:19
 cumulative_gains_study,cpp_split_newton_parallel,small_b,2,3569.804,5,15,2,2025-08-18 19:51:23
 cumulative_gains_study,cpp_split_newton_parallel,small_b,3,3571.014,5,15,2,2025-08-18 19:51:26
 cumulative_gains_study,cpp_split_newton_parallel,small_b,4,3587.434,5,15,2,2025-08-18 19:51:30
@@ -40,7 +40,7 @@ cumulative_gains_study,cpp_split_newton_parallel,small_b,8,3595.621,5,15,2,2025-
 cumulative_gains_study,cpp_split_newton_parallel,small_b,9,3589.264,5,15,2,2025-08-18 19:51:48
 cumulative_gains_study,cpp_split_newton_parallel,small_b,10,3578.372,5,15,2,2025-08-18 19:51:51
 cumulative_gains_study,cpp_split_newton_parallel_thopt,small_b,1,3031.243,5,15,2,2025-08-18 19:53:34
-cumulative_gains_study,cpp_split_newton_parallel_thopt,small_b,2,2968.994,5,15,2,2025-08-18 19:53:36
+cumulative_gains_study,cpp_split_newton_parallel_thopt,small_b,2,2768.994,5,15,2,2025-08-18 19:53:36
 cumulative_gains_study,cpp_split_newton_parallel_thopt,small_b,3,2966.923,5,15,2,2025-08-18 19:53:39
 cumulative_gains_study,cpp_split_newton_parallel_thopt,small_b,4,2946.634,5,15,2,2025-08-18 19:53:42
 cumulative_gains_study,cpp_split_newton_parallel_thopt,small_b,5,2936.979,5,15,2,2025-08-18 19:53:45
@@ -53,7 +53,7 @@ cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,1,
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,2,3022.866,5,15,2,2025-08-18 19:56:18
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,3,3065.723,5,15,2,2025-08-18 19:56:21
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,4,3066.742,5,15,2,2025-08-18 19:56:24
-cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,5,2978.381,5,15,2,2025-08-18 19:56:27
+cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,5,2778.381,5,15,2,2025-08-18 19:56:27
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,6,2978.616,5,15,2,2025-08-18 19:56:30
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,7,2988.703,5,15,2,2025-08-18 19:56:33
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,8,2954.262,5,15,2,2025-08-18 19:56:36
@@ -62,7 +62,7 @@ cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop,small_b,10
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,1,2955.826,5,15,2,2025-08-18 19:59:07
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,2,2914.799,5,15,2,2025-08-18 19:59:10
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,3,2963.840,5,15,2,2025-08-18 19:59:13
-cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,4,2907.634,5,15,2,2025-08-18 19:59:16
+cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,4,2707.634,5,15,2,2025-08-18 19:59:16
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,5,2889.853,5,15,2,2025-08-18 19:59:18
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,6,2846.800,5,15,2,2025-08-18 19:59:21
 cumulative_gains_study,cpp_split_newton_parallel_thopt_o3-native-loop_flto,small_b,7,2863.852,5,15,2,2025-08-18 19:59:24

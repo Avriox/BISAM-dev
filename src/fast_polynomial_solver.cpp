@@ -705,7 +705,8 @@ static void AberthEhrlich(int n, const double coeff_re[], const double coeff_im[
 
         // Simple upper bound for P(z) using Horner with complex coefficients
         f0  = complex_abs(a_re[n], a_im[n]);
-        eps = 6 * n * f0 * pow((double) _DBL_RADIX, -DBL_MANT_DIG);
+        // eps = 6 * n * f0 * pow((double) _DBL_RADIX, -DBL_MANT_DIG);
+        eps = 2 * n * f0 * MACHINE_EPSILON;
 
         for (i        = 0; i <= n; i++)
             apolyr[i] = complex_abs(a_re[i], a_im[i]);

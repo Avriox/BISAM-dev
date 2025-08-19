@@ -23,6 +23,6 @@ enum PolyRootAlgo {
     ABERTH_EHRLICH
 };
 
-constexpr PolyRootAlgo root_finding_algo = PolyRootAlgo::NEWTON_MADSEN;
+constexpr PolyRootAlgo root_finding_algo = PolyRootAlgo::ABERTH_EHRLICH;
 
 #endif //GLOBAL_STORAGE_H

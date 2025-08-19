@@ -8,7 +8,7 @@ library(stringr)
 ```
 
 ```{r config}
-cumulative_experiment_name <- "cumulative_gains_study"
+cumulative_experiment_name <- "cumulative_gains_study_aberth"
 multithreading_experiment_name <- "multithreading"
 results_dir <- "./simulations"
 ```
@@ -81,19 +81,19 @@ multithreading_timing_summary <- create_timing_summary(multithreading_timing_dat
 # Prepare cumulative optimization data
 cumulative_data <- cumulative_timing_summary %>%
   filter(str_detect(run_name, "cpp_")) %>%
-  filter(run_name != "cpp_split_newton_parallel_thopt_o3-native-loop") %>%
+  filter(run_name != "cpp_split_aberth_parallel_thopt_o3-native-loop") %>%
   mutate(
     time_seconds = mean_time_ms / 1000,
     optimization = case_when(
       run_name == "cpp_nothing_else" ~ "C++ Translation",
       run_name == "cpp_split" ~ "Matrix Splitting", 
-      run_name == "cpp_split_newton" ~ "Newton Root Finding",
-      run_name == "cpp_split_newton_parallel" ~ "Parallelization",
-      run_name == "cpp_split_newton_parallel_thopt" ~ "Model Caching",
-      run_name == "cpp_split_newton_parallel_thopt_o3-native-loop_flto" ~ "Compiler Optimizations"
+      run_name == "cpp_split_aberth" ~ "Aberth-Ehrlich Root Finding",
+      run_name == "cpp_split_aberth_parallel" ~ "Parallelization",
+      run_name == "cpp_split_aberth_parallel_thopt" ~ "Model Caching",
+      run_name == "cpp_split_aberth_parallel_thopt_o3-native-loop_flto" ~ "Compiler Optimizations"
     ),
     optimization = factor(optimization, levels = c(
-      "C++ Translation", "Matrix Splitting", "Newton Root Finding", 
+      "C++ Translation", "Matrix Splitting", "Aberth-Ehrlich Root Finding", 
       "Parallelization", "Model Caching", "Compiler Optimizations"
     ))
   ) %>%
@@ -103,7 +103,7 @@ cumulative_data <- cumulative_timing_summary %>%
 ```{r cumulative_plot}
 # Create cumulative performance plot
 ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
-  geom_col(fill = "#2c3e50", width = 0.7, alpha = 0.8) +
+  geom_col(fill = "#2980b9", width = 0.7, alpha = 0.8) +
   geom_text(aes(label = sprintf("%.2f s", time_seconds)), 
             vjust = -0.5, size = 3.5, color = "#2c3e50") +
   scale_y_continuous(
@@ -126,6 +126,42 @@ ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
     plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
     plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
     plot.margin = margin(20, 20, 20, 20)
+  )
+```
+
+```{r cumulative_plot}
+# Create cumulative performance plot with points and log scale
+# Create cumulative performance plot with points and log scale
+ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
+  geom_point(size = 5, color = "#2980b9", alpha = 0.8) +
+  geom_segment(aes(xend = optimization, yend = 0.5), 
+               color = "#2980b9", alpha = 0.6, size = 1.2) +
+  geom_text(aes(label = sprintf("%.2f s", time_seconds)),
+            vjust = -1.2, size = 4.2, color = "#2c3e50") +
+  scale_y_log10(
+    breaks = c(0.5, 1, 2, 5, 10, 20, 50, 100),
+    labels = c("0.5", "1", "2", "5", "10", "20", "50", "100"),
+    limits = c(0.5, 150),
+    expand = c(0, 0)
+  ) +
+  annotation_logticks(sides = "l", size = 0.4) +
+  labs(
+    title = "Cumulative Performance Improvements",
+    subtitle = "BISAM Framework Optimization (n=5, t=15) - Log Scale",
+    x = NULL,
+    y = "Execution Time (seconds) - Log Scale"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(color = "grey90", size = 0.4),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title.y = element_text(size = 13, margin = margin(r = 15)),
+    plot.title = element_text(size = 16, face = "bold", margin = margin(b = 8)),
+    plot.subtitle = element_text(size = 13, color = "#666666", margin = margin(b = 25)),
+    plot.margin = margin(25, 25, 25, 25)
   )
 ```
 

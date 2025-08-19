@@ -1,0 +1,16 @@
+experiment_name,run_name,dataset_name,run_number,execution_time_ms,n,t,nx,timestamp
+root_finding,JenkinsTraub,med_a,1,31128.476,10,20,4,2025-08-19 20:05:37
+root_finding,JenkinsTraub,med_a,2,32459.290,10,20,4,2025-08-19 20:06:09
+root_finding,JenkinsTraub,med_a,3,30800.578,10,20,4,2025-08-19 20:06:40
+root_finding,JenkinsTraub,med_a,4,31006.929,10,20,4,2025-08-19 20:07:11
+root_finding,JenkinsTraub,med_a,5,31910.605,10,20,4,2025-08-19 20:07:43
+root_finding,Newton,med_a,1,17981.279,10,20,4,2025-08-19 20:11:46
+root_finding,Newton,med_a,2,18317.190,10,20,4,2025-08-19 20:12:04
+root_finding,Newton,med_a,3,17697.569,10,20,4,2025-08-19 20:12:22
+root_finding,Newton,med_a,4,18350.619,10,20,4,2025-08-19 20:12:40
+root_finding,Newton,med_a,5,18995.528,10,20,4,2025-08-19 20:12:59
+root_finding,Aberth,med_a,1,6381.050,10,20,4,2025-08-19 20:15:24
+root_finding,Aberth,med_a,2,6769.943,10,20,4,2025-08-19 20:15:31
+root_finding,Aberth,med_a,3,5617.385,10,20,4,2025-08-19 20:15:37
+root_finding,Aberth,med_a,4,5453.022,10,20,4,2025-08-19 20:15:42
+root_finding,Aberth,med_a,5,6588.848,10,20,4,2025-08-19 20:15:49

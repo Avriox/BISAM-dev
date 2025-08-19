@@ -12,8 +12,8 @@
 // ========================================================================
 // CONFIGURATION SECTION
 // ========================================================================
-const bool ENABLE_VALIDATION_OUTPUT = false; // Set to false to disable all validation printing
-const int RUNS_PER_DATASET          = 3;     // Number of times to run each dataset for timing
+const bool ENABLE_VALIDATION_OUTPUT = true; // Set to false to disable all validation printing
+const int RUNS_PER_DATASET          = 10;     // Number of times to run each dataset for timing
 const bool APPEND_TO_EXISTING_FILES  = true; // Set to true to append to existing result files
 
 // MCMC Settings
@@ -21,16 +21,16 @@ const int MCMC_ITERATIONS = 5000; // Total MCMC iterations
 const int MCMC_BURNIN     = 500;  // Burn-in period
 
 // Results Storage Configuration
-const std::string EXPERIMENT_NAME = "multithreading"; // File name base
+const std::string EXPERIMENT_NAME = "ignore"; // File name base
 
 // Select which datasets to test (comment/uncomment as needed)
 std::vector<std::string> test_datasets = {
     // "tiny",    // Very small for quick testing
     // "small_a", // Small for detailed analysis
-    // "small_b", // Another small dataset
+    "small_b", // Another small dataset
     // "med_a",     // Medium size
     // "large_a"    // Large size - takes longer
-    "large_b"
+    // "large_b"
 };
 
 int main() {
@@ -49,12 +49,10 @@ int main() {
 
     // Loop through thread counts from 1 to 30
         // Update RUN_NAME for current thread count
-    int thread_count = 20;
-        std::string RUN_NAME = std::to_string(thread_count) + "-core";
 
-        std::cout << "\n=== Testing with " << thread_count << " threads ===" << std::endl;
+        std::string RUN_NAME ="cpp_split_newton_parallel_thopt_o3-native-loop_flto";
 
-        for (const auto &dataset: datasets) {
+             for (const auto &dataset: datasets) {
             // Skip datasets not in test list
             if (std::find(test_datasets.begin(), test_datasets.end(), dataset.name) == test_datasets.end()) {
                 continue;
@@ -98,7 +96,7 @@ int main() {
                     0.01, 0.01,   // alpha, lambda
                     1, 0.5, {1, 1}, // additional parameters
                     bisam::ComputationStrategy::SPLIT_PARALLEL, // Use optimized strategy
-                    thread_count  // Use current thread count
+                    8  // Use current thread count
                     );
 
                 // End timing for this individual run
@@ -144,10 +142,10 @@ int main() {
         }
 
         // Save results after each thread count iteration to ensure data is persisted
-        std::cout << "Saving results for " << thread_count << " threads..." << std::endl;
+
         results_storage.save_results();
         results_storage.clear_memory(); // Clear accumulated results to prevent memory issues
-        std::cout << "Results saved for " << thread_count << " threads." << std::endl;
+
 
     // Final save (redundant but ensures everything is saved)
     std::cout << "\nFinal save of all results..." << std::endl;

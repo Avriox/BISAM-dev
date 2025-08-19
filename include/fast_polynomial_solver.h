@@ -28,9 +28,9 @@ constexpr int MAX_ITER = 50;
 
 // ===== Aberth-Ehrlich solver constants =====
 constexpr int MAX_ABERTH_ITER          = 50;
-constexpr double OSCILLATION_THRESHOLD = 1e-10; // Threshold to detect oscillation
+constexpr double OSCILLATION_THRESHOLD = 1e-12; // Threshold to detect oscillation
 constexpr double GOOD_ENOUGH_THRESHOLD = 1e-15; // Early termination threshold
-constexpr int MAX_OSCILLATION_COUNT    = 4;     // Maximum oscillation count before early termination
+constexpr int MAX_OSCILLATION_COUNT    = 3;     // Maximum oscillation count before early termination
 
 // ===== Global cache and helper structs =====
 
