@@ -3,6 +3,8 @@
 //
 #include "modelselection_strategy.h"
 #include <stdexcept>
+#include <algorithm>
+#include <iostream>
 
 namespace bisam {
     // Global instance of the parallel executor to be reused across calls
@@ -26,33 +28,47 @@ namespace bisam {
     }
 
     void ModelSelectionParallelExecutor::set_max_threads(int max_threads) {
-        if (max_threads > 0) {
-            this->num_threads = max_threads;
+        // Handle special cases: 0 or negative means use all available
+        if (max_threads <= 0) {
 #ifdef _OPENMP
-            // Update OpenMP's thread count for future parallel regions
-            omp_set_num_threads(max_threads);
+            this->num_threads = omp_get_max_threads();
+#else
+            this->num_threads = 1;
 #endif
+        } else {
+            // Use exactly the specified number of threads
+            this->num_threads = max_threads;
         }
+
+#ifdef _OPENMP
+        // Force re-initialization with new thread count
+        initialized = false;
+        g_omp_pool_initialized = false;
+#endif
     }
 
     void ModelSelectionParallelExecutor::initialize() {
         if (!initialized) {
 #ifdef _OPENMP
-
             // Control nested parallelism - disable it to prevent excessive thread creation
             omp_set_nested(0);
 
-            // Set the OpenMP thread pool size once at initialization
+            // Set dynamic adjustment off to enforce exact thread count
+            omp_set_dynamic(0);
+
+            // Set the OpenMP thread pool size
             omp_set_num_threads(num_threads);
 
-            // Create a global thread pool if it hasn't been created yet
+            // Force thread pool creation with exact thread count
             if (!g_omp_pool_initialized) {
-                // Force thread pool creation with a minimal parallel region
-#pragma omp parallel
+                // Create thread pool with a dummy parallel region
+#pragma omp parallel num_threads(num_threads)
                 {
-#pragma omp single nowait
+#pragma omp single
                     {
                         g_omp_pool_initialized = true;
+                        // Debug output to verify thread count
+                        // std::cout << "OpenMP initialized with " << omp_get_num_threads() << " threads" << std::endl;
                     }
                 }
             }
@@ -90,115 +106,114 @@ namespace bisam {
         int r,
         double alpha,
         double lambda,
-        int n
+        int n,
+        int max_threads  // NEW: Use this parameter
     ) {
-        // Make sure we're initialized with appropriate thread count
-        if (!initialized) {
-            // For first initialization, set thread pool size based on partition count
-            // This ensures we never create more threads than necessary
-            int appropriate_thread_count = std::min(n,
+        // Set thread count based on max_threads parameter
+        int desired_threads;
+        if (max_threads <= 0) {
+            // Use all available threads
 #ifdef _OPENMP
-                                                    omp_get_max_threads()
+            desired_threads = omp_get_max_threads();
 #else
-                1
+            desired_threads = 1;
 #endif
-            );
-            set_max_threads(appropriate_thread_count);
+        } else {
+            // Use exactly the specified number
+            desired_threads = max_threads;
+        }
+
+        // Only update if different from current setting
+        if (desired_threads != num_threads || !initialized) {
+            set_max_threads(desired_threads);
             initialize();
         }
 
-        // Prepare the split data - updated to pass include_vars to partition_data
+        // Prepare the split data
         DataPartition split_data = partition_data(y,
                                                   x,
                                                   deltaini_input,
-                                                  thinit
-                                                  // , include_vars
-                                                  ,
+                                                  thinit,
                                                   n);
 
-        // Initialize vector for results with appropriate padding to avoid false sharing
-        // Each result will be aligned to cache line boundary (64 bytes typical)
+        // Initialize vector for results
         std::vector<arma::Col<int> > results(n);
 
 #ifdef _OPENMP
-        // Use the single construct with tasks for better load balancing
-        // This allows the runtime to schedule work dynamically
-#pragma omp parallel
-        {
-#pragma omp single nowait
-            {
-                for (int part = 0; part < n; part++) {
-#pragma omp task firstprivate(part)
-                    {
-                        results[part] = modelSelection(
-                            split_data.y_parts[part],
-                            split_data.common_x,
-                            niter,
-                            thinning,
-                            burnin,
-                            split_data.delta_init_parts[part],
-                            center,
-                            scale,
-                            XtXprecomp,
-                            phi,
-                            tau,
-                            priorSkew,
-                            prDelta,
-                            prDeltap,
-                            parprDeltap,
-                            split_data.theta_init_parts[part],
-                            initpar_type,
-                            // split_data.include_vars_parts[part], // Use partitioned include_vars
-                            method,
-                            hesstype,
-                            optimMethod,
-                            optim_maxit,
-                            B,
-                            knownphi,
-                            r,
-                            alpha,
-                            lambda
-                        );
-                    }
-                }
-                // Implicit taskwait at the end of the single construct
-            }
+        // CRITICAL: Set threads before any parallel region
+        int original_threads = omp_get_max_threads();
+        omp_set_num_threads(num_threads);
+
+        // Use parallel for with explicit thread count instead of tasks
+        // This gives better control over thread usage
+#pragma omp parallel for num_threads(num_threads) schedule(dynamic)
+        for (int part = 0; part < n; part++) {
+            // Set thread count for nested regions within modelSelection
+            omp_set_num_threads(1);  // Force serial execution in nested regions
+
+            results[part] = modelSelection(
+                split_data.y_parts[part],
+                split_data.common_x,
+                niter,
+                thinning,
+                burnin,
+                split_data.delta_init_parts[part],
+                center,
+                scale,
+                XtXprecomp,
+                phi,
+                tau,
+                priorSkew,
+                prDelta,
+                prDeltap,
+                parprDeltap,
+                split_data.theta_init_parts[part],
+                initpar_type,
+                method,
+                hesstype,
+                optimMethod,
+                optim_maxit,
+                B,
+                knownphi,
+                r,
+                alpha,
+                lambda
+            );
         }
+
+        // Restore original thread count
+        omp_set_num_threads(original_threads);
 #else
         // Fallback to sequential execution if OpenMP is not available
         for (int part = 0; part < n; part++) {
             results[part] = modelSelection(
-                           split_data.y_parts[part],
-                           split_data.common_x,
-                           niter,
-                           thinning,
-                           burnin,
-                           split_data.delta_init_parts[part],
-                           center,
-                           scale,
-                           XtXprecomp,
-                           phi,
-                           tau,
-                           priorSkew,
-                           prDelta,
-                           prDeltap,
-                           parprDeltap,
-                           split_data.theta_init_parts[part],
-                           initpar_type,
-                           // split_data.include_vars_parts[part], // Use partitioned include_vars
-                           method,
-                           hesstype,
-                           optimMethod,
-                           optim_maxit,
-                           B,
-                           knownphi,
-                           r,
-                           alpha,
-                           lambda
-                       );
-
-
-
+                split_data.y_parts[part],
+                split_data.common_x,
+                niter,
+                thinning,
+                burnin,
+                split_data.delta_init_parts[part],
+                center,
+                scale,
+                XtXprecomp,
+                phi,
+                tau,
+                priorSkew,
+                prDelta,
+                prDeltap,
+                parprDeltap,
+                split_data.theta_init_parts[part],
+                initpar_type,
+                method,
+                hesstype,
+                optimMethod,
+                optim_maxit,
+                B,
+                knownphi,
+                r,
+                alpha,
+                lambda
+            );
         }
 #endif
 
@@ -220,7 +235,6 @@ namespace bisam {
                                                  double priorSkew,
                                                  arma::vec thinit,
                                                  InitType initpar_type,
-                                                 // NEW PARAMETERS
                                                  // arma::Col<int> &include_vars,
                                                  int method,
                                                  int hesstype,
@@ -231,35 +245,34 @@ namespace bisam {
                                                  int r,
                                                  double alpha,
                                                  double lambda,
-
-                                                 // /NEW PARAMETERS
                                                  ComputationStrategy strategy,
                                                  int n,
-
                                                  int prDelta,
                                                  double prDeltap,
-                                                 std::vector<double> parprDeltap
+                                                 std::vector<double> parprDeltap,
+                                                 int max_threads  // NEW: Thread control parameter
     ) {
-        // Important: Set the thread pool size based on partition count BEFORE the first parallel region
-        // This ensures the OpenMP thread pool is created with the optimal size and reused for all iterations
-        static bool first_call = true;
-        if (first_call && strategy == ComputationStrategy::SPLIT_PARALLEL) {
+        // Only apply thread limiting for SPLIT_PARALLEL strategy
+        if (strategy == ComputationStrategy::SPLIT_PARALLEL) {
 #ifdef _OPENMP
-            // Create the optimal number of threads on first call
-            int max_threads     = omp_get_max_threads();
-            int optimal_threads = std::min(n, max_threads);
+            // Configure thread count based on max_threads parameter
+            int desired_threads;
+            if (max_threads <= 0) {
+                // 0 or negative means use all available
+                desired_threads = omp_get_max_threads();
+            } else {
+                // Use exactly the specified number
+                desired_threads = max_threads;
+            }
 
-            // Set thread count once for all future parallel regions
-            g_parallel_executor.set_max_threads(optimal_threads);
-
-            // Initialize the persistent thread pool
+            // Update the global executor with the desired thread count
+            g_parallel_executor.set_max_threads(desired_threads);
             g_parallel_executor.initialize();
-#endif
-            first_call = false;
-        }
 
-        // std::cout << "y: " << y << std::endl << std::endl;
-        // std::cout << "x: " << x << std::endl << std::endl;
+            // Debug output
+            // std::cout << "Using " << g_parallel_executor.get_num_threads() << " threads for parallel execution" << std::endl;
+#endif
+        }
 
         switch (strategy) {
             case ComputationStrategy::STANDARD:
@@ -281,7 +294,6 @@ namespace bisam {
                                       parprDeltap,
                                       thinit,
                                       initpar_type,
-                                      // include_vars,
                                       method,
                                       hesstype,
                                       optimMethod,
@@ -293,13 +305,11 @@ namespace bisam {
                                       lambda);
 
             case ComputationStrategy::SPLIT_SEQUENTIAL: {
-                // Prepare the split data - updated to pass include_vars
+                // Prepare the split data
                 DataPartition split_data = partition_data(y,
                                                           x,
                                                           deltaini_input,
-                                                          thinit
-                                                          // ,                    include_vars
-                                                          ,
+                                                          thinit,
                                                           n);
 
                 // Process each part sequentially
@@ -323,7 +333,6 @@ namespace bisam {
                         parprDeltap,
                         split_data.theta_init_parts[part],
                         initpar_type,
-                        // split_data.include_vars_parts[part], // Use partitioned include_vars
                         method,
                         hesstype,
                         optimMethod,
@@ -343,7 +352,7 @@ namespace bisam {
             }
 
             case ComputationStrategy::SPLIT_PARALLEL: {
-                // Use the global parallel executor which maintains thread state between calls
+                // Use the global parallel executor with specified thread count
                 return g_parallel_executor.execute_parallel(
                     y,
                     x,
@@ -362,7 +371,6 @@ namespace bisam {
                     parprDeltap,
                     thinit,
                     initpar_type,
-                    // include_vars,
                     method,
                     hesstype,
                     optimMethod,
@@ -372,7 +380,8 @@ namespace bisam {
                     r,
                     alpha,
                     lambda,
-                    n
+                    n,
+                    max_threads  // Pass the thread control parameter
                 );
             }
 
@@ -387,15 +396,13 @@ namespace bisam {
         const arma::mat &x,
         arma::Col<int> &delta_initial,
         arma::vec &theta_init,
-        // arma::Col<int> &include_vars, // Added parameter
         int num_partitions
     ) {
         DataPartition data;
 
         size_t n_rows      = y.size();
         size_t n_cols      = x.n_cols;
-        size_t thinit_size = theta_init.size(); // Check the actual size of thinit
-        // size_t include_vars_size = include_vars.size(); // Check the size of include_vars
+        size_t thinit_size = theta_init.size();
 
         // Calculate sizes for each part
         size_t rows_per_part  = n_rows / num_partitions;
@@ -403,8 +410,7 @@ namespace bisam {
         size_t rows_remainder = n_rows % num_partitions;
         size_t cols_remainder = n_cols % num_partitions;
 
-        // Extract the same submatrix of x for all parts (as per requirement)
-        // We'll use the first partition's dimensions
+        // Extract the same submatrix of x for all parts
         size_t x_start_row = 0;
         size_t x_end_row   = rows_per_part + (rows_remainder > 0 ? 1 : 0) - 1;
         size_t x_start_col = 0;
@@ -417,17 +423,13 @@ namespace bisam {
         data.y_parts.resize(num_partitions);
         data.delta_init_parts.resize(num_partitions);
         data.theta_init_parts.resize(num_partitions);
-        // data.include_vars_parts.resize(num_partitions); // Added for include_vars
         data.start_columns.resize(num_partitions);
         data.end_columns.resize(num_partitions);
 
         // Check if thinit needs to be split
         bool split_thinit = (thinit_size == n_cols);
 
-        // Check if include_vars needs to be split
-        // bool split_include_vars = (include_vars_size == n_cols);
-
-        // Split y, deltaini_input, and include_vars
+        // Split y and deltaini_input
         for (int part = 0; part < num_partitions; part++) {
             // Calculate row range for this part
             size_t start_row = part * rows_per_part + std::min(static_cast<size_t>(part), rows_remainder);
@@ -442,18 +444,6 @@ namespace bisam {
 
             // Extract the corresponding part of deltaini_input
             data.delta_init_parts[part] = delta_initial.subvec(start_col, end_col);
-
-            // Handle include_vars appropriately based on its size
-            // if (split_include_vars) {
-            //     // If include_vars has the same length as x.n_cols, split it accordingly
-            //     data.include_vars_parts[part] = include_vars.subvec(start_col, end_col);
-            // } else if (include_vars_size > 0) {
-            //     // If include_vars is not empty but doesn't match x.n_cols, use the full vector
-            //     data.include_vars_parts[part] = include_vars;
-            // } else {
-            //     // If include_vars is empty, create an empty vector
-            //     data.include_vars_parts[part] = arma::Col<int>();
-            // }
 
             // Handle thinit appropriately based on its size
             if (split_thinit) {

@@ -48,7 +48,8 @@ namespace bisam {
                                int prDelta,
                                double prDeltap,
                                std::vector<double> parprDeltap,
-                               ComputationStrategy strategy) {
+                               ComputationStrategy strategy,
+                               int num_threads) {
         // [DEV]
         // This sets up a "random device" for development purposes. We need it because RcppArmadillo tries to
         // use R's random number generator per default which we have not loaded when we are developing in cpp.
@@ -453,7 +454,9 @@ namespace bisam {
                                                                        n,
                                                                        prDelta,
                                                                        prDeltap,
-                                                                       parprDeltap
+                                                                       parprDeltap,
+                                                                       num_threads
+
             );
 
             w_i = post_sample;

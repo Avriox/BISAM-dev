@@ -43,7 +43,8 @@ namespace bisam {
         int prDelta,
         double prDeltap,
         std::vector<double> parprDeltap,
-        ComputationStrategy strategy
+        ComputationStrategy strategy,
+        int num_threads = 0
     );
 }
 

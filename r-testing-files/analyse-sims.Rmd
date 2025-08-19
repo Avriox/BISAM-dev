@@ -1,63 +1,86 @@
-
-```{r}
+```{r setup}
 library(ggplot2)
 library(dplyr)
 library(tidyr)
 library(readr)
 library(knitr)
+library(stringr)
 ```
 
-
-```{r}
-experiment_name <- "cumulative_gains_study"
-results_dir <- "cmake-build-release/simulations"
+```{r config}
+cumulative_experiment_name <- "cumulative_gains_study"
+multithreading_experiment_name <- "multithreading"
+results_dir <- "./simulations"
 ```
 
+```{r data_loading_functions}
+# Function to load data - reusable across experiments
+load_experiment_data <- function(experiment_name, results_dir) {
+  timing_file <- file.path(results_dir, paste0(experiment_name, "_timing.csv"))
+  estimates_file <- file.path(results_dir, paste0(experiment_name, "_estimates.csv"))
+  validation_file <- file.path(results_dir, paste0(experiment_name, "_validation.csv"))
+  
+  cat("Reading results from experiment:", experiment_name, "\n")
+  
+  # Read data
+  timing_data <- read_csv(timing_file, show_col_types = FALSE)
+  estimates_data <- read_csv(estimates_file, show_col_types = FALSE)
+  validation_data <- read_csv(validation_file, show_col_types = FALSE)
+  
+  cat("Data loaded successfully:\n")
+  cat("  Timing entries:", nrow(timing_data), "\n")
+  cat("  Estimation entries:", nrow(estimates_data), "\n")
+  cat("  Validation entries:", nrow(validation_data), "\n\n")
+  
+  return(list(
+    timing = timing_data,
+    estimates = estimates_data,
+    validation = validation_data
+  ))
+}
 
-```{r}
-# Read the results files
-timing_file <- file.path(results_dir, paste0(experiment_name, "_timing.csv"))
-estimates_file <- file.path(results_dir, paste0(experiment_name, "_estimates.csv"))
-validation_file <- file.path(results_dir, paste0(experiment_name, "_validation.csv"))
-
-cat("Reading results from experiment:", experiment_name, "\n")
-
-# Check if files exist
-if (!file.exists(timing_file)) stop("Timing file not found: ", timing_file)
-if (!file.exists(estimates_file)) stop("Estimates file not found: ", estimates_file)
-if (!file.exists(validation_file)) stop("Validation file not found: ", validation_file)
-
-# Read data
-timing_data <- read_csv(timing_file, show_col_types = FALSE)
-estimates_data <- read_csv(estimates_file, show_col_types = FALSE)
-validation_data <- read_csv(validation_file, show_col_types = FALSE)
-
-cat("Data loaded successfully:\n")
-cat("  Timing entries:", nrow(timing_data), "\n")
-cat("  Estimation entries:", nrow(estimates_data), "\n")
-cat("  Validation entries:", nrow(validation_data), "\n\n")
+# Function to create timing summary - reusable across experiments
+create_timing_summary <- function(timing_data) {
+  timing_data %>%
+    group_by(run_name, n, t, nx) %>%
+    summarise(
+      mean_time_ms = mean(execution_time_ms),
+      median_time_ms = median(execution_time_ms),
+      sd_time_ms = sd(execution_time_ms),
+      min_time_ms = min(execution_time_ms),
+      max_time_ms = max(execution_time_ms),
+      n_runs = n(),
+      se_time_ms = sd_time_ms / sqrt(n_runs),
+      .groups = "drop"
+    ) %>%
+    arrange(mean_time_ms)
+}
 ```
 
-
-```{r}
-timing_summary <- timing_data %>%
-  group_by(run_name, n, t, nx) %>%
-  summarise(
-    mean_time_ms = mean(execution_time_ms),
-    median_time_ms = median(execution_time_ms),
-    sd_time_ms = sd(execution_time_ms),
-    min_time_ms = min(execution_time_ms),
-    max_time_ms = max(execution_time_ms),
-    n_runs = n(),
-    .groups = "drop"
-  ) %>%
-  arrange(mean_time_ms)
+```{r load_cumulative_data}
+# Load cumulative gains study data
+cumulative_experiment_data <- load_experiment_data(cumulative_experiment_name, results_dir)
+cumulative_timing_data <- cumulative_experiment_data$timing
+cumulative_estimates_data <- cumulative_experiment_data$estimates
+cumulative_validation_data <- cumulative_experiment_data$validation
+cumulative_timing_summary <- create_timing_summary(cumulative_timing_data)
 ```
 
+```{r load_multithreading_data}
+# Load multithreading study data
+multithreading_experiment_data <- load_experiment_data(multithreading_experiment_name, results_dir)
+multithreading_timing_data <- multithreading_experiment_data$timing
+multithreading_estimates_data <- multithreading_experiment_data$estimates
+multithreading_validation_data <- multithreading_experiment_data$validation
+multithreading_timing_summary <- create_timing_summary(multithreading_timing_data)
+```
 
-```{r}
-# Filter and prepare data
-plot_data <- timing_summary %>%
+# Cumulative Performance Analysis
+
+```{r cumulative_data_prep}
+# Prepare cumulative optimization data
+cumulative_data <- cumulative_timing_summary %>%
+  filter(str_detect(run_name, "cpp_")) %>%
   filter(run_name != "cpp_split_newton_parallel_thopt_o3-native-loop") %>%
   mutate(
     time_seconds = mean_time_ms / 1000,
@@ -77,15 +100,14 @@ plot_data <- timing_summary %>%
   arrange(desc(time_seconds))
 ```
 
-
-```{r}
-# Create the plot
-ggplot(plot_data, aes(x = optimization, y = time_seconds)) +
+```{r cumulative_plot}
+# Create cumulative performance plot
+ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
   geom_col(fill = "#2c3e50", width = 0.7, alpha = 0.8) +
   geom_text(aes(label = sprintf("%.2f s", time_seconds)), 
             vjust = -0.5, size = 3.5, color = "#2c3e50") +
   scale_y_continuous(
-    limits = c(0, max(plot_data$time_seconds) * 1.15),
+    limits = c(0, max(cumulative_data$time_seconds) * 1.15),
     expand = c(0, 0)
   ) +
   labs(
@@ -107,20 +129,17 @@ ggplot(plot_data, aes(x = optimization, y = time_seconds)) +
   )
 ```
 
+```{r cumulative_analysis}
+# Calculate speedup factors and create table
+baseline_time <- cumulative_data$time_seconds[cumulative_data$optimization == "C++ Translation"]
+final_time <- cumulative_data$time_seconds[cumulative_data$optimization == "Compiler Optimizations"]
+cumulative_speedup <- baseline_time / final_time
 
-```{r}
-# Calculate speedup factors
-baseline_time <- plot_data$time_seconds[plot_data$optimization == "C++ Translation"]
-final_time <- plot_data$time_seconds[plot_data$optimization == "Compiler Optimizations"]
-speedup <- baseline_time / final_time
+cat(sprintf("Overall speedup: %.1fx faster (from %.2f to %.2f seconds)\n", 
+            cumulative_speedup, baseline_time, final_time))
 
-cat(sprintf("Overall speedup: %.1fx faster (from %.2f to %.2f seconds)", 
-            speedup, baseline_time, final_time))
-```
-
-```{r}
 # Create speedup table
-speedup_data <- plot_data %>%
+cumulative_speedup_data <- cumulative_data %>%
   arrange(desc(time_seconds)) %>%
   mutate(
     baseline_time = first(time_seconds),
@@ -129,10 +148,9 @@ speedup_data <- plot_data %>%
   ) %>%
   select(optimization, time_seconds, speedup_factor, cumulative_improvement)
 
-# Generate LaTeX table
-latex_table <- speedup_data %>%
+# Generate table
+cumulative_latex_table <- cumulative_speedup_data %>%
   mutate(
-    # optimization = str_replace_all(optimization, "\n", " "),
     time_formatted = paste0(round(time_seconds, 2), "s"),
     speedup_formatted = paste0(round(speedup_factor, 1), "×")
   ) %>%
@@ -143,16 +161,121 @@ latex_table <- speedup_data %>%
     "Total Improvement" = cumulative_improvement
   )
 
-kable(latex_table, format = "latex", booktabs = TRUE, 
-      caption = "Performance improvements from cumulative optimizations") %>%
-  cat()
+kable(cumulative_latex_table, format = "html", 
+      caption = "Performance improvements from cumulative optimizations")
+
+# Display final speedup summary
+cumulative_final_speedup <- round(max(cumulative_speedup_data$speedup_factor), 1)
+cat(paste0("\nOverall speedup achieved: ", cumulative_final_speedup, "× faster\n"))
+cat(paste0("Execution time reduced from ", round(max(cumulative_speedup_data$time_seconds), 2), 
+           "s to ", round(min(cumulative_speedup_data$time_seconds), 2), "s\n\n"))
 ```
 
+# Multithreading Performance Analysis
 
-```{r}
-  # Display the final speedup summary
-final_speedup <- round(max(speedup_data$speedup_factor), 1)
-cat(paste0("Overall speedup achieved: ", final_speedup, "× faster\n"))
-cat(paste0("Execution time reduced from ", round(max(speedup_data$time_seconds), 2), 
-           "s to ", round(min(speedup_data$time_seconds), 2), "s"))
+```{r multithreading_data_prep}
+# Prepare multithreading data
+threading_data <- multithreading_timing_summary %>%
+  filter(str_detect(run_name, "\\d+-core")) %>%
+  mutate(
+    core_count = as.numeric(str_extract(run_name, "\\d+(?=-core)")),
+    time_seconds = mean_time_ms / 1000,
+    time_se_seconds = se_time_ms / 1000,
+    ci_lower = time_seconds - 1.96 * time_se_seconds,
+    ci_upper = time_seconds + 1.96 * time_se_seconds
+  ) %>%
+  arrange(core_count)
 ```
+
+```{r multithreading_plot}
+# Create multithreading performance plot
+ggplot(threading_data, aes(x = core_count, y = time_seconds)) +
+  geom_line(color = "#2980b9", size = 1.2) +
+  geom_point(color = "#2980b9", size = 3, alpha = 0.8) +
+  scale_x_continuous(
+    breaks = threading_data$core_count,
+    labels = threading_data$core_count
+  ) +
+  scale_y_continuous(
+    limits = c(0, max(threading_data$time_seconds) * 1.05),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title = "Multithreading Performance Scaling",
+    subtitle = sprintf("Runtime vs Core Count (n=%d, t=%d)", 
+                      threading_data$n[1], threading_data$t[1]),
+    x = "Number of Cores",
+    y = "Execution Time (seconds)"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "#f8f9fa", size = 0.5),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
+    plot.margin = margin(20, 20, 20, 20)
+  )
+```
+
+```{r multithreading_analysis}
+# Calculate threading efficiency
+threading_baseline_time <- threading_data$time_seconds[threading_data$core_count == min(threading_data$core_count)]
+
+threading_efficiency_data <- threading_data %>%
+  mutate(
+    speedup = threading_baseline_time / time_seconds,
+    efficiency = speedup / core_count * 100,
+    theoretical_speedup = core_count,
+    parallel_efficiency = speedup / theoretical_speedup * 100
+  ) %>%
+  select(core_count, time_seconds, speedup, efficiency, parallel_efficiency)
+
+cat("Multithreading Performance Summary:\n")
+cat("=====================================\n")
+
+threading_efficiency_table <- threading_efficiency_data %>%
+  mutate(
+    time_formatted = paste0(round(time_seconds, 3), "s"),
+    speedup_formatted = paste0(round(speedup, 2), "×"),
+    efficiency_formatted = paste0(round(parallel_efficiency, 1), "%")
+  ) %>%
+  select(
+    "Cores" = core_count,
+    "Runtime" = time_formatted,
+    "Speedup" = speedup_formatted,
+    "Parallel Efficiency" = efficiency_formatted
+  )
+
+print(kable(threading_efficiency_table, format = "html",
+      caption = "Multithreading scaling efficiency"))
+
+# Summary statistics
+threading_max_speedup <- max(threading_efficiency_data$speedup)
+threading_best_efficiency <- max(threading_efficiency_data$parallel_efficiency)
+
+cat(sprintf("\nMaximum speedup achieved: %.2fx with %d cores\n", 
+            threading_max_speedup, threading_efficiency_data$core_count[which.max(threading_efficiency_data$speedup)]))
+cat(sprintf("Best parallel efficiency: %.1f%% with %d cores\n", 
+            threading_best_efficiency, threading_efficiency_data$core_count[which.max(threading_efficiency_data$parallel_efficiency)]))
+```
+
+# Combined Analysis Summary
+
+```{r combined_summary}
+cat("Analysis Summary\n")
+cat("===============\n")
+
+cat("Cumulative Optimizations:\n")
+cat(sprintf("- Overall speedup: %.1fx\n", max(cumulative_speedup_data$speedup_factor)))
+cat(sprintf("- Runtime reduction: %.1f%%\n", 
+            (1 - min(cumulative_speedup_data$time_seconds)/max(cumulative_speedup_data$time_seconds)) * 100))
+
+cat("\nMultithreading Scaling:\n")
+cat(sprintf("- Maximum speedup: %.2fx\n", max(threading_efficiency_data$speedup)))
+cat(sprintf("- Best efficiency: %.1f%%\n", max(threading_efficiency_data$parallel_efficiency)))
+cat(sprintf("- Core count range: %d to %d cores\n", 
+            min(threading_data$core_count), max(threading_data$core_count)))
+
+cat("\nAnalysis completed successfully!\n")

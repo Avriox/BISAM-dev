@@ -46,7 +46,8 @@ namespace bisam {
                                                  int n = 3,
                                                  int prDelta = 1,
                                                  double prDeltap = 0.5,
-                                                 std::vector<double> parprDeltap = {1, 1});
+                                                 std::vector<double> parprDeltap = {1, 1},
+                                                 int max_threads = 0);  // NEW: Thread control parameter (0 = use all)
 
     DataPartition partition_data(
         const arma::vec &y,
@@ -69,6 +70,7 @@ namespace bisam {
     private:
         int num_threads;
         bool initialized;
+        int saved_num_threads;  // Store original thread count for restoration
 
     public:
         // Constructor - default to 0 which means use system max
@@ -79,6 +81,12 @@ namespace bisam {
 
         // Set the maximum number of threads for future operations
         void set_max_threads(int max_threads);
+
+        // Get the current thread count
+        int get_num_threads() const { return num_threads; }
+
+        // Cleanup and restore original OpenMP state
+        void cleanup();
 
         // The main execution method that handles parallel processing
         arma::Col<int> execute_parallel(
@@ -109,7 +117,8 @@ namespace bisam {
             int r,
             double alpha,
             double lambda,
-            int n
+            int n,
+            int max_threads  // NEW: Thread control parameter
         );
     };
 }

@@ -11,7 +11,8 @@ rm(list = ls())
 
 # remove.packages("mombf")
 # install.packages("mombf")
-# devtools::install("../mombf/mombf")
+library(devtools)
+devtools::install("../mombf")
 library(mombf)
 
 # setwd("~/uni/wu/sis_project")

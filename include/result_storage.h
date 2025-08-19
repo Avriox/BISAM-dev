@@ -230,6 +230,18 @@ public:
         save_validation_summaries();
     }
 
+    // NEW: Clear memory after saving to prevent accumulation
+    void clear_memory() {
+        timing_results_.clear();
+        estimation_results_.clear();
+        validation_summaries_.clear();
+
+        // Optional: Shrink to fit to release memory back to OS
+        timing_results_.shrink_to_fit();
+        estimation_results_.shrink_to_fit();
+        validation_summaries_.shrink_to_fit();
+    }
+
 private:
     void save_timing_results() {
         std::string filename = base_directory_ + "/" + experiment_name_ + "_timing.csv";
