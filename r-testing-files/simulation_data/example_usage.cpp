@@ -1,39 +1,30 @@
-// Example C++ usage of simulation datasets
+// Example C++ usage of simulation datasets for root finding algorithm comparison
 #include "simulation_datasets.h"
 #include <iostream>
 #include <chrono>
 
 int main() {
-    auto datasets = get_all_datasets();
-    
-    for (const auto& dataset : datasets) {
-        std::cout << "Running BISAM on dataset: " << dataset.name 
-                  << " (n=" << dataset.n << ", t=" << dataset.t << ", nx=" << dataset.nx << ")" << std::endl;
+    // Test different step sizes with same root finding algorithm
+    auto stepsize_datasets = get_stepsize_datasets();
+    std::cout << "Testing different step sizes:" << std::endl;
+    for (const auto& dataset : stepsize_datasets) {
+        std::cout << "Dataset: " << dataset.name << " (step_mean=" << dataset.step_mean << ")" << std::endl;
+        std::cout << "  True breaks: " << dataset.num_breaks << " breaks" << std::endl;
         
-        // Access simulation truth
-        std::cout << "  True betas: " << dataset.true_beta.t();
-        if (dataset.has_const) {
-            std::cout << "  True constant: " << dataset.true_const << std::endl;
-        }
-        if (dataset.true_breaks.n_rows > 0) {
-            std::cout << "  True breaks: " << dataset.true_breaks.n_rows << " breaks" << std::endl;
-        }
-        
-        auto start = std::chrono::high_resolution_clock::now();
-        
-        // YOUR BISAM CODE HERE
-        // arma::mat data_copy = dataset.data;  // Make non-const copy if needed
-        // bisam_result = run_bisam(data_copy);
-        
-        // ACCURACY EVALUATION HERE
-        // Compare bisam_result.estimated_betas with dataset.true_beta
-        // Compare bisam_result.detected_breaks with dataset.true_breaks
-        
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-        
-        std::cout << "  Runtime: " << duration.count() << "ms" << std::endl;
-        std::cout << "  " << std::string(50, '-') << std::endl;
+        // YOUR BISAM CODE HERE with specific root finding algorithm
+        // Compare results across different step sizes
     }
+    
+    // Test different time series lengths
+    auto timelength_datasets = get_timelength_datasets();
+    std::cout << "\nTesting different time series lengths:" << std::endl;
+    for (const auto& dataset : timelength_datasets) {
+        std::cout << "Dataset: " << dataset.name << " (t=" << dataset.t << ")" << std::endl;
+        std::cout << "  True breaks: " << dataset.num_breaks << " breaks" << std::endl;
+        
+        // YOUR BISAM CODE HERE with specific root finding algorithm
+        // Compare results across different time series lengths
+    }
+    
     return 0;
 }

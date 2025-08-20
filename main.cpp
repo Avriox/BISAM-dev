@@ -12,8 +12,8 @@
 // ========================================================================
 // CONFIGURATION SECTION
 // ========================================================================
-const bool ENABLE_VALIDATION_OUTPUT = true; // Set to false to disable all validation printing
-const int RUNS_PER_DATASET          = 10;     // Number of times to run each dataset for timing
+const bool ENABLE_VALIDATION_OUTPUT = false; // Set to false to disable all validation printing
+const int RUNS_PER_DATASET          = 1;     // Number of times to run each dataset for timing
 const bool APPEND_TO_EXISTING_FILES  = true; // Set to true to append to existing result files
 
 // MCMC Settings
@@ -21,16 +21,35 @@ const int MCMC_ITERATIONS = 5000; // Total MCMC iterations
 const int MCMC_BURNIN     = 500;  // Burn-in period
 
 // Results Storage Configuration
-const std::string EXPERIMENT_NAME = "ignore"; // File name base
+const std::string EXPERIMENT_NAME = "timelength"; // File name base
 
 // Select which datasets to test (comment/uncomment as needed)
 std::vector<std::string> test_datasets = {
     // "tiny",    // Very small for quick testing
-    // "small_a", // Small for detailed analysis
-    "small_b", // Another small dataset
+    // "small_b", // Small for detailed analysis
+    // "small_b", // Another small dataset
     // "med_a",     // Medium size
     // "large_a"    // Large size - takes longer
-    // "large_b"
+    // "large_b",
+    // "rootfind_stepsize_050",
+    // "rootfind_stepsize_075",
+    // "rootfind_stepsize_100",
+    // "rootfind_stepsize_150",
+    // "rootfind_stepsize_300",
+    // "rootfind_stepsize_500",
+
+        // "rootfind_timelength_t010",
+        // "rootfind_timelength_t020",
+        // "rootfind_timelength_t030",
+        // "rootfind_timelength_t040",
+        // "rootfind_timelength_t050",
+        // "rootfind_timelength_t060",
+        "rootfind_timelength_t070",
+        // "rootfind_timelength_t080",
+        // "rootfind_timelength_t090",
+        // "rootfind_timelength_t100",
+        // "rootfind_timelength_t110",
+        // "rootfind_timelength_t120",
 };
 
 int main() {
@@ -50,13 +69,15 @@ int main() {
     // Loop through thread counts from 1 to 30
         // Update RUN_NAME for current thread count
 
-        std::string RUN_NAME ="cpp_split_newton_parallel_thopt_o3-native-loop_flto";
+
 
              for (const auto &dataset: datasets) {
             // Skip datasets not in test list
             if (std::find(test_datasets.begin(), test_datasets.end(), dataset.name) == test_datasets.end()) {
                 continue;
             }
+
+                 std::string RUN_NAME = dataset.name;
 
             // Print dataset information
             if (ENABLE_VALIDATION_OUTPUT) {
@@ -95,7 +116,7 @@ int main() {
                     100000, 1, 1, // MCMC parameters
                     0.01, 0.01,   // alpha, lambda
                     1, 0.5, {1, 1}, // additional parameters
-                    bisam::ComputationStrategy::SPLIT_PARALLEL, // Use optimized strategy
+                    bisam::ComputationStrategy::SPLIT_SEQUENTIAL, // Use optimized strategy
                     8  // Use current thread count
                     );
 
@@ -139,12 +160,13 @@ int main() {
                 std::cout << " | Beta: " << (first_run_validation.beta_max_error < 0.5 ? "OK" : "FAIL")
                           << " | Break: " << (first_run_validation.break_detected_correctly ? "OK" : "FAIL") << std::endl;
             }
+                 results_storage.save_results();
+                 results_storage.clear_memory(); // Clear accumulated results to prevent memory issues
         }
 
         // Save results after each thread count iteration to ensure data is persisted
 
-        results_storage.save_results();
-        results_storage.clear_memory(); // Clear accumulated results to prevent memory issues
+
 
 
     // Final save (redundant but ensures everything is saved)
@@ -155,39 +177,3 @@ int main() {
 
     return 0;
 }
-
-// ========================================================================
-// USAGE INSTRUCTIONS
-// ========================================================================
-
-/*
-SIMPLE USAGE:
-
-1. Set EXPERIMENT_NAME to the study name (this determines file names)
-2. Choose your datasets in test_datasets
-3. Set APPEND_TO_EXISTING_FILES = true to add to existing files
-4. Compile and run
-
-This version automatically tests thread counts from 1 to 30:
-- RUN_NAME is automatically set to "{thread_count}-core" (e.g., "1-core", "2-core", etc.)
-- For each thread count, all selected datasets are tested
-- For each dataset, RUNS_PER_DATASET timing runs are performed
-- Results are saved to multithreading_timing.csv with thread count info
-
-For cumulative gains study:
-- Keep EXPERIMENT_NAME = "cumulative_gains_study"
-- Change RUN_NAME for each version: "R_original", "cpp_basic", "cpp_optimized", etc.
-- Set APPEND_TO_EXISTING_FILES = true
-- Results go to cumulative_gains_study_timing.csv with RUN_NAME stored in each row
-
-For root finding comparison:
-- Set EXPERIMENT_NAME = "root_finding_comparison"
-- Change RUN_NAME for each algorithm: "jenkins_traub", "newton_raphson", etc.
-- Recompile with different algorithms and run
-- Results append to root_finding_comparison_timing.csv
-
-For parallelization study:
-- Set EXPERIMENT_NAME = "parallelization_study"
-- This version automatically handles thread count variations from 1-30
-- Results append to parallelization_study_timing.csv
-*/

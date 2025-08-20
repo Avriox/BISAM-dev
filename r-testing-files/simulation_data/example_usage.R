@@ -1,14 +1,19 @@
-# Example R usage of simulation datasets
+# Example R usage for root finding algorithm comparison
 library(here)
 
 # Load dataset registry
 registry <- readRDS('simulation_data/dataset_registry.rds')
 
-# Run BISAM on all datasets
-results <- list()
+# Split datasets by type
+stepsize_datasets <- registry[grepl('stepsize', registry$name), ]
+timelength_datasets <- registry[grepl('timelength', registry$name), ]
 
-for (i in 1:nrow(registry)) {
-  dataset_info <- registry[i, ]
+# Test different step sizes
+cat('Testing different step sizes:\n')
+stepsize_results <- list()
+
+for (i in 1:nrow(stepsize_datasets)) {
+  dataset_info <- stepsize_datasets[i, ]
   
   # Load dataset
   r_filename <- file.path('simulation_data', 
@@ -18,52 +23,30 @@ for (i in 1:nrow(registry)) {
                                 sprintf('%02d', dataset_info$nx), '.rds'))
   
   dataset <- readRDS(r_filename)
-  sim <- dataset$sim_data
   
-  cat(sprintf('Running BISAM on dataset: %s (n=%d, t=%d, nx=%d)\n', 
-              dataset_info$name, dataset_info$n, dataset_info$t, dataset_info$nx))
+  cat(sprintf('Dataset: %s (step_mean=%.2f, %d breaks)\n', 
+              dataset_info$name, dataset_info$step_mean, dataset_info$num_breaks))
+  cat(sprintf('  Break info: %s\n', 
+              paste(sprintf('Unit %d Time %d', dataset$break_info$unit, dataset$break_info$time), collapse=', ')))
   
-  # Show simulation truth
-  cat(sprintf('  True betas: [%s]\n', paste(sim$true.b, collapse=', ')))
-  if (!is.null(sim$true.const)) {
-    cat(sprintf('  True constant: %.3f\n', sim$true.const))
-  }
-  if (!is.null(sim$tr.idx) && nrow(sim$tr.idx) > 0) {
-    cat(sprintf('  True breaks: %d breaks\n', nrow(sim$tr.idx)))
-  }
+  # YOUR BISAM CODE HERE with specific root finding algorithm
+  # Compare results across different step sizes
   
-  # Time the execution
-  start_time <- Sys.time()
-  
-  # YOUR BISAM CODE HERE
-  # bisam_result <- run_bisam(sim$data)
-  
-  # ACCURACY EVALUATION HERE
-  # Compare bisam_result$estimated_betas with sim$true.b
-  # Compare bisam_result$detected_breaks with sim$tr.idx
-  
-  end_time <- Sys.time()
-  runtime <- as.numeric(difftime(end_time, start_time, units = 'secs'))
-  
-  cat(sprintf('  Runtime: %.2f seconds\n', runtime))
-  cat(paste(rep('-', 50), collapse=''), '\n')
-  
-  # Store results
-  results[[dataset_info$name]] <- list(
+  stepsize_results[[dataset_info$name]] <- list(
     dataset_info = dataset_info,
-    runtime = runtime,
-    sim_truth = list(
-      true_beta = sim$true.b,
-      true_const = sim$true.const,
-      true_breaks = sim$tr.idx
-    )
-    # bisam_result = bisam_result
+    break_info = dataset$break_info
+    # Add your results here
   )
 }
 
-# Summary of results
-cat('\nSummary of all runs:\n')
-for (name in names(results)) {
-  r <- results[[name]]
-  cat(sprintf('%s: %.2fs\n', name, r$runtime))
+# Test different time series lengths
+cat('\nTesting different time series lengths:\n')
+timelength_results <- list()
+
+for (i in 1:nrow(timelength_datasets)) {
+  dataset_info <- timelength_datasets[i, ]
+  
+  # Load dataset (similar to above)
+  # YOUR BISAM CODE HERE with specific root finding algorithm
+  # Compare results across different time series lengths
 }

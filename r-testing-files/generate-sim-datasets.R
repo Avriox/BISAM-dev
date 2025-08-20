@@ -1,5 +1,5 @@
 # =============================================================================
-# BISAM Simulation Dataset Generator
+# BISAM Simulation Dataset Generator - Fixed for Root Finding Algorithm Comparison
 # =============================================================================
 
 # Load required libraries
@@ -148,48 +148,79 @@ if (dir.exists(sim_dir)) {
 }
 
 # =============================================================================
-# DATASET CONFIGURATIONS
+# DATASET CONFIGURATIONS - Updated for Root Finding Algorithm Comparison
 # =============================================================================
 
-# Define all possible dataset sizes - comment out ones you don't want to generate
 dataset_configs <- list(
   # Very small (for quick testing/validation)
-  list(n=3,  t=15, nx=2, name="tiny"),
-  list(n=3,  t=20, nx=3, name="small_a"),
-  list(n=5,  t=15, nx=2, name="small_b"),
+  list(n=3,  t=15, nx=2, step_mean=5.00, name="tiny"),
+  list(n=3,  t=20, nx=3, step_mean=5.00, name="small_a"),
+  list(n=5,  t=15, nx=2, step_mean=5.00, name="small_b"),
   
   # Small (for detailed analysis)
-  list(n=5,  t=20, nx=3, name="small_c"),
-  list(n=5,  t=25, nx=3, name="small_d"),
-  list(n=7,  t=20, nx=4, name="small_e"),
-  list(n=8,  t=25, nx=3, name="small_f"),
+  list(n=5,  t=20, nx=3, step_mean=5.00, name="small_c"),
+  list(n=5,  t=25, nx=3, step_mean=5.00, name="small_d"),
+  list(n=7,  t=20, nx=4, step_mean=5.00, name="small_e"),
+  list(n=8,  t=25, nx=3, step_mean=5.00, name="small_f"),
   
   # Medium (for main comparisons)
-  list(n=10, t=20, nx=4, name="med_a"),
-  list(n=8,  t=30, nx=4, name="med_b"),
-  list(n=10, t=30, nx=5, name="med_c"),
-  list(n=12, t=35, nx=4, name="med_d"),
-  list(n=15, t=30, nx=5, name="med_e"),
+  list(n=10, t=20, nx=4, step_mean=5.00, name="med_a"),
+  list(n=8,  t=30, nx=4, step_mean=5.00, name="med_b"),
+  list(n=10, t=30, nx=5, step_mean=5.00, name="med_c"),
+  list(n=12, t=35, nx=4, step_mean=5.00, name="med_d"),
+  list(n=15, t=30, nx=5, step_mean=5.00, name="med_e"),
   
   # Large (realistic climate research sizes)
-  list(n=15, t=40, nx=5, name="large_a"),  # 15 countries, 40 years
-  list(n=20, t=35, nx=6, name="large_b"),  # 20 countries, 35 years
-  list(n=25, t=40, nx=6, name="large_c"),  # 25 countries, 40 years
-  list(n=30, t=45, nx=7, name="large_d"),  # 30 countries, 45 years
+  list(n=15, t=40, nx=5, step_mean=5.00, name="large_a"),  # 15 countries, 40 years
+  list(n=20, t=35, nx=6, step_mean=5.00, name="large_b"),  # 20 countries, 35 years
+  list(n=25, t=40, nx=6, step_mean=5.00, name="large_c"),  # 25 countries, 40 years
+  list(n=30, t=45, nx=7, step_mean=5.00, name="large_d"),  # 30 countries, 45 years
   
   # Very large (ambitious real-world sizes)
-  list(n=35, t=50, nx=8, name="xlarge_a"), # 35 countries, 50 years
-  list(n=40, t=50, nx=8, name="xlarge_b"), # 40 countries, 50 years
-  list(n=50, t=55, nx=9, name="xlarge_c"), # 50 countries, 55 years
+  list(n=35, t=50, nx=8, step_mean=5.00, name="xlarge_a"), # 35 countries, 50 years
+  list(n=40, t=50, nx=8, step_mean=5.00, name="xlarge_b"), # 40 countries, 50 years
+  list(n=50, t=55, nx=9, step_mean=5.00, name="xlarge_c"), # 50 countries, 55 years
   
   # Extreme (stress testing)
-  list(n=60, t=60, nx=10, name="extreme_a"), # 60 countries, 60 years
-  list(n=75, t=65, nx=10, name="extreme_b"), # 75 countries, 65 years
-  list(n=100, t=50, nx=12, name="extreme_c") # 100 countries, 50 years - EU + others
+  list(n=60, t=60, nx=10, step_mean=5.00, name="extreme_a"), # 60 countries, 60 years
+  list(n=75, t=65, nx=10, step_mean=5.00, name="extreme_b"), # 75 countries, 65 years
+  list(n=100, t=50, nx=12, step_mean=5.00, name="extreme_c"), # 100 countries, 50 years - EU + others
   
-  # Uncomment below for even more extreme testing
-  # list(n=150, t=70, nx=15, name="massive_a"), # All UN countries
-  # list(n=200, t=80, nx=20, name="massive_b")  # Theoretical maximum
+  # =============================================================================
+  # SET 1: BREAK SIZE COMPARISON (n=10, t=30, varying step sizes)
+  # Fixed: n=10, t=30, nx=3
+  # Variable: step_mean (break size)
+  # ~50% of units have breaks in the middle third
+  # =============================================================================
+  
+  list(n=10, t=30, nx=3, step_mean=0.50, name="rootfind_stepsize_050"),
+  list(n=10, t=30, nx=3, step_mean=0.75, name="rootfind_stepsize_075"),
+  list(n=10, t=30, nx=3, step_mean=1.00, name="rootfind_stepsize_100"),
+  list(n=10, t=30, nx=3, step_mean=1.50, name="rootfind_stepsize_150"),
+  list(n=10, t=30, nx=3, step_mean=3.00, name="rootfind_stepsize_300"),
+  list(n=10, t=30, nx=3, step_mean=5.00, name="rootfind_stepsize_500"),
+  
+  # =============================================================================
+  # SET 2: TIME SERIES LENGTH COMPARISON (n=10, fixed step_mean=5, varying t)
+  # Fixed: n=10, step_mean=5, nx=3
+  # Variable: t (time series length)
+  # ~50% of units have breaks in the middle third
+  # =============================================================================
+  
+  list(n=10, t=10, nx=3, step_mean=5.0, name="rootfind_timelength_t010"),
+  list(n=10, t=15, nx=3, step_mean=5.0, name="rootfind_timelength_t015"),
+  list(n=10, t=20, nx=3, step_mean=5.0, name="rootfind_timelength_t020"),
+  list(n=10, t=25, nx=3, step_mean=5.0, name="rootfind_timelength_t025"),
+  list(n=10, t=30, nx=3, step_mean=5.0, name="rootfind_timelength_t030"),
+  list(n=10, t=40, nx=3, step_mean=5.0, name="rootfind_timelength_t040"),
+  list(n=10, t=50, nx=3, step_mean=5.0, name="rootfind_timelength_t050"),
+  list(n=10, t=60, nx=3, step_mean=5.0, name="rootfind_timelength_t060"),
+  list(n=10, t=70, nx=3, step_mean=5.0, name="rootfind_timelength_t070"),
+  list(n=10, t=80, nx=3, step_mean=5.0, name="rootfind_timelength_t080"),
+  list(n=10, t=90, nx=3, step_mean=5.0, name="rootfind_timelength_t090"),
+  list(n=10, t=100, nx=3, step_mean=5.0, name="rootfind_timelength_t100"),
+  list(n=10, t=110, nx=3, step_mean=5.0, name="rootfind_timelength_t110"),
+  list(n=10, t=120, nx=3, step_mean=5.0, name="rootfind_timelength_t120")
 )
 
 # =============================================================================
@@ -205,9 +236,9 @@ iis <- TRUE         # Include indicator saturation
 sis <- TRUE         # Include stepshift saturation
 error.sd <- 1.0     # Error standard deviation
 
-# Break parameters (matching your original setup)
-outl.mean <- 0      # No outliers
-step.mean <- 10     # Large step size
+# Break parameters - these will be overridden per dataset
+outl.mean <- 0      # No outliers (as requested)
+# step.mean will be set per dataset configuration
 
 # =============================================================================
 # DATA GENERATION FUNCTIONS
@@ -218,17 +249,57 @@ generate_dataset <- function(config) {
   t <- config$t
   nx <- config$nx
   name <- config$name
+  step_mean_config <- config$step_mean  # Get step_mean from config
   
-  cat(sprintf("Generating dataset: %s (n=%d, t=%d, nx=%d)\n", name, n, t, nx))
+  cat(sprintf("Generating dataset: %s (n=%d, t=%d, nx=%d, step_mean=%.2f)\n", 
+              name, n, t, nx, step_mean_config))
   
-  # Generate break positions (matching your original approach)
-  pos.outl <- c()  # No outliers (p.outl = 0.0)
+  # Generate break positions
+  pos.outl <- c()  # No outliers (as requested)
   
-  # Generate one step break per dataset (like your pos.step <- c(10))
-  # Place it roughly in the middle of the time series
-  step_time <- round(t * 0.5)  # Middle of time series
-  step_unit <- sample(1:n, 1)  # Random unit
-  pos.step <- (step_unit - 1) * t + step_time
+  # Calculate number of breaks as approximately half the units (minimum 1, maximum n-1)
+  num_breaks <- max(1, min(n-1, round(n * 0.5)))
+  
+  cat(sprintf("  Creating %d breaks for %d units\n", num_breaks, n))
+  
+  # Generate breaks across different units in the middle third of time series
+  set.seed(as.numeric(charToRaw(name)[1]) + n + t)  # Reproducible but different per dataset
+  
+  # Select random units for breaks
+  break_units <- sample(1:n, num_breaks, replace = FALSE)
+  
+  # For each selected unit, place break in middle third of time series at different positions
+  middle_start <- max(2, round(t * 0.33))  # Start of middle third, but not too early
+  middle_end <- min(t-1, round(t * 0.67))  # End of middle third, but not too late
+  
+  # Ensure we have valid range
+  if (middle_start >= middle_end) {
+    middle_start <- max(2, round(t * 0.4))
+    middle_end <- min(t-1, round(t * 0.6))
+  }
+  if (middle_start >= middle_end) {
+    middle_start <- 2
+    middle_end <- t-1
+  }
+  
+  pos.step <- c()
+  for (i in 1:num_breaks) {
+    unit <- break_units[i]
+    # Distribute breaks across the middle third
+    if (num_breaks > 1) {
+      spread_factor <- (i-1) / (num_breaks-1)
+      break_time <- round(middle_start + spread_factor * (middle_end - middle_start))
+    } else {
+      break_time <- round((middle_start + middle_end) / 2)
+    }
+    
+    # Add some randomness to avoid identical timing
+    jitter_range <- max(1, round((middle_end - middle_start) * 0.1))
+    break_time <- break_time + sample(-jitter_range:jitter_range, 1)
+    break_time <- max(middle_start, min(middle_end, break_time))
+    
+    pos.step <- c(pos.step, (unit - 1) * t + break_time)
+  }
   
   # Generate simulation data
   sim_data <- contr_sim_breaks(
@@ -243,14 +314,28 @@ generate_dataset <- function(config) {
     ife = ife,
     tfe = tfe,
     outl.mean = outl.mean,
-    step.mean = step.mean,
+    step.mean = step_mean_config,  # Use step_mean from config
     error.sd = error.sd
   )
+  
+  # Add break information to output for verification
+  break_info <- data.frame(
+    unit = break_units,
+    time = (pos.step - 1) %% t + 1,
+    position = pos.step,
+    step_mean = rep(step_mean_config, num_breaks),
+    stringsAsFactors = FALSE
+  )
+  
+  cat(sprintf("  Breaks placed at: %s\n", 
+              paste(sprintf("Unit %d Time %d", break_info$unit, break_info$time), collapse=", ")))
   
   return(list(
     sim_data = sim_data,
     config = config,
-    n = n, t = t, nx = nx, name = name
+    break_info = break_info,
+    n = n, t = t, nx = nx, name = name,
+    num_breaks = num_breaks
   ))
 }
 
@@ -267,27 +352,31 @@ save_for_cpp <- function(dataset, sim_dir) {
   nx <- dataset$nx
   name <- dataset$name
   sim <- dataset$sim_data
+  step_mean_used <- dataset$config$step_mean
   
   filename <- sprintf("%s/sim_%s_n%02d_t%02d_nx%02d.h", 
                       sim_dir, name, n, t, nx)
   
   # Create C++ header file
-  cat(sprintf("// Auto-generated simulation data: %s (n=%d, t=%d, nx=%d)\n", name, n, t, nx),
+  cat(sprintf("// Auto-generated simulation data: %s (n=%d, t=%d, nx=%d, step_mean=%.2f)\n", 
+              name, n, t, nx, step_mean_used),
       file = filename)
-  cat(sprintf("#ifndef SIM_%s_H\n", toupper(name)), file = filename, append = TRUE)
-  cat(sprintf("#define SIM_%s_H\n\n", toupper(name)), file = filename, append = TRUE)
+  cat(sprintf("#ifndef SIM_%s_H\n", toupper(gsub("[^A-Z0-9]", "_", toupper(name)))), file = filename, append = TRUE)
+  cat(sprintf("#define SIM_%s_H\n\n", toupper(gsub("[^A-Z0-9]", "_", toupper(name)))), file = filename, append = TRUE)
   cat("#include <armadillo>\n", file = filename, append = TRUE)
   cat("#include <vector>\n", file = filename, append = TRUE)
   cat("#include <string>\n\n", file = filename, append = TRUE)
   
   # Dataset metadata
-  cat(sprintf("const int DATASET_%s_N = %d;\n", toupper(name), n), file = filename, append = TRUE)
-  cat(sprintf("const int DATASET_%s_T = %d;\n", toupper(name), t), file = filename, append = TRUE)
-  cat(sprintf("const int DATASET_%s_NX = %d;\n", toupper(name), nx), file = filename, append = TRUE)
-  cat(sprintf("const std::string DATASET_%s_NAME = \"%s\";\n\n", toupper(name), name), file = filename, append = TRUE)
+  name_cpp <- toupper(gsub("[^A-Z0-9]", "_", toupper(name)))
+  cat(sprintf("const int DATASET_%s_N = %d;\n", name_cpp, n), file = filename, append = TRUE)
+  cat(sprintf("const int DATASET_%s_T = %d;\n", name_cpp, t), file = filename, append = TRUE)
+  cat(sprintf("const int DATASET_%s_NX = %d;\n", name_cpp, nx), file = filename, append = TRUE)
+  cat(sprintf("const std::string DATASET_%s_NAME = \"%s\";\n", name_cpp, name), file = filename, append = TRUE)
+  cat(sprintf("const double DATASET_%s_STEP_MEAN_USED = %.8f;\n\n", name_cpp, step_mean_used), file = filename, append = TRUE)
   
   # Main data matrix
-  cat(sprintf("arma::mat DATASET_%s_DATA = {\n", toupper(name)), file = filename, append = TRUE)
+  cat(sprintf("arma::mat DATASET_%s_DATA = {\n", name_cpp), file = filename, append = TRUE)
   data <- sim$data
   for (i in 1:nrow(data)) {
     row_str <- paste0("        {", paste(sprintf("%.8f", data[i,]), collapse = ", "), "}")
@@ -298,27 +387,27 @@ save_for_cpp <- function(dataset, sim_dir) {
   
   # True betas
   if (!is.null(sim$true.b)) {
-    cat(sprintf("arma::vec DATASET_%s_TRUE_BETA = {", toupper(name)), file = filename, append = TRUE)
+    cat(sprintf("arma::vec DATASET_%s_TRUE_BETA = {", name_cpp), file = filename, append = TRUE)
     cat(paste(sprintf("%.8f", sim$true.b), collapse = ", "), file = filename, append = TRUE)
     cat("};\n\n", file = filename, append = TRUE)
   }
   
   # True constant (if present)
   if (!is.null(sim$true.const)) {
-    cat(sprintf("const double DATASET_%s_TRUE_CONST = %.8f;\n", toupper(name), sim$true.const), 
+    cat(sprintf("const double DATASET_%s_TRUE_CONST = %.8f;\n", name_cpp, sim$true.const), 
         file = filename, append = TRUE)
-    cat(sprintf("const bool DATASET_%s_HAS_TRUE_CONST = true;\n\n", toupper(name)), 
+    cat(sprintf("const bool DATASET_%s_HAS_TRUE_CONST = true;\n\n", name_cpp), 
         file = filename, append = TRUE)
   } else {
-    cat(sprintf("const double DATASET_%s_TRUE_CONST = 0.0;\n", toupper(name)), 
+    cat(sprintf("const double DATASET_%s_TRUE_CONST = 0.0;\n", name_cpp), 
         file = filename, append = TRUE)
-    cat(sprintf("const bool DATASET_%s_HAS_TRUE_CONST = false;\n\n", toupper(name)), 
+    cat(sprintf("const bool DATASET_%s_HAS_TRUE_CONST = false;\n\n", name_cpp), 
         file = filename, append = TRUE)
   }
   
   # True break indices and magnitudes
   if (!is.null(sim$tr.idx) && nrow(sim$tr.idx) > 0) {
-    cat(sprintf("arma::mat DATASET_%s_TRUE_BREAKS = {\n", toupper(name)), file = filename, append = TRUE)
+    cat(sprintf("arma::mat DATASET_%s_TRUE_BREAKS = {\n", name_cpp), file = filename, append = TRUE)
     tr_idx <- sim$tr.idx
     for (i in 1:nrow(tr_idx)) {
       row_str <- paste0("        {", paste(sprintf("%.8f", tr_idx[i,]), collapse = ", "), "}")
@@ -327,18 +416,31 @@ save_for_cpp <- function(dataset, sim_dir) {
     }
     cat("    };\n\n", file = filename, append = TRUE)
   } else {
-    cat(sprintf("arma::mat DATASET_%s_TRUE_BREAKS;\n\n", toupper(name)), file = filename, append = TRUE)
+    cat(sprintf("arma::mat DATASET_%s_TRUE_BREAKS;\n\n", name_cpp), file = filename, append = TRUE)
+  }
+  
+  # Break information for verification
+  if (!is.null(dataset$break_info)) {
+    cat(sprintf("// Break placement info: %d breaks\n", nrow(dataset$break_info)), file = filename, append = TRUE)
+    for (i in 1:nrow(dataset$break_info)) {
+      cat(sprintf("// Unit %d, Time %d, Position %d\n", 
+                  dataset$break_info$unit[i], dataset$break_info$time[i], dataset$break_info$position[i]), 
+          file = filename, append = TRUE)
+    }
+    cat("\n", file = filename, append = TRUE)
   }
   
   # Simulation parameters for reference
-  cat(sprintf("const double DATASET_%s_ERROR_SD = %.8f;\n", toupper(name), error.sd), file = filename, append = TRUE)
-  cat(sprintf("const double DATASET_%s_STEP_MEAN = %.8f;\n", toupper(name), step.mean), file = filename, append = TRUE)
-  cat(sprintf("const double DATASET_%s_OUTL_MEAN = %.8f;\n", toupper(name), outl.mean), file = filename, append = TRUE)
-  cat(sprintf("const bool DATASET_%s_CONST = %s;\n", toupper(name), ifelse(const, "true", "false")), file = filename, append = TRUE)
-  cat(sprintf("const bool DATASET_%s_IFE = %s;\n", toupper(name), ifelse(ife, "true", "false")), file = filename, append = TRUE)
-  cat(sprintf("const bool DATASET_%s_TFE = %s;\n\n", toupper(name), ifelse(tfe, "true", "false")), file = filename, append = TRUE)
+  cat(sprintf("const double DATASET_%s_ERROR_SD = %.8f;\n", name_cpp, error.sd), file = filename, append = TRUE)
+  cat(sprintf("const double DATASET_%s_STEP_MEAN = %.8f;\n", name_cpp, step_mean_used), file = filename, append = TRUE)
+  cat(sprintf("const double DATASET_%s_OUTL_MEAN = %.8f;\n", name_cpp, outl.mean), file = filename, append = TRUE)
+  cat(sprintf("const bool DATASET_%s_CONST = %s;\n", name_cpp, ifelse(const, "true", "false")), file = filename, append = TRUE)
+  cat(sprintf("const bool DATASET_%s_IFE = %s;\n", name_cpp, ifelse(ife, "true", "false")), file = filename, append = TRUE)
+  cat(sprintf("const bool DATASET_%s_TFE = %s;\n", name_cpp, ifelse(tfe, "true", "false")), file = filename, append = TRUE)
+  cat(sprintf("const int DATASET_%s_NUM_BREAKS = %d;\n\n", name_cpp, 
+              if(!is.null(sim$tr.idx)) nrow(sim$tr.idx) else 0), file = filename, append = TRUE)
   
-  cat(sprintf("#endif // SIM_%s_H\n", toupper(name)), file = filename, append = TRUE)
+  cat(sprintf("#endif // SIM_%s_H\n", name_cpp), file = filename, append = TRUE)
   
   cat(sprintf("  Saved C++ header: %s\n", basename(filename)))
 }
@@ -347,7 +449,7 @@ save_for_cpp <- function(dataset, sim_dir) {
 # GENERATE ALL DATASETS
 # =============================================================================
 
-cat("Starting dataset generation...\n\n")
+cat("Starting dataset generation for root finding algorithm comparison...\n\n")
 
 # Store metadata for C++ automation
 cpp_datasets <- data.frame(
@@ -355,7 +457,9 @@ cpp_datasets <- data.frame(
   n = integer(0),
   t = integer(0),
   nx = integer(0),
+  step_mean = numeric(0),
   filename = character(0),
+  num_breaks = integer(0),
   stringsAsFactors = FALSE
 )
 
@@ -373,7 +477,9 @@ for (config in dataset_configs) {
     n = config$n,
     t = config$t,
     nx = config$nx,
+    step_mean = config$step_mean,
     filename = sprintf("sim_%s_n%02d_t%02d_nx%02d.h", config$name, config$n, config$t, config$nx),
+    num_breaks = dataset$num_breaks,
     stringsAsFactors = FALSE
   ))
   
@@ -386,7 +492,7 @@ for (config in dataset_configs) {
 
 # Create master header file for C++
 cpp_master_file <- file.path(sim_dir, "simulation_datasets.h")
-cat("// Auto-generated master header for all simulation datasets\n", file = cpp_master_file)
+cat("// Auto-generated master header for all simulation datasets - Root Finding Algorithm Comparison\n", file = cpp_master_file)
 cat("#ifndef SIMULATION_DATASETS_H\n", file = cpp_master_file, append = TRUE)
 cat("#define SIMULATION_DATASETS_H\n\n", file = cpp_master_file, append = TRUE)
 cat("#include <vector>\n", file = cpp_master_file, append = TRUE)
@@ -402,13 +508,14 @@ cat("\n// Dataset metadata structure\n", file = cpp_master_file, append = TRUE)
 cat("struct DatasetInfo {\n", file = cpp_master_file, append = TRUE)
 cat("    std::string name;\n", file = cpp_master_file, append = TRUE)
 cat("    int n, t, nx;\n", file = cpp_master_file, append = TRUE)
+cat("    double step_mean;\n", file = cpp_master_file, append = TRUE)
 cat("    arma::mat data;\n", file = cpp_master_file, append = TRUE)
 cat("    arma::vec true_beta;\n", file = cpp_master_file, append = TRUE)
 cat("    arma::mat true_breaks;\n", file = cpp_master_file, append = TRUE)
 cat("    double true_const;\n", file = cpp_master_file, append = TRUE)
 cat("    double error_sd;\n", file = cpp_master_file, append = TRUE)
-cat("    double step_mean;\n", file = cpp_master_file, append = TRUE)
 cat("    bool has_const;\n", file = cpp_master_file, append = TRUE)
+cat("    int num_breaks;\n", file = cpp_master_file, append = TRUE)
 cat("};\n\n", file = cpp_master_file, append = TRUE)
 
 # Create dataset registry function
@@ -417,22 +524,49 @@ cat("inline std::vector<DatasetInfo> get_all_datasets() {\n", file = cpp_master_
 cat("    return {\n", file = cpp_master_file, append = TRUE)
 
 for (i in 1:nrow(cpp_datasets)) {
-  name_upper <- toupper(cpp_datasets$name[i])
+  name_cpp <- toupper(gsub("[^A-Z0-9]", "_", toupper(cpp_datasets$name[i])))
   comma <- if(i < nrow(cpp_datasets)) "," else ""
-  cat(sprintf("        {\"%s\", DATASET_%s_N, DATASET_%s_T, DATASET_%s_NX, DATASET_%s_DATA,\n", 
-              cpp_datasets$name[i], name_upper, name_upper, name_upper, name_upper), 
+  cat(sprintf("        {\"%s\", DATASET_%s_N, DATASET_%s_T, DATASET_%s_NX,\n", 
+              cpp_datasets$name[i], name_cpp, name_cpp, name_cpp), 
       file = cpp_master_file, append = TRUE)
-  cat(sprintf("         DATASET_%s_TRUE_BETA, DATASET_%s_TRUE_BREAKS,\n", name_upper, name_upper),
+  cat(sprintf("         DATASET_%s_STEP_MEAN_USED, DATASET_%s_DATA,\n", name_cpp, name_cpp),
       file = cpp_master_file, append = TRUE)
-  cat(sprintf("         DATASET_%s_TRUE_CONST,\n", name_upper),
+  cat(sprintf("         DATASET_%s_TRUE_BETA, DATASET_%s_TRUE_BREAKS,\n", name_cpp, name_cpp),
       file = cpp_master_file, append = TRUE)
-  cat(sprintf("         DATASET_%s_ERROR_SD, DATASET_%s_STEP_MEAN, DATASET_%s_HAS_TRUE_CONST}%s\n", 
-              name_upper, name_upper, name_upper, comma),
+  cat(sprintf("         DATASET_%s_TRUE_CONST, DATASET_%s_ERROR_SD,\n", name_cpp, name_cpp),
+      file = cpp_master_file, append = TRUE)
+  cat(sprintf("         DATASET_%s_HAS_TRUE_CONST, DATASET_%s_NUM_BREAKS}%s\n", 
+              name_cpp, name_cpp, comma),
       file = cpp_master_file, append = TRUE)
 }
 
 cat("    };\n", file = cpp_master_file, append = TRUE)
 cat("}\n\n", file = cpp_master_file, append = TRUE)
+
+# Add convenience functions
+cat("// Get datasets by type\n", file = cpp_master_file, append = TRUE)
+cat("inline std::vector<DatasetInfo> get_stepsize_datasets() {\n", file = cpp_master_file, append = TRUE)
+cat("    auto all = get_all_datasets();\n", file = cpp_master_file, append = TRUE)
+cat("    std::vector<DatasetInfo> result;\n", file = cpp_master_file, append = TRUE)
+cat("    for (const auto& ds : all) {\n", file = cpp_master_file, append = TRUE)
+cat("        if (ds.name.find(\"stepsize\") != std::string::npos) {\n", file = cpp_master_file, append = TRUE)
+cat("            result.push_back(ds);\n", file = cpp_master_file, append = TRUE)
+cat("        }\n", file = cpp_master_file, append = TRUE)
+cat("    }\n", file = cpp_master_file, append = TRUE)
+cat("    return result;\n", file = cpp_master_file, append = TRUE)
+cat("}\n\n", file = cpp_master_file, append = TRUE)
+
+cat("inline std::vector<DatasetInfo> get_timelength_datasets() {\n", file = cpp_master_file, append = TRUE)
+cat("    auto all = get_all_datasets();\n", file = cpp_master_file, append = TRUE)
+cat("    std::vector<DatasetInfo> result;\n", file = cpp_master_file, append = TRUE)
+cat("    for (const auto& ds : all) {\n", file = cpp_master_file, append = TRUE)
+cat("        if (ds.name.find(\"timelength\") != std::string::npos) {\n", file = cpp_master_file, append = TRUE)
+cat("            result.push_back(ds);\n", file = cpp_master_file, append = TRUE)
+cat("        }\n", file = cpp_master_file, append = TRUE)
+cat("    }\n", file = cpp_master_file, append = TRUE)
+cat("    return result;\n", file = cpp_master_file, append = TRUE)
+cat("}\n\n", file = cpp_master_file, append = TRUE)
+
 cat("#endif // SIMULATION_DATASETS_H\n", file = cpp_master_file, append = TRUE)
 
 # Create R dataset registry
@@ -445,55 +579,50 @@ saveRDS(cpp_datasets, r_registry_file)
 
 # Create example C++ usage
 cpp_example <- file.path(sim_dir, "example_usage.cpp")
-cat("// Example C++ usage of simulation datasets\n", file = cpp_example)
+cat("// Example C++ usage of simulation datasets for root finding algorithm comparison\n", file = cpp_example)
 cat("#include \"simulation_datasets.h\"\n", file = cpp_example, append = TRUE)
 cat("#include <iostream>\n", file = cpp_example, append = TRUE)
 cat("#include <chrono>\n\n", file = cpp_example, append = TRUE)
 cat("int main() {\n", file = cpp_example, append = TRUE)
-cat("    auto datasets = get_all_datasets();\n", file = cpp_example, append = TRUE)
-cat("    \n", file = cpp_example, append = TRUE)
-cat("    for (const auto& dataset : datasets) {\n", file = cpp_example, append = TRUE)
-cat("        std::cout << \"Running BISAM on dataset: \" << dataset.name \n", file = cpp_example, append = TRUE)
-cat("                  << \" (n=\" << dataset.n << \", t=\" << dataset.t << \", nx=\" << dataset.nx << \")\" << std::endl;\n", file = cpp_example, append = TRUE)
+cat("    // Test different step sizes with same root finding algorithm\n", file = cpp_example, append = TRUE)
+cat("    auto stepsize_datasets = get_stepsize_datasets();\n", file = cpp_example, append = TRUE)
+cat("    std::cout << \"Testing different step sizes:\" << std::endl;\n", file = cpp_example, append = TRUE)
+cat("    for (const auto& dataset : stepsize_datasets) {\n", file = cpp_example, append = TRUE)
+cat("        std::cout << \"Dataset: \" << dataset.name << \" (step_mean=\" << dataset.step_mean << \")\" << std::endl;\n", file = cpp_example, append = TRUE)
+cat("        std::cout << \"  True breaks: \" << dataset.num_breaks << \" breaks\" << std::endl;\n", file = cpp_example, append = TRUE)
 cat("        \n", file = cpp_example, append = TRUE)
-cat("        // Access simulation truth\n", file = cpp_example, append = TRUE)
-cat("        std::cout << \"  True betas: \" << dataset.true_beta.t();\n", file = cpp_example, append = TRUE)
-cat("        if (dataset.has_const) {\n", file = cpp_example, append = TRUE)
-cat("            std::cout << \"  True constant: \" << dataset.true_const << std::endl;\n", file = cpp_example, append = TRUE)
-cat("        }\n", file = cpp_example, append = TRUE)
-cat("        if (dataset.true_breaks.n_rows > 0) {\n", file = cpp_example, append = TRUE)
-cat("            std::cout << \"  True breaks: \" << dataset.true_breaks.n_rows << \" breaks\" << std::endl;\n", file = cpp_example, append = TRUE)
-cat("        }\n", file = cpp_example, append = TRUE)
-cat("        \n", file = cpp_example, append = TRUE)
-cat("        auto start = std::chrono::high_resolution_clock::now();\n", file = cpp_example, append = TRUE)
-cat("        \n", file = cpp_example, append = TRUE)
-cat("        // YOUR BISAM CODE HERE\n", file = cpp_example, append = TRUE)
-cat("        // arma::mat data_copy = dataset.data;  // Make non-const copy if needed\n", file = cpp_example, append = TRUE)
-cat("        // bisam_result = run_bisam(data_copy);\n", file = cpp_example, append = TRUE)
-cat("        \n", file = cpp_example, append = TRUE)
-cat("        // ACCURACY EVALUATION HERE\n", file = cpp_example, append = TRUE)
-cat("        // Compare bisam_result.estimated_betas with dataset.true_beta\n", file = cpp_example, append = TRUE)
-cat("        // Compare bisam_result.detected_breaks with dataset.true_breaks\n", file = cpp_example, append = TRUE)
-cat("        \n", file = cpp_example, append = TRUE)
-cat("        auto end = std::chrono::high_resolution_clock::now();\n", file = cpp_example, append = TRUE)
-cat("        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);\n", file = cpp_example, append = TRUE)
-cat("        \n", file = cpp_example, append = TRUE)
-cat("        std::cout << \"  Runtime: \" << duration.count() << \"ms\" << std::endl;\n", file = cpp_example, append = TRUE)
-cat("        std::cout << \"  \" << std::string(50, '-') << std::endl;\n", file = cpp_example, append = TRUE)
+cat("        // YOUR BISAM CODE HERE with specific root finding algorithm\n", file = cpp_example, append = TRUE)
+cat("        // Compare results across different step sizes\n", file = cpp_example, append = TRUE)
 cat("    }\n", file = cpp_example, append = TRUE)
+cat("    \n", file = cpp_example, append = TRUE)
+cat("    // Test different time series lengths\n", file = cpp_example, append = TRUE)
+cat("    auto timelength_datasets = get_timelength_datasets();\n", file = cpp_example, append = TRUE)
+cat("    std::cout << \"\\nTesting different time series lengths:\" << std::endl;\n", file = cpp_example, append = TRUE)
+cat("    for (const auto& dataset : timelength_datasets) {\n", file = cpp_example, append = TRUE)
+cat("        std::cout << \"Dataset: \" << dataset.name << \" (t=\" << dataset.t << \")\" << std::endl;\n", file = cpp_example, append = TRUE)
+cat("        std::cout << \"  True breaks: \" << dataset.num_breaks << \" breaks\" << std::endl;\n", file = cpp_example, append = TRUE)
+cat("        \n", file = cpp_example, append = TRUE)
+cat("        // YOUR BISAM CODE HERE with specific root finding algorithm\n", file = cpp_example, append = TRUE)
+cat("        // Compare results across different time series lengths\n", file = cpp_example, append = TRUE)
+cat("    }\n", file = cpp_example, append = TRUE)
+cat("    \n", file = cpp_example, append = TRUE)
 cat("    return 0;\n", file = cpp_example, append = TRUE)
 cat("}\n", file = cpp_example, append = TRUE)
 
 # Create example R usage
 r_example <- file.path(sim_dir, "example_usage.R")
-cat("# Example R usage of simulation datasets\n", file = r_example)
+cat("# Example R usage for root finding algorithm comparison\n", file = r_example)
 cat("library(here)\n\n", file = r_example, append = TRUE)
 cat("# Load dataset registry\n", file = r_example, append = TRUE)
 cat("registry <- readRDS('simulation_data/dataset_registry.rds')\n\n", file = r_example, append = TRUE)
-cat("# Run BISAM on all datasets\n", file = r_example, append = TRUE)
-cat("results <- list()\n\n", file = r_example, append = TRUE)
-cat("for (i in 1:nrow(registry)) {\n", file = r_example, append = TRUE)
-cat("  dataset_info <- registry[i, ]\n", file = r_example, append = TRUE)
+cat("# Split datasets by type\n", file = r_example, append = TRUE)
+cat("stepsize_datasets <- registry[grepl('stepsize', registry$name), ]\n", file = r_example, append = TRUE)
+cat("timelength_datasets <- registry[grepl('timelength', registry$name), ]\n\n", file = r_example, append = TRUE)
+cat("# Test different step sizes\n", file = r_example, append = TRUE)
+cat("cat('Testing different step sizes:\\n')\n", file = r_example, append = TRUE)
+cat("stepsize_results <- list()\n\n", file = r_example, append = TRUE)
+cat("for (i in 1:nrow(stepsize_datasets)) {\n", file = r_example, append = TRUE)
+cat("  dataset_info <- stepsize_datasets[i, ]\n", file = r_example, append = TRUE)
 cat("  \n", file = r_example, append = TRUE)
 cat("  # Load dataset\n", file = r_example, append = TRUE)
 cat("  r_filename <- file.path('simulation_data', \n", file = r_example, append = TRUE)
@@ -503,69 +632,57 @@ cat("                                sprintf('%02d', dataset_info$t), '_nx',\n",
 cat("                                sprintf('%02d', dataset_info$nx), '.rds'))\n", file = r_example, append = TRUE)
 cat("  \n", file = r_example, append = TRUE)
 cat("  dataset <- readRDS(r_filename)\n", file = r_example, append = TRUE)
-cat("  sim <- dataset$sim_data\n", file = r_example, append = TRUE)
 cat("  \n", file = r_example, append = TRUE)
-cat("  cat(sprintf('Running BISAM on dataset: %s (n=%d, t=%d, nx=%d)\\n', \n", file = r_example, append = TRUE)
-cat("              dataset_info$name, dataset_info$n, dataset_info$t, dataset_info$nx))\n", file = r_example, append = TRUE)
+cat("  cat(sprintf('Dataset: %s (step_mean=%.2f, %d breaks)\\n', \n", file = r_example, append = TRUE)
+cat("              dataset_info$name, dataset_info$step_mean, dataset_info$num_breaks))\n", file = r_example, append = TRUE)
+cat("  cat(sprintf('  Break info: %s\\n', \n", file = r_example, append = TRUE)
+cat("              paste(sprintf('Unit %d Time %d', dataset$break_info$unit, dataset$break_info$time), collapse=', ')))\n", file = r_example, append = TRUE)
 cat("  \n", file = r_example, append = TRUE)
-cat("  # Show simulation truth\n", file = r_example, append = TRUE)
-cat("  cat(sprintf('  True betas: [%s]\\n', paste(sim$true.b, collapse=', ')))\n", file = r_example, append = TRUE)
-cat("  if (!is.null(sim$true.const)) {\n", file = r_example, append = TRUE)
-cat("    cat(sprintf('  True constant: %.3f\\n', sim$true.const))\n", file = r_example, append = TRUE)
-cat("  }\n", file = r_example, append = TRUE)
-cat("  if (!is.null(sim$tr.idx) && nrow(sim$tr.idx) > 0) {\n", file = r_example, append = TRUE)
-cat("    cat(sprintf('  True breaks: %d breaks\\n', nrow(sim$tr.idx)))\n", file = r_example, append = TRUE)
-cat("  }\n", file = r_example, append = TRUE)
+cat("  # YOUR BISAM CODE HERE with specific root finding algorithm\n", file = r_example, append = TRUE)
+cat("  # Compare results across different step sizes\n", file = r_example, append = TRUE)
 cat("  \n", file = r_example, append = TRUE)
-cat("  # Time the execution\n", file = r_example, append = TRUE)
-cat("  start_time <- Sys.time()\n", file = r_example, append = TRUE)
-cat("  \n", file = r_example, append = TRUE)
-cat("  # YOUR BISAM CODE HERE\n", file = r_example, append = TRUE)
-cat("  # bisam_result <- run_bisam(sim$data)\n", file = r_example, append = TRUE)
-cat("  \n", file = r_example, append = TRUE)
-cat("  # ACCURACY EVALUATION HERE\n", file = r_example, append = TRUE)
-cat("  # Compare bisam_result$estimated_betas with sim$true.b\n", file = r_example, append = TRUE)
-cat("  # Compare bisam_result$detected_breaks with sim$tr.idx\n", file = r_example, append = TRUE)
-cat("  \n", file = r_example, append = TRUE)
-cat("  end_time <- Sys.time()\n", file = r_example, append = TRUE)
-cat("  runtime <- as.numeric(difftime(end_time, start_time, units = 'secs'))\n", file = r_example, append = TRUE)
-cat("  \n", file = r_example, append = TRUE)
-cat("  cat(sprintf('  Runtime: %.2f seconds\\n', runtime))\n", file = r_example, append = TRUE)
-cat("  cat(paste(rep('-', 50), collapse=''), '\\n')\n", file = r_example, append = TRUE)
-cat("  \n", file = r_example, append = TRUE)
-cat("  # Store results\n", file = r_example, append = TRUE)
-cat("  results[[dataset_info$name]] <- list(\n", file = r_example, append = TRUE)
+cat("  stepsize_results[[dataset_info$name]] <- list(\n", file = r_example, append = TRUE)
 cat("    dataset_info = dataset_info,\n", file = r_example, append = TRUE)
-cat("    runtime = runtime,\n", file = r_example, append = TRUE)
-cat("    sim_truth = list(\n", file = r_example, append = TRUE)
-cat("      true_beta = sim$true.b,\n", file = r_example, append = TRUE)
-cat("      true_const = sim$true.const,\n", file = r_example, append = TRUE)
-cat("      true_breaks = sim$tr.idx\n", file = r_example, append = TRUE)
-cat("    )\n", file = r_example, append = TRUE)
-cat("    # bisam_result = bisam_result\n", file = r_example, append = TRUE)
+cat("    break_info = dataset$break_info\n", file = r_example, append = TRUE)
+cat("    # Add your results here\n", file = r_example, append = TRUE)
 cat("  )\n", file = r_example, append = TRUE)
 cat("}\n\n", file = r_example, append = TRUE)
-cat("# Summary of results\n", file = r_example, append = TRUE)
-cat("cat('\\nSummary of all runs:\\n')\n", file = r_example, append = TRUE)
-cat("for (name in names(results)) {\n", file = r_example, append = TRUE)
-cat("  r <- results[[name]]\n", file = r_example, append = TRUE)
-cat("  cat(sprintf('%s: %.2fs\\n', name, r$runtime))\n", file = r_example, append = TRUE)
+cat("# Test different time series lengths\n", file = r_example, append = TRUE)
+cat("cat('\\nTesting different time series lengths:\\n')\n", file = r_example, append = TRUE)
+cat("timelength_results <- list()\n\n", file = r_example, append = TRUE)
+cat("for (i in 1:nrow(timelength_datasets)) {\n", file = r_example, append = TRUE)
+cat("  dataset_info <- timelength_datasets[i, ]\n", file = r_example, append = TRUE)
+cat("  \n", file = r_example, append = TRUE)
+cat("  # Load dataset (similar to above)\n", file = r_example, append = TRUE)
+cat("  # YOUR BISAM CODE HERE with specific root finding algorithm\n", file = r_example, append = TRUE)
+cat("  # Compare results across different time series lengths\n", file = r_example, append = TRUE)
 cat("}\n", file = r_example, append = TRUE)
 
 # =============================================================================
 # SUMMARY
 # =============================================================================
 
+# Get counts for stepsize and timelength datasets
+stepsize_datasets <- cpp_datasets[grepl('stepsize', cpp_datasets$name), ]
+timelength_datasets <- cpp_datasets[grepl('timelength', cpp_datasets$name), ]
+
 cat("\n", paste(rep("=", 60), collapse=""), "\n")
-cat("DATASET GENERATION COMPLETE\n")
+cat("DATASET GENERATION COMPLETE - ROOT FINDING ALGORITHM COMPARISON\n")
 cat(paste(rep("=", 60), collapse=""), "\n")
 cat(sprintf("Generated %d datasets in '%s/' directory\n", length(dataset_configs), sim_dir))
-cat("\nDataset sizes:\n")
-for (i in 1:nrow(cpp_datasets)) {
-  cat(sprintf("  %s: n=%d, t=%d, nx=%d (total obs: %d)\n", 
-              cpp_datasets$name[i], cpp_datasets$n[i], cpp_datasets$t[i], 
-              cpp_datasets$nx[i], cpp_datasets$n[i] * cpp_datasets$t[i]))
-}
+cat("\nDataset breakdown:\n")
+cat(sprintf("  Step size comparison: %d datasets (step_mean: %.2f to %.2f)\n", 
+            nrow(stepsize_datasets), min(stepsize_datasets$step_mean), max(stepsize_datasets$step_mean)))
+cat(sprintf("  Time length comparison: %d datasets (t: %d to %d)\n", 
+            nrow(timelength_datasets), min(timelength_datasets$t), max(timelength_datasets$t)))
+cat(sprintf("  Other datasets: %d datasets for validation and stress testing\n", 
+            nrow(cpp_datasets) - nrow(stepsize_datasets) - nrow(timelength_datasets)))
+
+cat("\nKey characteristics:\n")
+cat("  - Adaptive number of breaks (approximately 50% of units)\n")
+cat("  - Breaks placed in middle third of time series at different positions\n")
+cat("  - No outliers (outl.mean = 0)\n")
+cat("  - All datasets have unique names for easy identification\n")
 
 cat("\nFiles created:\n")
 cat("  - R data files: sim_*.rds\n")
@@ -575,11 +692,7 @@ cat("  - Dataset registry: dataset_registry.rds\n")
 cat("  - Example usage: example_usage.cpp, example_usage.R\n")
 
 cat("\nTo use in C++:\n")
-cat("  #include \"simulation_data/simulation_datasets.h\"\n")
-cat("  auto datasets = get_all_datasets();\n")
-
-cat("\nTo use in R:\n")
-cat("  registry <- readRDS('simulation_data/dataset_registry.rds')\n")
-cat("  dataset <- readRDS('simulation_data/sim_[name]_n[XX]_t[XX]_nx[XX].rds')\n")
+cat("  auto stepsize_datasets = get_stepsize_datasets();\n")
+cat("  auto timelength_datasets = get_timelength_datasets();\n")
 
 cat("\n", paste(rep("=", 60), collapse=""), "\n")
