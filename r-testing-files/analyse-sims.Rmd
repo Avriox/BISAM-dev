@@ -987,3 +987,614 @@ ggplot(break_profiles %>% filter(distance_from_true <= 5),
 
 # Original Data
 
+
+```{r}
+# Function to load original simulation datasets
+load_original_dataset <- function(step_size, results_dir = "./r-testing-files/simulation_data") {
+  # Convert step_size to the format used in filenames
+  step_size_str <- sprintf("%03d", step_size * 100)
+  dataset_name <- paste0("rootfind_stepsize_", step_size_str)
+  
+  # Construct filename based on the pattern from data generation
+  filename <- file.path(results_dir, paste0("sim_", dataset_name, "_n10_t30_nx03.rds"))
+  
+  if (file.exists(filename)) {
+    return(readRDS(filename))
+  } else {
+    cat("File not found:", filename, "\n")
+    return(NULL)
+  }
+}
+
+# Load all step size datasets
+step_sizes <- unique(step_size_estimates_clean$step_size)
+original_datasets <- list()
+
+for (size in step_sizes) {
+  cat("Loading step size", size, "dataset...\n")
+  original_datasets[[paste0("step_", size)]] <- load_original_dataset(size)
+}
+
+cat("Original datasets loaded for step sizes:", paste(step_sizes, collapse = ", "), "\n")
+```
+
+
+```{r}
+# Extract detected breaks for each algorithm at each step size
+detected_breaks <- step_size_estimates_clean %>%
+  filter(parameter_type == "break_indicator") %>%
+  group_by(algorithm, step_size, dataset_name, run_number) %>%
+  arrange(parameter_index) %>%
+  mutate(
+    # Calculate which unit and time this break_indicator corresponds to
+    # For n=10, t=30, we have (t-2) = 28 break indicators per unit
+    # parameter_index 0-27 = unit 1, 28-55 = unit 2, etc.
+    break_indicators_per_unit = 28,  # t-2 for t=30
+    unit = floor(parameter_index / break_indicators_per_unit) + 1,
+    time_within_unit = (parameter_index %% break_indicators_per_unit) + 2  # +2 because breaks start at time 2
+  ) %>%
+  filter(probability > 0.5) %>%  # Only consider high-probability detections
+  ungroup()
+
+# Get the most likely break for each algorithm/step_size/run combination
+primary_detected_breaks <- step_size_estimates_clean %>%
+  filter(parameter_type == "break_indicator") %>%
+  group_by(algorithm, step_size, dataset_name, run_number) %>%
+  arrange(desc(probability)) %>%
+  slice(1) %>%
+  mutate(
+    break_indicators_per_unit = 28,
+    unit = floor(parameter_index / break_indicators_per_unit) + 1,
+    time_within_unit = (parameter_index %% break_indicators_per_unit) + 2
+  ) %>%
+  ungroup()
+
+cat("Break detection data prepared\n")
+```
+
+
+```{r}
+# Create time series plots for each step size
+for (step_size in step_sizes) {
+  cat("\nCreating plot for step size", step_size, "\n")
+  
+  # Get original dataset
+  dataset_key <- paste0("step_", step_size)
+  original_data <- original_datasets[[dataset_key]]
+  
+  if (is.null(original_data)) {
+    cat("Skipping step size", step_size, "- data not available\n")
+    next
+  }
+  
+  # Extract time series data
+  ts_data <- as.data.frame(original_data$sim_data$data) %>%
+    mutate(
+      unit = n,
+      time = t,
+      outcome = y
+    ) %>%
+    select(unit, time, outcome)
+  
+  # Get true break information
+  true_breaks <- original_data$break_info %>%
+    mutate(step_size_val = step_size)
+  
+  # Get detected breaks for this step size (average across runs)
+  detected_for_this_size <- primary_detected_breaks %>%
+    filter(step_size == !!step_size) %>%
+    group_by(algorithm, unit, time_within_unit) %>%
+    summarise(
+      avg_probability = mean(probability, na.rm = TRUE),
+      n_detections = n(),
+      .groups = "drop"
+    ) %>%
+    filter(avg_probability > 0.3)  # Show if detected in multiple runs
+  
+  # Create the plot
+  p <- ggplot(ts_data, aes(x = time, y = outcome)) +
+    geom_line(aes(group = unit), alpha = 0.6, color = "#7f8c8d", size = 0.8) +
+    facet_wrap(~unit, scales = "free_y", ncol = 5, 
+               labeller = labeller(unit = function(x) paste("Unit", x))) +
+    
+    # Add true breaks as red vertical lines
+    geom_vline(data = true_breaks, 
+               aes(xintercept = time), 
+               color = "#e74c3c", size = 1.2, alpha = 0.8) +
+    
+    # Add detected breaks for each algorithm
+    {if (nrow(detected_for_this_size %>% filter(algorithm == "jenkins")) > 0)
+      geom_vline(data = detected_for_this_size %>% filter(algorithm == "jenkins"),
+                 aes(xintercept = time_within_unit), 
+                 color = "#2c3e50", size = 1, alpha = 0.7, linetype = "dashed")
+    } +
+    
+    {if (nrow(detected_for_this_size %>% filter(algorithm == "newton")) > 0)
+      geom_vline(data = detected_for_this_size %>% filter(algorithm == "newton"),
+                 aes(xintercept = time_within_unit), 
+                 color = "#f39c12", size = 1, alpha = 0.7, linetype = "dotted")
+    } +
+    
+    {if (nrow(detected_for_this_size %>% filter(algorithm == "aberth")) > 0)
+      geom_vline(data = detected_for_this_size %>% filter(algorithm == "aberth"),
+                 aes(xintercept = time_within_unit), 
+                 color = "#3498db", size = 1, alpha = 0.7, linetype = "dotdash")
+    } +
+    
+    scale_x_continuous(breaks = seq(0, 30, by = 5)) +
+    labs(
+      title = paste("Time Series with Break Detection - Step Size", paste0(step_size * 100, "%")),
+      subtitle = paste("True breaks (red solid) vs Detected breaks:",
+                      "Jenkins (dark dashed), Newton (orange dotted), Aberth (blue dot-dash)"),
+      x = "Time Period",
+      y = "Outcome Value"
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.major = element_line(color = "#f8f9fa", size = 0.3),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(size = 8),
+      axis.title = element_text(size = 10),
+      plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+      plot.subtitle = element_text(size = 10, color = "#666666", margin = margin(b = 15)),
+      strip.text = element_text(size = 9, face = "bold"),
+      plot.margin = margin(20, 20, 20, 20)
+    )
+  
+  # Print the plot
+  print(p)
+  
+  # Print summary information
+  cat("Step size", step_size, "summary:\n")
+  cat("  True breaks:", nrow(true_breaks), "breaks at units", 
+      paste(true_breaks$unit, collapse = ", "), "\n")
+  cat("  Jenkins detections:", 
+      nrow(detected_for_this_size %>% filter(algorithm == "jenkins")), "\n")
+  cat("  Newton detections:", 
+      nrow(detected_for_this_size %>% filter(algorithm == "newton")), "\n")
+  cat("  Aberth detections:", 
+      nrow(detected_for_this_size %>% filter(algorithm == "aberth")), "\n")
+}
+```
+
+
+```{r}
+# Create an aggregate view showing just the units with breaks
+for (step_size in step_sizes) {
+  cat("\nCreating aggregate plot for step size", step_size, "\n")
+  
+  dataset_key <- paste0("step_", step_size)
+  original_data <- original_datasets[[dataset_key]]
+  
+  if (is.null(original_data)) next
+  
+  # Get units that have true breaks
+  units_with_breaks <- original_data$break_info$unit
+  
+  # Filter time series data to only units with breaks
+  ts_data_subset <- as.data.frame(original_data$sim_data$data) %>%
+    mutate(unit = n, time = t, outcome = y) %>%
+    filter(unit %in% units_with_breaks) %>%
+    select(unit, time, outcome)
+  
+  # Get true breaks
+  true_breaks <- original_data$break_info %>%
+    mutate(step_size_val = step_size)
+  
+  # Get detected breaks
+  detected_for_this_size <- primary_detected_breaks %>%
+    filter(step_size == !!step_size, unit %in% units_with_breaks) %>%
+    group_by(algorithm, unit, time_within_unit) %>%
+    summarise(
+      avg_probability = mean(probability, na.rm = TRUE),
+      .groups = "drop"
+    )
+  
+  # Create focused plot
+  p_focused <- ggplot(ts_data_subset, aes(x = time, y = outcome)) +
+    geom_line(color = "#34495e", size = 1.2, alpha = 0.8) +
+    facet_wrap(~unit, scales = "free_y", ncol = min(3, length(units_with_breaks)),
+               labeller = labeller(unit = function(x) paste("Unit", x, "(True Break)"))) +
+    
+    # True breaks
+    geom_vline(data = true_breaks, 
+               aes(xintercept = time), 
+               color = "#e74c3c", size = 2, alpha = 0.9) +
+    
+    # Algorithm detections with different styles
+    {if (nrow(detected_for_this_size %>% filter(algorithm == "jenkins")) > 0)
+      geom_vline(data = detected_for_this_size %>% filter(algorithm == "jenkins"),
+                 aes(xintercept = time_within_unit), 
+                 color = "#2c3e50", size = 1.5, alpha = 0.8, linetype = "dashed")
+    } +
+    
+    {if (nrow(detected_for_this_size %>% filter(algorithm == "newton")) > 0)
+      geom_vline(data = detected_for_this_size %>% filter(algorithm == "newton"),
+                 aes(xintercept = time_within_unit), 
+                 color = "#f39c12", size = 1.5, alpha = 0.8, linetype = "dotted")
+    } +
+    
+    {if (nrow(detected_for_this_size %>% filter(algorithm == "aberth")) > 0)
+      geom_vline(data = detected_for_this_size %>% filter(algorithm == "aberth"),
+                 aes(xintercept = time_within_unit), 
+                 color = "#3498db", size = 1.5, alpha = 0.8, linetype = "longdash")
+    } +
+    
+    scale_x_continuous(breaks = seq(0, 30, by = 5)) +
+    labs(
+      title = paste("Break Detection Focus - Step Size", paste0(step_size * 100, "%")),
+      subtitle = paste("Units with true breaks only |",
+                      "True (red solid), Jenkins (dark dashed), Newton (orange dotted), Aberth (blue long-dash)"),
+      x = "Time Period",
+      y = "Outcome Value"
+    ) +
+    theme_minimal() +
+    theme(
+      panel.grid.major = element_line(color = "#f8f9fa", size = 0.4),
+      panel.grid.minor = element_blank(),
+      axis.text = element_text(size = 10),
+      axis.title = element_text(size = 11),
+      plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+      plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 15)),
+      strip.text = element_text(size = 10, face = "bold"),
+      plot.margin = margin(20, 20, 20, 20)
+    )
+  
+  print(p_focused)
+  
+  # Print detailed break information
+  cat("Detailed break analysis for step size", step_size, ":\n")
+  for (unit in units_with_breaks) {
+    true_break_time <- true_breaks$time[true_breaks$unit == unit]
+    cat(sprintf("  Unit %d - True break at time %d:\n", unit, true_break_time))
+    
+    unit_detections <- detected_for_this_size %>% filter(unit == !!unit)
+    if (nrow(unit_detections) > 0) {
+      for (i in 1:nrow(unit_detections)) {
+        det <- unit_detections[i, ]
+        time_diff <- det$time_within_unit - true_break_time
+        cat(sprintf("    %s: detected at time %d (diff: %+d, prob: %.3f)\n", 
+                    str_to_title(det$algorithm), det$time_within_unit, 
+                    time_diff, det$avg_probability))
+      }
+    } else {
+      cat("    No high-probability detections\n")
+    }
+  }
+  cat("\n")
+}
+```
+
+
+```{r}
+# Create a summary table of detection accuracy
+detection_accuracy_table <- data.frame()
+
+for (step_size in step_sizes) {
+  dataset_key <- paste0("step_", step_size)
+  original_data <- original_datasets[[dataset_key]]
+  
+  if (is.null(original_data)) next
+  
+  true_breaks <- original_data$break_info
+  
+  for (algorithm in c("jenkins", "newton", "aberth")) {
+    detected <- primary_detected_breaks %>%
+      filter(step_size == !!step_size, algorithm == !!algorithm) %>%
+      group_by(unit, time_within_unit) %>%
+      summarise(avg_prob = mean(probability), .groups = "drop") %>%
+      arrange(desc(avg_prob)) %>%
+      slice(1)  # Take the most likely detection
+    
+    if (nrow(detected) > 0 && nrow(true_breaks) > 0) {
+      # Find closest match
+      best_match <- true_breaks[1, ]  # For simplicity, assume one break per dataset
+      time_error <- detected$time_within_unit[1] - best_match$time
+      unit_match <- detected$unit[1] == best_match$unit
+      
+      detection_accuracy_table <- rbind(detection_accuracy_table, data.frame(
+        step_size = step_size,
+        algorithm = algorithm,
+        detected_unit = detected$unit[1],
+        true_unit = best_match$unit,
+        detected_time = detected$time_within_unit[1],
+        true_time = best_match$time,
+        time_error = time_error,
+        unit_correct = unit_match,
+        detection_probability = detected$avg_prob[1],
+        stringsAsFactors = FALSE
+      ))
+    }
+  }
+}
+
+print(kable(detection_accuracy_table %>%
+              mutate(across(where(is.numeric), ~round(.x, 3))),
+            format = "html", 
+            caption = "Break detection accuracy summary"))
+
+cat("\nBreak Detection Performance Summary:\n")
+cat("===================================\n")
+accuracy_summary <- detection_accuracy_table %>%
+  group_by(algorithm) %>%
+  summarise(
+    avg_time_error = mean(abs(time_error), na.rm = TRUE),
+    perfect_detections = sum(time_error == 0 & unit_correct, na.rm = TRUE),
+    total_detections = n(),
+    accuracy_rate = perfect_detections / total_detections,
+    .groups = "drop"
+  )
+
+for (i in 1:nrow(accuracy_summary)) {
+  alg <- accuracy_summary$algorithm[i]
+  cat(sprintf("%s: %.1f avg time error, %d/%d perfect detections (%.1f%%)\n",
+              str_to_title(alg),
+              accuracy_summary$avg_time_error[i],
+              accuracy_summary$perfect_detections[i],
+              accuracy_summary$total_detections[i],
+              accuracy_summary$accuracy_rate[i] * 100))
+}
+```
+
+
+```{r}
+# Focus on PIPs (Posterior Inclusion Probabilities) for break indicators
+pip_data <- step_size_estimates_clean %>%
+  filter(parameter_type == "break_indicator") %>%
+  mutate(
+    # Calculate break position in the panel structure
+    break_indicators_per_unit = 28,  # t-2 for t=30
+    unit = floor(parameter_index / break_indicators_per_unit) + 1,
+    time_within_unit = (parameter_index %% break_indicators_per_unit) + 2,
+    step_size_pct = paste0(step_size * 100, "%")
+  ) %>%
+  select(algorithm, step_size, step_size_pct, dataset_name, run_number, 
+         unit, time_within_unit, parameter_index, probability)
+
+cat("PIP data prepared:\n")
+cat("  Break indicators per dataset:", max(pip_data$parameter_index) + 1, "\n")
+cat("  Units:", paste(sort(unique(pip_data$unit)), collapse = ", "), "\n")
+cat("  Time range:", min(pip_data$time_within_unit), "to", max(pip_data$time_within_unit), "\n")
+```
+
+
+```{r}
+# Calculate PIP differences between algorithms for each break size
+pip_comparison <- pip_data %>%
+  # Average PIPs across runs for each algorithm/step_size/position combination
+  group_by(algorithm, step_size, step_size_pct, unit, time_within_unit, parameter_index) %>%
+  summarise(avg_pip = mean(probability, na.rm = TRUE), .groups = "drop") %>%
+  
+  # Pivot to compare algorithms side by side
+  pivot_wider(names_from = algorithm, values_from = avg_pip, names_prefix = "pip_") %>%
+  
+  # Calculate differences from Jenkins baseline
+  mutate(
+    newton_diff = pip_newton - pip_jenkins,
+    aberth_diff = pip_aberth - pip_jenkins,
+    newton_abs_diff = abs(newton_diff),
+    aberth_abs_diff = abs(aberth_diff)
+  ) %>%
+  filter(!is.na(pip_jenkins), !is.na(pip_newton), !is.na(pip_aberth))
+
+# Summary statistics for PIP differences by step size
+pip_diff_summary <- pip_comparison %>%
+  group_by(step_size, step_size_pct) %>%
+  summarise(
+    n_indicators = n(),
+    # Newton vs Jenkins
+    newton_mean_abs_diff = mean(newton_abs_diff, na.rm = TRUE),
+    newton_max_abs_diff = max(newton_abs_diff, na.rm = TRUE),
+    newton_mean_diff = mean(newton_diff, na.rm = TRUE),
+    # Aberth vs Jenkins  
+    aberth_mean_abs_diff = mean(aberth_abs_diff, na.rm = TRUE),
+    aberth_max_abs_diff = max(aberth_abs_diff, na.rm = TRUE),
+    aberth_mean_diff = mean(aberth_diff, na.rm = TRUE),
+    # High PIP indicators (>0.1) - these matter most
+    high_pip_indicators = sum(pip_jenkins > 0.1, na.rm = TRUE),
+    newton_high_pip_diff = ifelse(high_pip_indicators > 0,
+                                  mean(newton_abs_diff[pip_jenkins > 0.1], na.rm = TRUE), NA),
+    aberth_high_pip_diff = ifelse(high_pip_indicators > 0,
+                                  mean(aberth_abs_diff[pip_jenkins > 0.1], na.rm = TRUE), NA),
+    .groups = "drop"
+  )
+
+print(kable(pip_diff_summary %>%
+              mutate(across(where(is.numeric), ~round(.x, 4))),
+            format = "html", 
+            caption = "PIP Differences between Root Finding Algorithms by Break Size"))
+```
+```{r}
+# Plot PIP distributions for each algorithm and step size
+pip_long <- pip_data %>%
+  group_by(algorithm, step_size, step_size_pct, parameter_index) %>%
+  summarise(avg_pip = mean(probability, na.rm = TRUE), .groups = "drop") %>%
+  mutate(algorithm_factor = factor(algorithm, levels = c("jenkins", "newton", "aberth")))
+
+ggplot(pip_long, aes(x = avg_pip, fill = algorithm_factor)) +
+  geom_histogram(bins = 50, alpha = 0.7, position = "identity") +
+  facet_grid(step_size_pct ~ algorithm_factor, 
+             labeller = labeller(step_size_pct = function(x) paste("Step Size:", x))) +
+  scale_fill_manual(
+    values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
+    labels = c("Jenkins", "Newton-Raphson", "Aberth-Ehrlich")
+  ) +
+  scale_x_continuous(
+    limits = c(0, 1),
+    breaks = c(0, 0.25, 0.5, 0.75, 1.0),
+    labels = c("0%", "25%", "50%", "75%", "100%")
+  ) +
+  labs(
+    title = "Distribution of Posterior Inclusion Probabilities (PIPs)",
+    subtitle = "Comparing root finding algorithms across break sizes",
+    x = "Posterior Inclusion Probability",
+    y = "Count of Break Indicators",
+    fill = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "#f8f9fa", size = 0.3),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 9),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11, color = "#666666"),
+    strip.text = element_text(size = 9),
+    legend.position = "bottom"
+  )
+```
+
+
+```{r}
+# Create heatmap showing PIP differences for high-probability indicators
+high_pip_data <- pip_comparison %>%
+  filter(pip_jenkins > 0.05) %>%  # Focus on indicators that Jenkins gives some weight to
+  select(step_size_pct, unit, time_within_unit, pip_jenkins, newton_diff, aberth_diff) %>%
+  pivot_longer(cols = c(newton_diff, aberth_diff), 
+               names_to = "comparison", values_to = "pip_difference") %>%
+  mutate(
+    comparison = case_when(
+      comparison == "newton_diff" ~ "Newton vs Jenkins",
+      comparison == "aberth_diff" ~ "Aberth vs Jenkins"
+    ),
+    position_label = paste("U", unit, "T", time_within_unit)
+  )
+
+ggplot(high_pip_data, aes(x = step_size_pct, y = position_label, fill = pip_difference)) +
+  geom_tile(color = "white", size = 0.5) +
+  facet_wrap(~comparison, ncol = 1) +
+  scale_fill_gradient2(
+    low = "#3498db", mid = "white", high = "#e74c3c",
+    midpoint = 0, 
+    limits = c(-0.1, 0.1),
+    labels = scales::percent_format(accuracy = 1),
+    name = "PIP\nDifference"
+  ) +
+  labs(
+    title = "PIP Differences for High-Probability Break Indicators",
+    subtitle = "Only showing break indicators where Jenkins PIP > 5%",
+    x = "Break Size (Step Mean)",
+    y = "Break Position (Unit, Time)"
+  ) +
+  theme_minimal() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 9),
+    axis.text.y = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11, color = "#666666"),
+    strip.text = element_text(size = 10, face = "bold"),
+    legend.title = element_text(size = 9),
+    panel.grid = element_blank()
+  )
+```
+
+
+```{r}
+# Scatter plots comparing PIPs directly between algorithms
+pip_scatter_data <- pip_comparison %>%
+  select(step_size_pct, pip_jenkins, pip_newton, pip_aberth) %>%
+  pivot_longer(cols = c(pip_newton, pip_aberth), 
+               names_to = "algorithm", values_to = "pip_alternative") %>%
+  mutate(
+    algorithm = case_when(
+      algorithm == "pip_newton" ~ "Newton-Raphson",
+      algorithm == "pip_aberth" ~ "Aberth-Ehrlich"
+    )
+  )
+
+ggplot(pip_scatter_data, aes(x = pip_jenkins, y = pip_alternative)) +
+  geom_point(alpha = 0.6, size = 1.5, color = "#34495e") +
+  geom_abline(slope = 1, intercept = 0, color = "#e74c3c", linetype = "dashed", size = 1) +
+  facet_grid(algorithm ~ step_size_pct,
+             labeller = labeller(step_size_pct = function(x) paste("Step Size:", x))) +
+  scale_x_continuous(
+    limits = c(0, 1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    labels = scales::percent_format(accuracy = 1)
+  ) +
+  labs(
+    title = "PIP Correlation between Root Finding Algorithms",
+    subtitle = "Perfect agreement would lie on the red diagonal line",
+    x = "Jenkins PIP",
+    y = "Alternative Algorithm PIP"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "#f8f9fa", size = 0.3),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 9),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold"),
+    plot.subtitle = element_text(size = 11, color = "#666666"),
+    strip.text = element_text(size = 9)
+  )
+```
+
+
+```{r}
+# Calculate correlation and agreement metrics
+pip_correlations <- pip_comparison %>%
+  group_by(step_size, step_size_pct) %>%
+  summarise(
+    jenkins_newton_cor = cor(pip_jenkins, pip_newton, use = "complete.obs"),
+    jenkins_aberth_cor = cor(pip_jenkins, pip_aberth, use = "complete.obs"),
+    # Root Mean Square Difference
+    newton_rmsd = sqrt(mean(newton_diff^2, na.rm = TRUE)),
+    aberth_rmsd = sqrt(mean(aberth_diff^2, na.rm = TRUE)),
+    # Agreement within 1% for high PIPs
+    newton_agreement_1pct = mean(newton_abs_diff < 0.01, na.rm = TRUE),
+    aberth_agreement_1pct = mean(aberth_abs_diff < 0.01, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+print(kable(pip_correlations %>%
+              mutate(across(where(is.numeric), ~round(.x, 4))),
+            format = "html",
+            caption = "PIP Agreement Metrics between Root Finding Algorithms"))
+
+cat("\n=== PIP ANALYSIS SUMMARY ===\n")
+cat("============================\n\n")
+
+cat("POSTERIOR INCLUSION PROBABILITY (PIP) DIFFERENCES:\n\n")
+
+for(i in 1:nrow(pip_correlations)) {
+  step <- pip_correlations$step_size_pct[i]
+  newton_cor <- round(pip_correlations$jenkins_newton_cor[i], 4)
+  aberth_cor <- round(pip_correlations$jenkins_aberth_cor[i], 4)
+  newton_rmsd <- round(pip_correlations$newton_rmsd[i], 4)
+  aberth_rmsd <- round(pip_correlations$aberth_rmsd[i], 4)
+  
+  cat(sprintf("Step Size %s:\n", step))
+  cat(sprintf("  Newton-Raphson: r=%.4f, RMSD=%.4f\n", newton_cor, newton_rmsd))
+  cat(sprintf("  Aberth-Ehrlich: r=%.4f, RMSD=%.4f\n", aberth_cor, aberth_rmsd))
+  
+  if(newton_cor > 0.999 && aberth_cor > 0.999) {
+    cat("  → Nearly identical PIPs across algorithms\n")
+  } else if(min(newton_cor, aberth_cor) > 0.99) {
+    cat("  → Very high agreement, minor differences\n")
+  } else {
+    cat("  → Notable differences in PIPs\n")
+  }
+  cat("\n")
+}
+
+# Overall conclusion
+overall_newton_cor <- mean(pip_correlations$jenkins_newton_cor, na.rm = TRUE)
+overall_aberth_cor <- mean(pip_correlations$jenkins_aberth_cor, na.rm = TRUE)
+
+cat("OVERALL CONCLUSION:\n")
+cat(sprintf("Average correlations: Newton r=%.4f, Aberth r=%.4f\n", 
+            overall_newton_cor, overall_aberth_cor))
+
+if(min(overall_newton_cor, overall_aberth_cor) > 0.999) {
+  cat("The root finding algorithms produce virtually identical PIPs.\n")
+  cat("Choice of algorithm should be based on computational efficiency.\n")
+} else {
+  cat("There are measurable differences in PIPs between algorithms.\n")
+  cat("This suggests the root finding step affects the final model selection.\n")
+}
+```

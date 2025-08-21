@@ -9,7 +9,7 @@ library(mvtnorm)
 # Source the simulation function (assuming it's in the same directory)
 # source("simulation_functions.R")  # Uncomment if function is in separate file
 
-# Simulation function (included directly for completeness)
+# _________________ Controlled Simulation ______________----
 contr_sim_breaks <- function(
     n,
     t,
@@ -229,7 +229,7 @@ dataset_configs <- list(
 
 # Fixed simulation parameters
 set.seed(192837612)  # For reproducibility
-const <- TRUE        # Include constant
+const <- FALSE        # Include constant
 ife <- FALSE        # No individual fixed effects (for performance)
 tfe <- FALSE        # No time fixed effects (for performance)
 iis <- TRUE         # Include indicator saturation

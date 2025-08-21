@@ -224,11 +224,115 @@ public:
         validation_summaries_.emplace_back(experiment_name_, run_name, dataset_name, run_number, validation);
     }
 
-    void save_results() {
-        save_timing_results();
-        save_estimation_results();
-        save_validation_summaries();
+    // Replace the save_results() method in your ResultsStorage class with this debug version:
+
+void save_results() {
+    std::cout << "=== SAVE_RESULTS DEBUG START ===" << std::endl;
+
+    // Get absolute path
+    std::filesystem::path abs_path = std::filesystem::absolute(base_directory_);
+    std::cout << "Base directory: " << abs_path << std::endl;
+    std::cout << "Directory exists: " << (std::filesystem::exists(abs_path) ? "YES" : "NO") << std::endl;
+
+    // Check data sizes
+    std::cout << "Data to save:" << std::endl;
+    std::cout << "  - Timing results: " << timing_results_.size() << " entries" << std::endl;
+    std::cout << "  - Estimation results: " << estimation_results_.size() << " entries" << std::endl;
+    std::cout << "  - Validation summaries: " << validation_summaries_.size() << " entries" << std::endl;
+
+    if (timing_results_.empty() && estimation_results_.empty() && validation_summaries_.empty()) {
+        std::cout << "WARNING: No data to save!" << std::endl;
     }
+
+    try {
+        std::cout << "Attempting to save timing results..." << std::endl;
+        save_timing_results();
+        std::cout << "✓ Timing results saved successfully" << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "✗ ERROR saving timing results: " << e.what() << std::endl;
+    }
+
+    try {
+        std::cout << "Attempting to save estimation results..." << std::endl;
+        save_estimation_results();
+        std::cout << "✓ Estimation results saved successfully" << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "✗ ERROR saving estimation results: " << e.what() << std::endl;
+    }
+
+    try {
+        std::cout << "Attempting to save validation summaries..." << std::endl;
+        save_validation_summaries();
+        std::cout << "✓ Validation summaries saved successfully" << std::endl;
+    } catch (const std::exception& e) {
+        std::cout << "✗ ERROR saving validation summaries: " << e.what() << std::endl;
+    }
+
+    std::cout << "=== SAVE_RESULTS DEBUG END ===" << std::endl;
+}
+
+// Also replace save_timing_results() with this debug version:
+void save_timing_results() {
+    std::string filename = base_directory_ + "/" + experiment_name_ + "_timing.csv";
+    std::filesystem::path abs_filename = std::filesystem::absolute(filename);
+
+    std::cout << "  Timing file: " << abs_filename << std::endl;
+    std::cout << "  Data entries: " << timing_results_.size() << std::endl;
+
+    if (timing_results_.empty()) {
+        std::cout << "  WARNING: No timing data to save!" << std::endl;
+        return;
+    }
+
+    bool should_append = append_mode_ && file_exists_and_has_content(filename);
+    std::cout << "  Append mode: " << (should_append ? "YES" : "NO") << std::endl;
+
+    std::ofstream file;
+    if (should_append) {
+        file.open(filename, std::ios::app);
+        std::cout << "  Opened in append mode" << std::endl;
+    } else {
+        file.open(filename);
+        std::cout << "  Opened in write mode" << std::endl;
+        // Write header for new file
+        file << "experiment_name,run_name,dataset_name,run_number,execution_time_ms,n,t,nx,timestamp\n";
+        std::cout << "  Header written" << std::endl;
+    }
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Could not open timing results file: " + filename);
+    }
+
+    std::cout << "  File opened successfully, writing " << timing_results_.size() << " entries..." << std::endl;
+
+    // Write data
+    int count = 0;
+    for (const auto& result : timing_results_) {
+        file << result.experiment_name << ","
+             << result.run_name << ","
+             << result.dataset_name << ","
+             << result.run_number << ","
+             << std::fixed << std::setprecision(3) << result.execution_time_ms << ","
+             << result.n << ","
+             << result.t << ","
+             << result.nx << ","
+             << result.timestamp << "\n";
+        count++;
+    }
+
+    std::cout << "  Wrote " << count << " entries" << std::endl;
+
+    file.close();
+    std::cout << "  File closed" << std::endl;
+
+    // Verify file was created
+    if (std::filesystem::exists(abs_filename)) {
+        auto file_size = std::filesystem::file_size(abs_filename);
+        std::cout << "  ✓ File created successfully, size: " << file_size << " bytes" << std::endl;
+    } else {
+        std::cout << "  ✗ File was not created!" << std::endl;
+    }
+}
 
     // NEW: Clear memory after saving to prevent accumulation
     void clear_memory() {
@@ -243,38 +347,38 @@ public:
     }
 
 private:
-    void save_timing_results() {
-        std::string filename = base_directory_ + "/" + experiment_name_ + "_timing.csv";
-        bool should_append = append_mode_ && file_exists_and_has_content(filename);
-
-        std::ofstream file;
-        if (should_append) {
-            file.open(filename, std::ios::app);
-        } else {
-            file.open(filename);
-            // Write header for new file
-            file << "experiment_name,run_name,dataset_name,run_number,execution_time_ms,n,t,nx,timestamp\n";
-        }
-
-        if (!file.is_open()) {
-            throw std::runtime_error("Could not open timing results file: " + filename);
-        }
-
-        // Write data
-        for (const auto& result : timing_results_) {
-            file << result.experiment_name << ","
-                 << result.run_name << ","
-                 << result.dataset_name << ","
-                 << result.run_number << ","
-                 << std::fixed << std::setprecision(3) << result.execution_time_ms << ","
-                 << result.n << ","
-                 << result.t << ","
-                 << result.nx << ","
-                 << result.timestamp << "\n";
-        }
-
-        file.close();
-    }
+    // void save_timing_results() {
+    //     std::string filename = base_directory_ + "/" + experiment_name_ + "_timing.csv";
+    //     bool should_append = append_mode_ && file_exists_and_has_content(filename);
+    //
+    //     std::ofstream file;
+    //     if (should_append) {
+    //         file.open(filename, std::ios::app);
+    //     } else {
+    //         file.open(filename);
+    //         // Write header for new file
+    //         file << "experiment_name,run_name,dataset_name,run_number,execution_time_ms,n,t,nx,timestamp\n";
+    //     }
+    //
+    //     if (!file.is_open()) {
+    //         throw std::runtime_error("Could not open timing results file: " + filename);
+    //     }
+    //
+    //     // Write data
+    //     for (const auto& result : timing_results_) {
+    //         file << result.experiment_name << ","
+    //              << result.run_name << ","
+    //              << result.dataset_name << ","
+    //              << result.run_number << ","
+    //              << std::fixed << std::setprecision(3) << result.execution_time_ms << ","
+    //              << result.n << ","
+    //              << result.t << ","
+    //              << result.nx << ","
+    //              << result.timestamp << "\n";
+    //     }
+    //
+    //     file.close();
+    // }
 
     void save_estimation_results() {
         std::string filename = base_directory_ + "/" + experiment_name_ + "_estimates.csv";

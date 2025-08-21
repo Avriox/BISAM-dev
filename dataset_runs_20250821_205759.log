@@ -1,0 +1,3244 @@
+[2025-08-21 20:57:59] Starting rootfind_stepsize_050 from run 1 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_050'
+  argv[2] = '1'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_050
+Starting from run 1
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_050'
+  step_size: '050'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_050'
+rootfind_stepsize_050 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+39655.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 21546 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38001.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 21636 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36869.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 21726 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37011.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 21816 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36889.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 21906 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37217.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 21996 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+timeout: the monitored command dumped core
+[2025-08-21 21:02:04] rootfind_stepsize_050 incomplete (exit: 139, runs: 6/20, time: 245s)
+[2025-08-21 21:02:14] Starting rootfind_stepsize_050 from run 7 (attempt 2)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_050'
+  argv[2] = '7'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_050
+Starting from run 7
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_050'
+  step_size: '050'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_050'
+rootfind_stepsize_050 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+39360.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22086 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37450.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22176 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36843.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22266 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37403.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22357 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36166.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22448 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 35834.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22539 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36544.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22630 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36990.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22721 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36260.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22812 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36099.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22903 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36053.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 22994 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 35667.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23085 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36576.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23176 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36062.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23267 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+ | Beta: OK | Break: FAIL
+
+Final save of all results...
+=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 0 entries
+  - Estimation results: 0 entries
+  - Validation summaries: 0 entries
+WARNING: No data to save!
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 0
+  WARNING: No timing data to save!
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Completed multithreading performance test (1-30 cores)
+Successfully completed 14/14 runs
+[2025-08-21 21:10:48] rootfind_stepsize_050 completed successfully (14 runs, 514s)
+
+[2025-08-21 21:10:58] Starting rootfind_stepsize_075 from run 1 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_075'
+  argv[2] = '1'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_075
+Starting from run 1
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_075'
+  step_size: '075'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_075'
+rootfind_stepsize_075 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+38659.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23357 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39812.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23447 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39281.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23537 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39492.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23627 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38979.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23717 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38817.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23807 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38146.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23897 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37837.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 23987 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38207.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24077 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38384.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24168 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38110.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24259 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37567.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24350 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38482.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24441 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39040.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24532 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38310.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24623 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37861.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24714 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37357.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24805 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37846.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24896 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38046.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 24987 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36402.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25078 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+ | Beta: OK | Break: FAIL
+
+Final save of all results...
+=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 0 entries
+  - Estimation results: 0 entries
+  - Validation summaries: 0 entries
+WARNING: No data to save!
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 0
+  WARNING: No timing data to save!
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Completed multithreading performance test (1-30 cores)
+Successfully completed 20/20 runs
+[2025-08-21 21:23:45] rootfind_stepsize_075 completed successfully (20 runs, 767s)
+
+[2025-08-21 21:23:55] Starting rootfind_stepsize_100 from run 1 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_100'
+  argv[2] = '1'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_100
+Starting from run 1
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_100'
+  step_size: '100'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_100'
+rootfind_stepsize_100 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+40410.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25168 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 40049.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25258 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38593.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25348 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38549.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25438 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38722.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25528 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38714.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25618 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38398.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25708 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37092.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25798 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+timeout: the monitored command dumped core
+[2025-08-21 21:29:42] rootfind_stepsize_100 incomplete (exit: 139, runs: 8/20, time: 347s)
+[2025-08-21 21:29:52] Starting rootfind_stepsize_100 from run 9 (attempt 2)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_100'
+  argv[2] = '9'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_100
+Starting from run 9
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_100'
+  step_size: '100'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_100'
+rootfind_stepsize_100 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+40808.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25888 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38479.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 25979 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38188.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26070 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38748.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26161 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38638.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26252 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37898.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26343 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37356.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26434 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37768.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26525 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37064.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26616 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38569.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26707 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38067.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26798 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37085.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26889 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+ | Beta: OK | Break: OK
+
+Final save of all results...
+=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 0 entries
+  - Estimation results: 0 entries
+  - Validation summaries: 0 entries
+WARNING: No data to save!
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 0
+  WARNING: No timing data to save!
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Completed multithreading performance test (1-30 cores)
+Successfully completed 12/12 runs
+[2025-08-21 21:37:31] rootfind_stepsize_100 completed successfully (12 runs, 459s)
+
+[2025-08-21 21:37:41] Starting rootfind_stepsize_150 from run 1 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_150'
+  argv[2] = '1'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_150
+Starting from run 1
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_150'
+  step_size: '150'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_150'
+rootfind_stepsize_150 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+40528.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 26979 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39330.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27069 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38435.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27159 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38838.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27249 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37929.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27339 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38940.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27429 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38818.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27519 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38620.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27609 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38542.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27610 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38424.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27701 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37775.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27792 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36919.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27883 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 37601.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 27974 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 36519.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28065 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+timeout: the monitored command dumped core
+[2025-08-21 21:47:34] rootfind_stepsize_150 incomplete (exit: 139, runs: 14/20, time: 593s)
+[2025-08-21 21:47:44] Starting rootfind_stepsize_150 from run 14 (attempt 2)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_150'
+  argv[2] = '14'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_150
+Starting from run 14
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_150'
+  step_size: '150'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_150'
+rootfind_stepsize_150 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+41004.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28156 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 40422.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28247 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 40043.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28338 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39474.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28429 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39326.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28520 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 38812.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28611 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 39022.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28702 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+ | Beta: OK | Break: OK
+
+Final save of all results...
+=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 0 entries
+  - Estimation results: 0 entries
+  - Validation summaries: 0 entries
+WARNING: No data to save!
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 0
+  WARNING: No timing data to save!
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Completed multithreading performance test (1-30 cores)
+Successfully completed 7/7 runs
+[2025-08-21 21:52:22] rootfind_stepsize_150 completed successfully (7 runs, 278s)
+
+[2025-08-21 21:52:32] Starting rootfind_stepsize_300 from run 1 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_300'
+  argv[2] = '1'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_300
+Starting from run 1
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_300'
+  step_size: '300'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_300'
+rootfind_stepsize_300 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+45019.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28792 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 44367.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28882 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43505.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 28972 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42933.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29062 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42801.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29152 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 44937.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29242 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42597.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29332 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42545.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29422 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42754.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29512 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43080.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29603 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43105.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29694 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43240.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29785 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43230.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29876 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42862.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 29967 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42830.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30058 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42564.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30149 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42725.7ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30240 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42593.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30331 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43429.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30422 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42242.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30513 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+ | Beta: OK | Break: OK
+
+Final save of all results...
+=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 0 entries
+  - Estimation results: 0 entries
+  - Validation summaries: 0 entries
+WARNING: No data to save!
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 0
+  WARNING: No timing data to save!
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Completed multithreading performance test (1-30 cores)
+Successfully completed 20/20 runs
+[2025-08-21 22:06:56] rootfind_stepsize_300 completed successfully (20 runs, 864s)
+
+[2025-08-21 22:07:06] Starting rootfind_stepsize_500 from run 1 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_500'
+  argv[2] = '1'
+  argv[3] = 'jenkins'
+Running single dataset from command line: rootfind_stepsize_500
+Starting from run 1
+Using run name prefix from command line: 'jenkins'
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_500'
+  step_size: '500'
+  run_name_prefix: 'jenkins'
+  final RUN_NAME: 'jenkins_500'
+rootfind_stepsize_500 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+45065.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30603 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43797.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30693 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43280.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30783 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43094.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30873 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42579.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 30963 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43282.8ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31053 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42811.0ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31143 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43111.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31233 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43260.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31323 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42948.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31414 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42898.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31505 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43397.3ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31596 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42793.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31687 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43192.5ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31778 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42633.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31869 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42563.2ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 31960 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42968.4ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 32051 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42586.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 32142 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 42838.9ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 32233 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+Calculating column means of w_store...
+, 43193.1ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 32324 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+ | Beta: OK | Break: OK
+
+Final save of all results...
+=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 0 entries
+  - Estimation results: 0 entries
+  - Validation summaries: 0 entries
+WARNING: No data to save!
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 0
+  WARNING: No timing data to save!
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Completed multithreading performance test (1-30 cores)
+Successfully completed 20/20 runs
+[2025-08-21 22:21:29] rootfind_stepsize_500 completed successfully (20 runs, 863s)
+
+[2025-08-21 22:21:39] Execution completed. Success: 6, Failed: 0, Skipped: 0

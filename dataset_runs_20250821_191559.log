@@ -1,0 +1,47 @@
+[2025-08-21 19:15:59] Starting rootfind_stepsize_050 from run 4 (attempt 1)
+Arguments received: 4
+  argv[0] = './cmake-build-release/BISAM'
+  argv[1] = 'rootfind_stepsize_050'
+  argv[2] = '4'
+  argv[3] = ''
+Running single dataset from command line: rootfind_stepsize_050
+Starting from run 4
+Using run name prefix from command line: ''
+BISAM Performance Testing
+Experiment: step_size_fixed
+Testing thread counts 1-30
+Testing 1 datasets with 20 runs each
+MCMC: 5000 iterations, 500 burn-in
+Append mode: ON
+DEBUG: Constructing RUN_NAME:
+  dataset.name: 'rootfind_stepsize_050'
+  step_size: '050'
+  run_name_prefix: ''
+  final RUN_NAME: '_050'
+rootfind_stepsize_050 (n=10, t=30, nx=3): Starting Gibbs Sampler
+Calculating column means of w_store...
+4774.6ms=== SAVE_RESULTS DEBUG START ===
+Base directory: "/home/jakob/coding/BISAM-dev/simulations"
+Directory exists: YES
+Data to save:
+  - Timing results: 1 entries
+  - Estimation results: 274 entries
+  - Validation summaries: 1 entries
+Attempting to save timing results...
+  Timing file: "/home/jakob/coding/BISAM-dev/simulations/step_size_fixed_timing.csv"
+  Data entries: 1
+  Append mode: YES
+  Opened in append mode
+  File opened successfully, writing 1 entries...
+  Wrote 1 entries
+  File closed
+  ✓ File created successfully, size: 412 bytes
+✓ Timing results saved successfully
+Attempting to save estimation results...
+✓ Estimation results saved successfully
+Attempting to save validation summaries...
+✓ Validation summaries saved successfully
+=== SAVE_RESULTS DEBUG END ===
+Starting Gibbs Sampler
+[2025-08-21 19:16:08] rootfind_stepsize_050 failed with exit code 141 (9s)
+[2025-08-21 19:16:18] Starting rootfind_stepsize_050 from run 4 (attempt 2)
