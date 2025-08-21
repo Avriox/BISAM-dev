@@ -10,6 +10,8 @@ library(stringr)
 ```{r config}
 cumulative_experiment_name <- "cumulative_gains_study_aberth"
 multithreading_experiment_name <- "multithreading"
+step_size_experiment_name <- "root_finder_step_size"
+root_finding_experiment_name <- "root_finding"
 results_dir <- "./simulations"
 ```
 
@@ -73,6 +75,22 @@ multithreading_timing_data <- multithreading_experiment_data$timing
 multithreading_estimates_data <- multithreading_experiment_data$estimates
 multithreading_validation_data <- multithreading_experiment_data$validation
 multithreading_timing_summary <- create_timing_summary(multithreading_timing_data)
+```
+
+```{r load_step_size_data}
+# Load multithreading study data
+step_size_experiment_data <- load_experiment_data(step_size_experiment_name, results_dir)
+step_size_timing_data <- multithreading_experiment_data$timing
+step_size_estimates_data <- multithreading_experiment_data$estimates
+step_size_validation_data <- multithreading_experiment_data$validation
+```
+
+```{r load_root_finding_data}
+# Load multithreading study data
+root_finding_experiment_data <- load_experiment_data(root_finding_experiment_name, results_dir)
+root_finding_timing_data <- multithreading_experiment_data$timing
+root_finding_estimates_data <- multithreading_experiment_data$estimates
+root_finding_validation_data <- multithreading_experiment_data$validation
 ```
 
 # Cumulative Performance Analysis
@@ -297,21 +315,675 @@ cat(sprintf("Best parallel efficiency: %.1f%% with %d cores\n",
             threading_best_efficiency, threading_efficiency_data$core_count[which.max(threading_efficiency_data$parallel_efficiency)]))
 ```
 
-# Combined Analysis Summary
+# Step Size Analysis
 
-```{r combined_summary}
-cat("Analysis Summary\n")
-cat("===============\n")
+```{r}
+# Load and prepare step size data
+step_size_data <- load_experiment_data(step_size_experiment_name, results_dir)
+step_size_timing_data <- step_size_data$timing
+step_size_estimates_data <- step_size_data$estimates  
+step_size_validation_data <- step_size_data$validation
 
-cat("Cumulative Optimizations:\n")
-cat(sprintf("- Overall speedup: %.1fx\n", max(cumulative_speedup_data$speedup_factor)))
-cat(sprintf("- Runtime reduction: %.1f%%\n", 
-            (1 - min(cumulative_speedup_data$time_seconds)/max(cumulative_speedup_data$time_seconds)) * 100))
+# Extract algorithm and step size from run_name
+step_size_estimates_clean <- step_size_estimates_data %>%
+  filter(run_name != "experiment_name") %>%  # Remove header row if present
+  mutate(
+    algorithm = str_extract(run_name, "^[a-z]+"),
+    step_size = as.numeric(str_extract(run_name, "\\d+$")) / 100,
+    parameter_index = as.numeric(parameter_index),
+    true_value = as.numeric(true_value),
+    estimated_value = as.numeric(estimated_value),
+    error = as.numeric(error),
+    probability = as.numeric(probability)
+  ) %>%
+  filter(!is.na(algorithm), !is.na(step_size))
 
-cat("\nMultithreading Scaling:\n")
-cat(sprintf("- Maximum speedup: %.2fx\n", max(threading_efficiency_data$speedup)))
-cat(sprintf("- Best efficiency: %.1f%%\n", max(threading_efficiency_data$parallel_efficiency)))
-cat(sprintf("- Core count range: %d to %d cores\n", 
-            min(threading_data$core_count), max(threading_data$core_count)))
+step_size_validation_clean <- step_size_validation_data %>%
+  filter(run_name != "experiment_name") %>%
+  mutate(
+    algorithm = str_extract(run_name, "^[a-z]+"),
+    step_size = as.numeric(str_extract(run_name, "\\d+$")) / 100,
+    beta_mse = as.numeric(beta_mse),
+    beta_max_error = as.numeric(beta_max_error),
+    break_detected_correctly = as.logical(break_detected_correctly),
+    true_break_position = as.numeric(true_break_position),
+    detected_break_position = as.numeric(detected_break_position),
+    detected_break_probability = as.numeric(detected_break_probability)
+  ) %>%
+  filter(!is.na(algorithm), !is.na(step_size))
 
-cat("\nAnalysis completed successfully!\n")
+cat("Step size data loaded:\n")
+cat("  Algorithms:", paste(unique(step_size_estimates_clean$algorithm), collapse = ", "), "\n")
+cat("  Step sizes:", paste(sort(unique(step_size_estimates_clean$step_size)), collapse = ", "), "\n")
+cat("  Datasets:", length(unique(step_size_estimates_clean$dataset_name)), "\n")
+
+```
+
+
+```{r}
+# Analyze beta coefficient accuracy across algorithms
+beta_accuracy <- step_size_estimates_clean %>%
+  filter(parameter_type == "beta") %>%
+  group_by(algorithm, step_size, dataset_name, run_number) %>%
+  summarise(
+    beta_mse = mean(error^2, na.rm = TRUE),
+    beta_max_error = max(abs(error), na.rm = TRUE),
+    beta_mean_abs_error = mean(abs(error), na.rm = TRUE),
+    n_betas = n(),
+    .groups = "drop"
+  ) %>%
+  group_by(algorithm, step_size) %>%
+  summarise(
+    mean_mse = mean(beta_mse, na.rm = TRUE),
+    mean_max_error = mean(beta_max_error, na.rm = TRUE),
+    mean_abs_error = mean(beta_mean_abs_error, na.rm = TRUE),
+    sd_mse = sd(beta_mse, na.rm = TRUE),
+    sd_max_error = sd(beta_max_error, na.rm = TRUE),
+    n_runs = n(),
+    .groups = "drop"
+  )
+
+# Create comparison against Jenkins baseline
+jenkins_baseline <- beta_accuracy %>%
+  filter(algorithm == "jenkins") %>%
+  select(step_size, jenkins_mse = mean_mse, jenkins_max_error = mean_max_error, jenkins_abs_error = mean_abs_error)
+
+beta_comparison <- beta_accuracy %>%
+  left_join(jenkins_baseline, by = "step_size") %>%
+  mutate(
+    mse_ratio = mean_mse / jenkins_mse,
+    max_error_ratio = mean_max_error / jenkins_max_error,
+    abs_error_ratio = mean_abs_error / jenkins_abs_error,
+    mse_diff = mean_mse - jenkins_mse,
+    algorithm_factor = factor(algorithm, levels = c("jenkins", "newton", "aberth"))
+  )
+
+print(kable(beta_comparison %>% 
+              select(algorithm, step_size, mean_mse, mse_ratio, mean_max_error, max_error_ratio) %>%
+              mutate(across(where(is.numeric), ~round(.x, 4))),
+            format = "markdown", caption = "Beta estimation accuracy comparison"))
+```
+
+
+```{r}
+# Plot beta estimation accuracy across algorithms and step sizes
+ggplot(beta_comparison, aes(x = step_size, y = mean_mse, color = algorithm_factor)) +
+  geom_line(size = 1.2, alpha = 0.8) +
+  geom_point(size = 3, alpha = 0.9) +
+  scale_color_manual(
+    values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
+    labels = c("Jenkins (Baseline)", "Newton-Raphson", "Aberth-Ehrlich")
+  ) +
+  scale_x_continuous(
+    breaks = unique(beta_comparison$step_size),
+    labels = paste0(unique(beta_comparison$step_size) * 100, "%")
+  ) +
+  scale_y_continuous(
+    limits = c(0, max(beta_comparison$mean_mse) * 1.05),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title = "Beta Coefficient Estimation Accuracy",
+    subtitle = "Mean Squared Error by Root Finding Algorithm and Step Size",
+    x = "Step Size",
+    y = "Mean Squared Error",
+    color = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "#f8f9fa", size = 0.5),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
+    legend.position = "bottom",
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 9),
+    plot.margin = margin(20, 20, 20, 20)
+  )
+```
+
+
+```{r}
+# Analyze break detection accuracy
+break_detection_summary <- step_size_estimates_clean %>%
+  filter(parameter_type == "break_indicator") %>%
+  group_by(algorithm, step_size, dataset_name, run_number) %>%
+  summarise(
+    n_indicators = n(),
+    mean_probability = mean(probability, na.rm = TRUE),
+    max_probability = max(probability, na.rm = TRUE),
+    n_high_prob = sum(probability > 0.5, na.rm = TRUE),
+    detected_break_position = which.max(probability),
+    detected_break_probability = max(probability, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(algorithm, step_size) %>%
+  summarise(
+    mean_detection_prob = mean(detected_break_probability, na.rm = TRUE),
+    sd_detection_prob = sd(detected_break_probability, na.rm = TRUE),
+    mean_position = mean(detected_break_position, na.rm = TRUE),
+    sd_position = sd(detected_break_position, na.rm = TRUE),
+    n_runs = n(),
+    .groups = "drop"
+  )
+
+# Compare break detection against Jenkins
+jenkins_break_baseline <- break_detection_summary %>%
+  filter(algorithm == "jenkins") %>%
+  select(step_size, jenkins_prob = mean_detection_prob, jenkins_position = mean_position)
+
+break_comparison <- break_detection_summary %>%
+  left_join(jenkins_break_baseline, by = "step_size") %>%
+  mutate(
+    prob_diff = mean_detection_prob - jenkins_prob,
+    position_diff = mean_position - jenkins_position,
+    algorithm_factor = factor(algorithm, levels = c("jenkins", "newton", "aberth"))
+  )
+
+print(kable(break_comparison %>%
+              select(algorithm, step_size, mean_detection_prob, prob_diff, mean_position, position_diff) %>%
+              mutate(across(where(is.numeric), ~round(.x, 4))),
+            format = "markdown", caption = "Break detection comparison"))
+```
+
+
+```{r}
+# Plot break detection probability
+ggplot(break_comparison, aes(x = step_size, y = mean_detection_prob, color = algorithm_factor)) +
+  geom_line(size = 1.2, alpha = 0.8) +
+  geom_point(size = 3, alpha = 0.9) +
+  geom_ribbon(aes(ymin = mean_detection_prob - sd_detection_prob, 
+                  ymax = mean_detection_prob + sd_detection_prob,
+                  fill = algorithm_factor), 
+              alpha = 0.2, color = NA) +
+  scale_color_manual(
+    values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
+    labels = c("Jenkins (Baseline)", "Newton-Raphson", "Aberth-Ehrlich")
+  ) +
+  scale_fill_manual(
+    values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
+    guide = "none"
+  ) +
+  scale_x_continuous(
+    breaks = unique(break_comparison$step_size),
+    labels = paste0(unique(break_comparison$step_size) * 100, "%")
+  ) +
+  scale_y_continuous(
+    limits = c(0.9, 1.0),
+    labels = scales::percent_format(accuracy = 0.1)
+  ) +
+  labs(
+    title = "Break Detection Probability",
+    subtitle = "Posterior Inclusion Probability by Root Finding Algorithm and Step Size",
+    x = "Step Size", 
+    y = "Detection Probability",
+    color = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "#f8f9fa", size = 0.5),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title = element_text(size = 11),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
+    legend.position = "bottom",
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 9),
+    plot.margin = margin(20, 20, 20, 20)
+  )
+```
+
+
+```{r}
+# Calculate detailed differences from Jenkins baseline
+detailed_comparison <- step_size_estimates_clean %>%
+  filter(parameter_type %in% c("beta", "break_indicator")) %>%
+  select(algorithm, step_size, dataset_name, run_number, parameter_type, 
+         parameter_index, estimated_value, probability) %>%
+  pivot_wider(names_from = algorithm, values_from = c(estimated_value, probability),
+              names_sep = "_") %>%
+  mutate(
+    newton_estimate_diff = estimated_value_newton - estimated_value_jenkins,
+    aberth_estimate_diff = estimated_value_aberth - estimated_value_jenkins,
+    newton_prob_diff = probability_newton - probability_jenkins,
+    aberth_prob_diff = probability_aberth - probability_jenkins
+  )
+
+# Summarize differences by parameter type and step size
+difference_summary <- detailed_comparison %>%
+  group_by(parameter_type, step_size) %>%
+  summarise(
+    newton_mean_estimate_diff = mean(abs(newton_estimate_diff), na.rm = TRUE),
+    aberth_mean_estimate_diff = mean(abs(aberth_estimate_diff), na.rm = TRUE),
+    newton_max_estimate_diff = max(abs(newton_estimate_diff), na.rm = TRUE),
+    aberth_max_estimate_diff = max(abs(aberth_estimate_diff), na.rm = TRUE),
+    newton_mean_prob_diff = mean(abs(newton_prob_diff), na.rm = TRUE),
+    aberth_mean_prob_diff = mean(abs(aberth_prob_diff), na.rm = TRUE),
+    n_comparisons = n(),
+    .groups = "drop"
+  )
+
+print(kable(difference_summary %>%
+              mutate(across(where(is.numeric), ~round(.x, 6))),
+            format = "markdown", caption = "Absolute differences from Jenkins baseline"))
+```
+
+
+```{r}
+# Plot error distributions for each algorithm
+error_distributions <- step_size_estimates_clean %>%
+  filter(parameter_type == "beta") %>%
+  mutate(
+    algorithm_factor = factor(algorithm, levels = c("jenkins", "newton", "aberth")),
+    step_size_factor = factor(paste0(step_size * 100, "%"))
+  )
+
+ggplot(error_distributions, aes(x = abs(error), fill = algorithm_factor)) +
+  geom_density(alpha = 0.7, adjust = 1.2) +
+  facet_wrap(~step_size_factor, scales = "free_y", labeller = label_both) +
+  scale_fill_manual(
+    values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
+    labels = c("Jenkins (Baseline)", "Newton-Raphson", "Aberth-Ehrlich")
+  ) +
+  scale_x_continuous(
+    trans = "log10",
+    labels = scales::trans_format("log10", scales::math_format(10^.x))
+  ) +
+  labs(
+    title = "Beta Estimation Error Distributions",
+    subtitle = "Absolute Error Density by Algorithm and Step Size (Log Scale)",
+    x = "Absolute Error (Log Scale)",
+    y = "Density",
+    fill = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "#f8f9fa", size = 0.3),
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 9),
+    axis.title = element_text(size = 10),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
+    legend.position = "bottom",
+    legend.title = element_text(size = 9),
+    legend.text = element_text(size = 8),
+    strip.text = element_text(size = 9),
+    plot.margin = margin(20, 20, 20, 20)
+  )
+```
+
+
+```{r}
+# Analyze consistency across step sizes for each algorithm
+consistency_analysis <- step_size_estimates_clean %>%
+  filter(parameter_type == "beta") %>%
+  group_by(algorithm, dataset_name, run_number, parameter_index) %>%
+  summarise(
+    error_variance = var(error, na.rm = TRUE),
+    error_range = max(error, na.rm = TRUE) - min(error, na.rm = TRUE),
+    mean_abs_error = mean(abs(error), na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(algorithm) %>%
+  summarise(
+    mean_error_variance = mean(error_variance, na.rm = TRUE),
+    mean_error_range = mean(error_range, na.rm = TRUE),
+    overall_consistency = 1 / (1 + mean_error_variance),  # Higher is more consistent
+    .groups = "drop"
+  ) %>%
+  arrange(desc(overall_consistency))
+
+print(kable(consistency_analysis %>%
+              mutate(across(where(is.numeric), ~round(.x, 6))),
+            format = "markdown", caption = "Algorithm consistency across step sizes"))
+```
+
+
+```{r}
+# Create final performance summary
+cat("\n=== ROOT FINDING ALGORITHM COMPARISON SUMMARY ===\n")
+cat("=================================================\n\n")
+
+# Beta estimation summary
+beta_summary <- beta_comparison %>%
+  group_by(algorithm) %>%
+  summarise(
+    avg_mse_ratio = mean(mse_ratio, na.rm = TRUE),
+    avg_max_error_ratio = mean(max_error_ratio, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(avg_mse_ratio)
+
+cat("Beta Estimation Performance (relative to Jenkins):\n")
+for(i in 1:nrow(beta_summary)) {
+  alg <- beta_summary$algorithm[i]
+  mse_ratio <- round(beta_summary$avg_mse_ratio[i], 3)
+  max_error_ratio <- round(beta_summary$avg_max_error_ratio[i], 3)
+  
+  if(alg == "jenkins") {
+    cat(sprintf("  %s: Baseline (MSE=1.000, Max Error=1.000)\n", str_to_title(alg)))
+  } else {
+    performance <- ifelse(mse_ratio < 1.01, "≈ Same", ifelse(mse_ratio < 1.05, "Slightly worse", "Notably worse"))
+    cat(sprintf("  %s: %s (MSE=%.3f, Max Error=%.3f)\n", str_to_title(alg), performance, mse_ratio, max_error_ratio))
+  }
+}
+
+# Break detection summary  
+break_summary <- break_comparison %>%
+  group_by(algorithm) %>%
+  summarise(
+    avg_prob_diff = mean(abs(prob_diff), na.rm = TRUE),
+    avg_position_diff = mean(abs(position_diff), na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(avg_prob_diff)
+
+cat("\nBreak Detection Performance (absolute difference from Jenkins):\n")
+for(i in 1:nrow(break_summary)) {
+  alg <- break_summary$algorithm[i]
+  prob_diff <- round(break_summary$avg_prob_diff[i], 4)
+  pos_diff <- round(break_summary$avg_position_diff[i], 2)
+  
+  if(alg == "jenkins") {
+    cat(sprintf("  %s: Baseline (Prob Diff=0.0000, Position Diff=0.00)\n", str_to_title(alg)))
+  } else {
+    performance <- ifelse(prob_diff < 0.001, "≈ Same", ifelse(prob_diff < 0.01, "Slightly different", "Notably different"))
+    cat(sprintf("  %s: %s (Prob Diff=%.4f, Position Diff=%.2f)\n", str_to_title(alg), performance, prob_diff, pos_diff))
+  }
+}
+
+# Overall recommendation
+cat("\nRECOMMENDATION:\n")
+newton_performance <- beta_summary$avg_mse_ratio[beta_summary$algorithm == "newton"]
+aberth_performance <- beta_summary$avg_mse_ratio[beta_summary$algorithm == "aberth"]
+
+if(min(newton_performance, aberth_performance, na.rm = TRUE) < 1.02) {
+  best_alg <- ifelse(newton_performance < aberth_performance, "Newton-Raphson", "Aberth-Ehrlich")
+  cat(sprintf("Both alternative algorithms produce nearly identical results to Jenkins.\n"))
+  cat(sprintf("%s shows marginally better performance and could be used as a replacement.\n", best_alg))
+} else {
+  cat("Jenkins remains the most accurate algorithm. Alternative algorithms show measurable differences.\n")
+}
+
+cat("\n=================================================\n")
+```
+
+
+# OPUS
+
+```{r}
+# Parse run names to extract algorithm and step size
+step_size_estimates_data <- step_size_estimates_data %>%
+  mutate(
+    algorithm = str_extract(run_name, "^[^_]+"),
+    step_size_str = str_extract(run_name, "\\d+$"),
+    step_size = as.numeric(step_size_str) / 100
+  )
+
+# Create a function to determine if a break was detected (using 0.5 threshold)
+detection_threshold <- 0.5
+
+# Separate beta estimates from break indicators
+beta_estimates <- step_size_estimates_data %>%
+  filter(parameter_type == "beta") %>%
+  select(algorithm, step_size, dataset_name, run_number, parameter_index, 
+         true_value, estimated_value, error)
+
+break_indicators <- step_size_estimates_data %>%
+  filter(parameter_type == "break_indicator") %>%
+  mutate(detected = probability > detection_threshold) %>%
+  select(algorithm, step_size, dataset_name, run_number, parameter_index, 
+         probability, detected)
+
+sigma_estimates <- step_size_estimates_data %>%
+  filter(parameter_type == "sigma2") %>%
+  select(algorithm, step_size, dataset_name, run_number, 
+         true_value, estimated_value, error)
+```
+
+
+```{r}
+# Compare beta estimates across algorithms
+beta_comparison <- beta_estimates %>%
+  group_by(algorithm, step_size, parameter_index) %>%
+  summarise(
+    mean_error = mean(abs(error)),
+    sd_error = sd(abs(error)),
+    mse = mean(error^2),
+    max_error = max(abs(error)),
+    n_runs = n(),
+    .groups = "drop"
+  )
+
+# Create beta error comparison plot
+ggplot(beta_comparison, aes(x = factor(step_size), y = mse, color = algorithm)) +
+  geom_point(size = 3, alpha = 0.8, position = position_dodge(width = 0.3)) +
+  geom_line(aes(group = interaction(algorithm, parameter_index)), 
+            alpha = 0.4, position = position_dodge(width = 0.3)) +
+  facet_wrap(~paste("Beta", parameter_index), scales = "free_y") +
+  scale_color_manual(values = c("jenkins" = "#2980b9", 
+                                "newton" = "#e74c3c", 
+                                "aberth" = "#27ae60")) +
+  labs(
+    title = "Beta Estimation Error Across Root Finding Algorithms",
+    subtitle = "Mean Squared Error by Step Size",
+    x = "Step Size",
+    y = "Mean Squared Error",
+    color = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    strip.text = element_text(face = "bold"),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20))
+  )
+```
+
+
+```{r}
+# Analyze break detection accuracy
+# First, identify which breaks are true breaks (from the data generation)
+# Since we don't have the true break positions explicitly, we'll use Jenkins as reference
+
+jenkins_breaks <- break_indicators %>%
+  filter(algorithm == "jenkins") %>%
+  group_by(step_size, dataset_name, parameter_index) %>%
+  summarise(
+    jenkins_prob = mean(probability),
+    jenkins_detected = mean(detected),
+    .groups = "drop"
+  )
+
+# Compare other algorithms to Jenkins
+break_comparison <- break_indicators %>%
+  group_by(algorithm, step_size, dataset_name, parameter_index) %>%
+  summarise(
+    mean_prob = mean(probability),
+    detection_rate = mean(detected),
+    .groups = "drop"
+  ) %>%
+  left_join(jenkins_breaks, by = c("step_size", "dataset_name", "parameter_index")) %>%
+  mutate(
+    prob_diff_from_jenkins = mean_prob - jenkins_prob,
+    detection_agreement = (detection_rate == jenkins_detected)
+  )
+
+# Find the true break location (highest probability in Jenkins)
+true_breaks <- jenkins_breaks %>%
+  group_by(step_size, dataset_name) %>%
+  filter(jenkins_prob == max(jenkins_prob)) %>%
+  mutate(is_true_break = TRUE) %>%
+  select(step_size, dataset_name, parameter_index, is_true_break)
+
+# Calculate detection performance for true breaks
+break_detection_performance <- break_comparison %>%
+  left_join(true_breaks, by = c("step_size", "dataset_name", "parameter_index")) %>%
+  mutate(is_true_break = ifelse(is.na(is_true_break), FALSE, is_true_break)) %>%
+  group_by(algorithm, step_size, is_true_break) %>%
+  summarise(
+    mean_probability = mean(mean_prob),
+    sd_probability = sd(mean_prob),
+    detection_rate = mean(detection_rate),
+    .groups = "drop"
+  )
+
+# Plot break detection performance
+ggplot(break_detection_performance %>% filter(is_true_break), 
+       aes(x = factor(step_size), y = mean_probability, fill = algorithm)) +
+  geom_col(position = "dodge", alpha = 0.8, width = 0.7) +
+  geom_hline(yintercept = detection_threshold, linetype = "dashed", 
+             color = "#7f8c8d", alpha = 0.7) +
+  annotate("text", x = Inf, y = detection_threshold + 0.02, 
+           label = "Detection Threshold", hjust = 1.1, 
+           color = "#7f8c8d", size = 3) +
+  scale_fill_manual(values = c("jenkins" = "#2980b9", 
+                               "newton" = "#e74c3c", 
+                               "aberth" = "#27ae60")) +
+  scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+  labs(
+    title = "Break Detection Probability at True Break Locations",
+    subtitle = "Posterior Inclusion Probability by Algorithm and Step Size",
+    x = "Step Size",
+    y = "Mean Posterior Probability",
+    fill = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.major.x = element_blank(),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20))
+  )
+```
+
+
+```{r}
+# Calculate agreement between algorithms
+algorithm_pairs <- list(
+  c("jenkins", "newton"),
+  c("jenkins", "aberth"),
+  c("newton", "aberth")
+)
+
+agreement_data <- data.frame()
+
+for (pair in algorithm_pairs) {
+  alg1_data <- break_indicators %>%
+    filter(algorithm == pair[1]) %>%
+    select(step_size, dataset_name, run_number, parameter_index, 
+           prob1 = probability, detected1 = detected)
+  
+  alg2_data <- break_indicators %>%
+    filter(algorithm == pair[2]) %>%
+    select(step_size, dataset_name, run_number, parameter_index, 
+           prob2 = probability, detected2 = detected)
+  
+  pair_agreement <- alg1_data %>%
+    inner_join(alg2_data, by = c("step_size", "dataset_name", "run_number", "parameter_index")) %>%
+    mutate(
+      prob_diff = abs(prob1 - prob2),
+      detection_match = (detected1 == detected2),
+      pair_name = paste(pair[1], "vs", pair[2])
+    )
+  
+  agreement_data <- bind_rows(agreement_data, pair_agreement)
+}
+
+# Summarize agreement
+agreement_summary <- agreement_data %>%
+  group_by(pair_name, step_size) %>%
+  summarise(
+    mean_prob_diff = mean(prob_diff),
+    sd_prob_diff = sd(prob_diff),
+    max_prob_diff = max(prob_diff),
+    detection_agreement_rate = mean(detection_match),
+    .groups = "drop"
+  )
+
+# Plot probability differences
+ggplot(agreement_summary, aes(x = factor(step_size), y = mean_prob_diff, 
+                              color = pair_name, group = pair_name)) +
+  geom_line(size = 1.2, alpha = 0.8) +
+  geom_point(size = 3, alpha = 0.8) +
+  scale_color_manual(values = c(
+    "jenkins vs newton" = "#8e44ad",
+    "jenkins vs aberth" = "#d35400",
+    "newton vs aberth" = "#16a085"
+  )) +
+  labs(
+    title = "Algorithm Agreement on Break Probabilities",
+    subtitle = "Mean Absolute Difference in Posterior Probabilities",
+    x = "Step Size",
+    y = "Mean Absolute Probability Difference",
+    color = "Algorithm Pair"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20))
+  )
+```
+
+
+```{r}
+# Analyze break localization accuracy (fuzziness around true break)
+# For each true break, look at probability distribution around it
+
+# Get probability profiles around true breaks
+break_profiles <- break_indicators %>%
+  left_join(true_breaks, by = c("step_size", "dataset_name", "parameter_index")) %>%
+  group_by(algorithm, step_size, dataset_name) %>%
+  mutate(
+    max_prob_idx = parameter_index[which.max(probability)],
+    true_break_idx = parameter_index[which(is_true_break == TRUE)[1]]
+  ) %>%
+  filter(!is.na(true_break_idx)) %>%
+  mutate(
+    distance_from_true = abs(parameter_index - true_break_idx),
+    relative_position = parameter_index - true_break_idx
+  ) %>%
+  group_by(algorithm, step_size, distance_from_true) %>%
+  summarise(
+    mean_probability = mean(probability),
+    se_probability = sd(probability) / sqrt(n()),
+    .groups = "drop"
+  )
+
+# Plot probability decay around true break
+ggplot(break_profiles %>% filter(distance_from_true <= 5), 
+       aes(x = distance_from_true, y = mean_probability, color = algorithm)) +
+  geom_line(size = 1.2, alpha = 0.8) +
+  geom_point(size = 2.5, alpha = 0.8) +
+  facet_wrap(~paste("Step Size:", step_size), scales = "free_y", nrow = 2) +
+  scale_color_manual(values = c("jenkins" = "#2980b9", 
+                                "newton" = "#e74c3c", 
+                                "aberth" = "#27ae60")) +
+  labs(
+    title = "Break Localization Accuracy",
+    subtitle = "Probability Distribution Around True Break Location",
+    x = "Distance from True Break (time periods)",
+    y = "Mean Posterior Probability",
+    color = "Algorithm"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    strip.text = element_text(face = "bold"),
+    panel.grid.minor = element_blank(),
+    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20))
+  )
+```
+
+# GPT
+
+
+# Original Data
+

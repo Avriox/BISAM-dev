@@ -1,14 +1,14 @@
 experiment_name,run_name,dataset_name,run_number,beta_mse,beta_max_error,break_detected_correctly,true_break_position,detected_break_position,detected_break_probability,constant_error,detection_threshold,timestamp
-root_finder_step_size,jenkins,rootfind_stepsize_050,1,0.00861475,0.11325640,TRUE,41,0,0.98088889,0.00000000,0.50000000,2025-08-20 14:15:37
-root_finder_step_size,jenkins,rootfind_stepsize_050,2,0.00847838,0.11512558,TRUE,41,0,0.98066667,0.00000000,0.50000000,2025-08-20 14:16:01
-root_finder_step_size,jenkins,rootfind_stepsize_050,3,0.00815242,0.11216438,TRUE,41,0,0.98177778,0.00000000,0.50000000,2025-08-20 14:16:25
-root_finder_step_size,jenkins,rootfind_stepsize_050,4,0.00818916,0.11274383,TRUE,41,0,0.98022222,0.00000000,0.50000000,2025-08-20 14:16:49
-root_finder_step_size,jenkins,rootfind_stepsize_050,5,0.00850688,0.11274661,TRUE,41,0,0.98155556,0.00000000,0.50000000,2025-08-20 14:17:12
-root_finder_step_size,jenkins,rootfind_stepsize_050,6,0.00849626,0.11257642,TRUE,41,0,0.97688889,0.00000000,0.50000000,2025-08-20 14:17:36
-root_finder_step_size,jenkins,rootfind_stepsize_050,7,0.00825088,0.11386820,TRUE,41,0,0.98133333,0.00000000,0.50000000,2025-08-20 14:18:00
-root_finder_step_size,jenkins,rootfind_stepsize_050,8,0.00847094,0.11450795,TRUE,41,0,0.98200000,0.00000000,0.50000000,2025-08-20 14:18:24
-root_finder_step_size,jenkins,rootfind_stepsize_050,9,0.00871883,0.11513389,TRUE,41,0,0.98000000,0.00000000,0.50000000,2025-08-20 14:18:48
-root_finder_step_size,jenkins,rootfind_stepsize_050,10,0.00844451,0.11305129,TRUE,41,0,0.97888889,0.00000000,0.50000000,2025-08-20 14:19:11
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,1,0.00861475,0.11325640,TRUE,41,0,0.98088889,0.00000000,0.50000000,2025-08-20 14:15:37
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,2,0.00847838,0.11512558,TRUE,41,0,0.98066667,0.00000000,0.50000000,2025-08-20 14:16:01
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,3,0.00815242,0.11216438,TRUE,41,0,0.98177778,0.00000000,0.50000000,2025-08-20 14:16:25
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,4,0.00818916,0.11274383,TRUE,41,0,0.98022222,0.00000000,0.50000000,2025-08-20 14:16:49
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,5,0.00850688,0.11274661,TRUE,41,0,0.98155556,0.00000000,0.50000000,2025-08-20 14:17:12
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,6,0.00849626,0.11257642,TRUE,41,0,0.97688889,0.00000000,0.50000000,2025-08-20 14:17:36
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,7,0.00825088,0.11386820,TRUE,41,0,0.98133333,0.00000000,0.50000000,2025-08-20 14:18:00
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,8,0.00847094,0.11450795,TRUE,41,0,0.98200000,0.00000000,0.50000000,2025-08-20 14:18:24
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,9,0.00871883,0.11513389,TRUE,41,0,0.98000000,0.00000000,0.50000000,2025-08-20 14:18:48
+root_finder_step_size,jenkins_050,rootfind_stepsize_050,10,0.00844451,0.11305129,TRUE,41,0,0.97888889,0.00000000,0.50000000,2025-08-20 14:19:11
 root_finder_step_size,jenkins_075,rootfind_stepsize_075,1,0.00981167,0.12499459,TRUE,41,0,0.97222222,0.00000000,0.50000000,2025-08-20 14:22:29
 root_finder_step_size,jenkins_075,rootfind_stepsize_075,2,0.00883600,0.11702170,TRUE,41,0,0.97866667,0.00000000,0.50000000,2025-08-20 14:22:56
 root_finder_step_size,jenkins_075,rootfind_stepsize_075,3,0.00922115,0.11876300,TRUE,41,0,0.96977778,0.00000000,0.50000000,2025-08-20 14:23:22
