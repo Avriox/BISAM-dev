@@ -27,7 +27,7 @@ public:
     static ValidationResults validate_results(const bisam::BisamResult &result,
                                               const DatasetInfo &dataset,
                                               double detection_threshold = 0.5,
-                                              bool print_output = true) {
+                                              bool print_output          = true) {
         ValidationResults val;
         val.detection_threshold        = detection_threshold;
         val.beta_mse                   = 0.0;
@@ -150,7 +150,8 @@ private:
         return arma::mean(beta_samples, 0).t(); // transpose to get column vector
     }
 
-    static void validate_betas(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset, bool print_output) {
+    static void validate_betas(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset,
+                               bool print_output) {
         if (dataset.true_beta.n_elem > 0 && result.beta_samples.n_cols > 0) {
             arma::vec estimated_betas = compute_beta_means(result.beta_samples);
 
@@ -200,72 +201,85 @@ private:
         }
     }
 
-    static void validate_breaks(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset, bool print_output) {
-        // Find the position with highest indicator probability
-        if (result.indicator_means.n_elem > 0) {
-            val.detected_break_probability = arma::max(result.indicator_means);
-            val.detected_break_position    = arma::index_max(result.indicator_means);
+    static void validate_breaks(ValidationResults &val, const bisam::BisamResult &result, const DatasetInfo &dataset,
+                                bool print_output) {
+        // Highest indicator probability and its index
+        if (result.indicator_means.n_elem == 0) return;
+        val.detected_break_probability = arma::max(result.indicator_means);
+        val.detected_break_position    = arma::index_max(result.indicator_means);
 
+        if (print_output) {
+            std::cout << "\n=== BREAK VALIDATION ===" << std::endl;
+        }
+
+        // Collect true Z indices directly from dataset.true_breaks
+        std::vector<int> true_z_positions;
+        if (dataset.true_breaks.n_rows > 0) {
+            for (int j = 0; j < dataset.true_breaks.n_rows; ++j) {
+                long long zidx_ll = static_cast<long long>(std::llround(dataset.true_breaks(j, 1)));
+                if (zidx_ll >= 0 && zidx_ll < static_cast<long long>(result.indicator_means.n_elem)) {
+                    true_z_positions.push_back(static_cast<int>(zidx_ll));
+                }
+            }
+        }
+
+        // For summary fields, record first true position (if any)
+        val.true_break_position = true_z_positions.empty() ? -1 : true_z_positions.front();
+
+        if (!true_z_positions.empty()) {
             if (print_output) {
-                std::cout << "\n=== BREAK VALIDATION ===" << std::endl;
+                std::cout << "True break Z indices (0-based): ";
+                for (size_t k = 0; k < true_z_positions.size(); ++k) {
+                    std::cout << true_z_positions[k] << (k + 1 < true_z_positions.size() ? ", " : "");
+                }
+                std::cout << std::endl;
+                std::cout << "Detected break: position " << val.detected_break_position
+                        << " (prob: " << std::fixed << std::setprecision(4)
+                        << val.detected_break_probability << ")" << std::endl;
             }
 
-            if (dataset.true_breaks.n_rows > 0) {
-                // There should be a break
-                val.true_break_position = static_cast<int>(dataset.true_breaks(0, 1)); // index column
-                double true_magnitude   = dataset.true_breaks(0, 0);                   // size column
-
-                if (print_output) {
-                    std::cout << "True break info:" << std::endl;
-                    std::cout << "  Position (raw index): " << val.true_break_position << std::endl;
-                    std::cout << "  Magnitude: " << true_magnitude << std::endl;
-                    std::cout << "  Step mean parameter: " << dataset.step_mean << std::endl;
-
-                    std::cout << "Detected break info:" << std::endl;
-                    std::cout << "  Position: " << val.detected_break_position
-                            << " (probability: " << std::fixed << std::setprecision(4)
-                            << val.detected_break_probability << ")" << std::endl;
+            bool detected_matches_truth = false;
+            for (int zidx: true_z_positions) {
+                if (val.detected_break_position == zidx) {
+                    detected_matches_truth = true;
+                    break;
                 }
+            }
 
-                // Break is correctly detected if probability exceeds threshold
-                val.break_detected_correctly = (val.detected_break_probability > val.detection_threshold);
+            val.break_detected_correctly =
+                    detected_matches_truth && (val.detected_break_probability > val.detection_threshold);
 
-                // Calculate magnitude error (approximate)
-                val.break_magnitude_error = std::abs(true_magnitude - dataset.step_mean);
-            } else {
-                // No true breaks - check for false positives
-                if (print_output) {
-                    std::cout << "No true breaks in dataset" << std::endl;
-                    std::cout << "Highest indicator probability: " << val.detected_break_probability
-                            << " at position " << val.detected_break_position << std::endl;
-                }
+            // Optional placeholder for magnitude error
+            val.break_magnitude_error = 0.0;
+        } else {
+            // No true breaks
+            if (print_output) {
+                std::cout << "No true breaks in dataset" << std::endl;
+                std::cout << "Highest indicator probability: " << val.detected_break_probability
+                        << " at position " << val.detected_break_position << std::endl;
+            }
+            val.has_false_positive       = (val.detected_break_probability > val.detection_threshold);
+            val.break_detected_correctly = !val.has_false_positive;
+        }
 
-                val.has_false_positive       = (val.detected_break_probability > val.detection_threshold);
-                val.break_detected_correctly = !val.has_false_positive;
+        // Show indicator probabilities around the detected break
+        if (print_output) {
+            std::cout << "\nIndicator probabilities around detected position:" << std::endl;
+            int start = std::max(0, val.detected_break_position - 5);
+            int end   = std::min(static_cast<int>(result.indicator_means.n_elem),
+                               val.detected_break_position + 6);
 
-                if (print_output) {
-                    if (val.has_false_positive) {
-                        std::cout << "WARNING: Potential false positive break detection!" << std::endl;
-                    } else {
-                        std::cout << "Correctly identified no significant breaks" << std::endl;
+            for (int i = start; i < end; i++) {
+                std::cout << "  Position " << std::setw(2) << i << ": "
+                        << std::fixed << std::setprecision(4) << result.indicator_means(i);
+                if (i == val.detected_break_position) std::cout << " <-- DETECTED";
+                for (int zidx: true_z_positions) {
+                    if (i == zidx) {
+                        std::cout << " <-- TRUE";
+                        break;
                     }
                 }
-            }
-
-            // Show indicator probabilities around the detected break
-            if (print_output) {
-                std::cout << "\nIndicator probabilities around detected position:" << std::endl;
-                int start = std::max(0, val.detected_break_position - 5);
-                int end   = std::min(static_cast<int>(result.indicator_means.n_elem),
-                                   val.detected_break_position + 6);
-
-                for (int i = start; i < end; i++) {
-                    std::cout << "  Position " << std::setw(2) << i << ": "
-                            << std::fixed << std::setprecision(4) << result.indicator_means(i);
-                    if (i == val.detected_break_position) std::cout << " <-- DETECTED";
-                    if (dataset.true_breaks.n_rows > 0 && i == val.true_break_position) std::cout << " <-- TRUE";
-                    std::cout << std::endl;
-                }
+                std::cout << std::endl;
             }
         }
     }

@@ -689,7 +689,7 @@ namespace bisam {
         arma::vec arma_weights(weights, p, true, true);
 
         // Clean up the dynamically allocated weights array
-        delete[] weights;
+        // delete[] weights;
 
         return arma_weights;
     }

@@ -10,7 +10,8 @@ library(stringr)
 ```{r config}
 cumulative_experiment_name <- "cumulative_gains_study_aberth"
 multithreading_experiment_name <- "multithreading"
-step_size_experiment_name <- "root_finder_step_size"
+step_size_experiment_name <- "step_size_fixed"
+step_size_experiment_fixed_name <- "step_size_fixed_fixed"
 root_finding_experiment_name <- "root_finding"
 results_dir <- "./simulations"
 ```
@@ -80,17 +81,25 @@ multithreading_timing_summary <- create_timing_summary(multithreading_timing_dat
 ```{r load_step_size_data}
 # Load multithreading study data
 step_size_experiment_data <- load_experiment_data(step_size_experiment_name, results_dir)
-step_size_timing_data <- multithreading_experiment_data$timing
-step_size_estimates_data <- multithreading_experiment_data$estimates
-step_size_validation_data <- multithreading_experiment_data$validation
+step_size_timing_data <- step_size_experiment_data$timing
+step_size_estimates_data <- step_size_experiment_data$estimates
+step_size_validation_data <- step_size_experiment_data$validation
+```
+
+```{r load_step_size_data}
+# Load multithreading study data
+step_size_experiment_fixed_data <- load_experiment_data(step_size_experiment_fixed_name, results_dir)
+step_size_fixed_timing_data <- step_size_experiment_fixed_data$timing
+step_size_fixed_estimates_data <- step_size_experiment_fixed_data$estimates
+step_size_fixed_validation_data <- step_size_experiment_fixed_data$validation
 ```
 
 ```{r load_root_finding_data}
 # Load multithreading study data
 root_finding_experiment_data <- load_experiment_data(root_finding_experiment_name, results_dir)
-root_finding_timing_data <- multithreading_experiment_data$timing
-root_finding_estimates_data <- multithreading_experiment_data$estimates
-root_finding_validation_data <- multithreading_experiment_data$validation
+root_finding_timing_data <- root_finding_experiment_data$timing  # FIXED: using correct data source
+root_finding_estimates_data <- root_finding_experiment_data$estimates
+root_finding_validation_data <- root_finding_experiment_data$validation
 ```
 
 # Cumulative Performance Analysis
@@ -98,11 +107,12 @@ root_finding_validation_data <- multithreading_experiment_data$validation
 ```{r cumulative_data_prep}
 # Prepare cumulative optimization data
 cumulative_data <- cumulative_timing_summary %>%
-  filter(str_detect(run_name, "cpp_")) %>%
+  # filter(str_detect(run_name, "cpp_")) %>%
   filter(run_name != "cpp_split_aberth_parallel_thopt_o3-native-loop") %>%
   mutate(
     time_seconds = mean_time_ms / 1000,
     optimization = case_when(
+      run_name == "r_original" ~ "Original R",
       run_name == "cpp_nothing_else" ~ "C++ Translation",
       run_name == "cpp_split" ~ "Matrix Splitting", 
       run_name == "cpp_split_aberth" ~ "Aberth-Ehrlich Root Finding",
@@ -111,7 +121,7 @@ cumulative_data <- cumulative_timing_summary %>%
       run_name == "cpp_split_aberth_parallel_thopt_o3-native-loop_flto" ~ "Compiler Optimizations"
     ),
     optimization = factor(optimization, levels = c(
-      "C++ Translation", "Matrix Splitting", "Aberth-Ehrlich Root Finding", 
+      "Original R","C++ Translation", "Matrix Splitting", "Aberth-Ehrlich Root Finding", 
       "Parallelization", "Model Caching", "Compiler Optimizations"
     ))
   ) %>%
@@ -119,36 +129,8 @@ cumulative_data <- cumulative_timing_summary %>%
 ```
 
 ```{r cumulative_plot}
-# Create cumulative performance plot
-ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
-  geom_col(fill = "#2980b9", width = 0.7, alpha = 0.8) +
-  geom_text(aes(label = sprintf("%.2f s", time_seconds)), 
-            vjust = -0.5, size = 3.5, color = "#2c3e50") +
-  scale_y_continuous(
-    limits = c(0, max(cumulative_data$time_seconds) * 1.15),
-    expand = c(0, 0)
-  ) +
-  labs(
-    title = "Cumulative Performance Improvements",
-    subtitle = "BISAM Framework Optimization (n=5, t=15)",
-    x = NULL,
-    y = "Execution Time (seconds)"
-  ) +
-  theme_minimal() +
-  theme(
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank(),
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 10),
-    axis.text.y = element_text(size = 10),
-    axis.title.y = element_text(size = 11, margin = margin(r = 15)),
-    plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
-    plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
-    plot.margin = margin(20, 20, 20, 20)
-  )
-```
 
-```{r cumulative_plot}
-# Create cumulative performance plot with points and log scale
+
 # Create cumulative performance plot with points and log scale
 ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
   geom_point(size = 5, color = "#2980b9", alpha = 0.8) +
@@ -157,10 +139,10 @@ ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
   geom_text(aes(label = sprintf("%.2f s", time_seconds)),
             vjust = -1.2, size = 4.2, color = "#2c3e50") +
   scale_y_log10(
-    breaks = c(0.5, 1, 2, 5, 10, 20, 50, 100),
-    labels = c("0.5", "1", "2", "5", "10", "20", "50", "100"),
-    limits = c(0.5, 150),
-    expand = c(0, 0)
+    breaks = c(0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500),
+    labels = c("0.5", "1", "2", "5", "10", "20", "50", "100", "200", "500"),
+    limits = c(0.5, 500),
+    expand = c(0.02, 0)
   ) +
   annotation_logticks(sides = "l", size = 0.4) +
   labs(
@@ -179,8 +161,11 @@ ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
     axis.title.y = element_text(size = 13, margin = margin(r = 15)),
     plot.title = element_text(size = 16, face = "bold", margin = margin(b = 8)),
     plot.subtitle = element_text(size = 13, color = "#666666", margin = margin(b = 25)),
-    plot.margin = margin(25, 25, 25, 25)
+    plot.margin = margin(5, 0, 10, 5)
   )
+
+ggsave("~/Documents/bisam-thesis/graphics/cumulative.png",
+       width = 10, height = 6.5, dpi = 300, units = "in")
 ```
 
 ```{r cumulative_analysis}
@@ -188,41 +173,132 @@ ggplot(cumulative_data, aes(x = optimization, y = time_seconds)) +
 baseline_time <- cumulative_data$time_seconds[cumulative_data$optimization == "C++ Translation"]
 final_time <- cumulative_data$time_seconds[cumulative_data$optimization == "Compiler Optimizations"]
 cumulative_speedup <- baseline_time / final_time
-
-cat(sprintf("Overall speedup: %.1fx faster (from %.2f to %.2f seconds)\n", 
+cat(sprintf("Overall speedup: %.1fx faster (from %.2f to %.2f seconds)\n",
             cumulative_speedup, baseline_time, final_time))
 
-# Create speedup table
+# Create speedup table with step-by-step and total speedups
 cumulative_speedup_data <- cumulative_data %>%
-  arrange(desc(time_seconds)) %>%
+  arrange(desc(time_seconds)) %>%  # Arrange from slowest to fastest
   mutate(
     baseline_time = first(time_seconds),
-    speedup_factor = baseline_time / time_seconds,
-    cumulative_improvement = paste0(round((1 - time_seconds/baseline_time) * 100, 1), "%")
+    previous_time = lag(time_seconds, default = first(time_seconds)),
+    step_speedup = ifelse(row_number() == 1, 1.0, previous_time / time_seconds),
+    total_speedup = baseline_time / time_seconds
   ) %>%
-  select(optimization, time_seconds, speedup_factor, cumulative_improvement)
+  select(optimization, time_seconds, step_speedup, total_speedup)
 
-# Generate table
-cumulative_latex_table <- cumulative_speedup_data %>%
+# Generate formatted data for LaTeX table
+formatted_data <- cumulative_speedup_data %>%
   mutate(
-    time_formatted = paste0(round(time_seconds, 2), "s"),
-    speedup_formatted = paste0(round(speedup_factor, 1), "×")
-  ) %>%
-  select(
-    "Optimization Step" = optimization,
-    "Execution Time" = time_formatted, 
-    "Speedup Factor" = speedup_formatted,
-    "Total Improvement" = cumulative_improvement
+    time_formatted = sprintf("%.2f", time_seconds),
+    step_speedup_formatted = sprintf("%.1f", step_speedup),
+    total_speedup_formatted = sprintf("%.1f", total_speedup)
   )
 
-kable(cumulative_latex_table, format = "html", 
-      caption = "Performance improvements from cumulative optimizations")
+# Print the data to verify
+print(formatted_data)
 
-# Display final speedup summary
-cumulative_final_speedup <- round(max(cumulative_speedup_data$speedup_factor), 1)
-cat(paste0("\nOverall speedup achieved: ", cumulative_final_speedup, "× faster\n"))
-cat(paste0("Execution time reduced from ", round(max(cumulative_speedup_data$time_seconds), 2), 
-           "s to ", round(min(cumulative_speedup_data$time_seconds), 2), "s\n\n"))
+# Generate LaTeX table in the exact format you want
+cat("\\begin{table}[h!]\n")
+cat("\\centering\n")
+cat("\\caption{Performance improvements from cumulative optimizations}\n")
+cat("\\label{tab:performance_improvements_clean}\n")
+cat("\\begin{tabular}{l S[table-format=3.2] S[table-format=2.1] S[table-format=2.1]}\n")
+cat("\\toprule\n")
+cat("Optimization Step & {Time (s)} & {Step Speedup} & {Total Speedup} \\\\\n")
+cat("\\midrule\n")
+
+# Generate table rows
+for(i in 1:nrow(formatted_data)) {
+  cat(sprintf("%s & %s & %s & %s \\\\\n",
+              formatted_data$optimization[i],
+              formatted_data$time_formatted[i],
+              formatted_data$step_speedup_formatted[i],
+              formatted_data$total_speedup_formatted[i]))
+}
+
+cat("\\bottomrule\n")
+cat("\\end{tabular}\n")
+cat("\\end{table}\n")
+```
+
+# Root Finder Comparison Speed
+
+```{r}
+# Prepare root finding comparison data
+root_finding_comparison <- root_finding_timing_data %>%
+  group_by(run_name) %>%
+  summarise(
+    mean_time_ms = mean(execution_time_ms),
+    median_time_ms = median(execution_time_ms),
+    sd_time_ms = sd(execution_time_ms),
+    min_time_ms = min(execution_time_ms),
+    max_time_ms = max(execution_time_ms),
+    n_runs = n(),
+    se_time_ms = sd_time_ms / sqrt(n_runs),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    time_seconds = mean_time_ms / 1000,
+    algorithm = case_when(
+      run_name == "JenkinsTraub" ~ "Jenkins-Traub",
+      run_name == "Newton" ~ "Newton-Raphson",
+      run_name == "Aberth" ~ "Aberth-Ehrlich"
+    ),
+    algorithm = factor(algorithm, levels = c("Jenkins-Traub", "Newton-Raphson", "Aberth-Ehrlich"))
+  ) %>%
+  arrange(desc(time_seconds))
+
+# Create root finding comparison plot with consistent styling
+ggplot(root_finding_comparison, aes(x = algorithm, y = time_seconds, fill = algorithm)) +
+  geom_col(alpha = 0.8, width = 0.7) +
+  geom_errorbar(aes(ymin = time_seconds - se_time_ms/1000, 
+                    ymax = time_seconds + se_time_ms/1000),
+                width = 0.2, color = "#2c3e50", alpha = 0.7) +
+  geom_text(aes(label = sprintf("%.2f s", time_seconds)),
+            vjust = -0.8, size = 4.2, color = "#2c3e50") +
+  scale_fill_manual(values = c("Jenkins-Traub" = "#2c3e50", 
+                                "Newton-Raphson" = "#e74c3c", 
+                                "Aberth-Ehrlich" = "#3498db")) +
+  scale_y_continuous(
+    breaks = seq(0, 35, 5),
+    limits = c(0, max(root_finding_comparison$time_seconds) * 1.15),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title = "Root Finding Algorithm Performance Comparison",
+    subtitle = "BISAM Framework (n=10, t=20)",
+    x = NULL,
+    y = "Execution Time (seconds)"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.y = element_line(color = "grey90", size = 0.4),
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 12),
+    axis.text.y = element_text(size = 12),
+    axis.title.y = element_text(size = 13, margin = margin(r = 15)),
+    plot.title = element_text(size = 16, face = "bold", margin = margin(b = 8)),
+    plot.subtitle = element_text(size = 13, color = "#666666", margin = margin(b = 25)),
+    plot.margin = margin(5, 0, 10, 5),
+    legend.position = "none"  # Hide legend since algorithm names are on x-axis
+  )
+
+ggsave("~/Documents/bisam-thesis/graphics/root_finding_comparison.png",
+       width = 10, height = 6.5, dpi = 300, units = "in")
+
+# Print summary statistics
+cat("\nRoot Finding Algorithm Performance Summary:\n")
+cat("==========================================\n")
+root_finding_comparison %>%
+  mutate(
+    speedup_vs_jenkins = max(time_seconds) / time_seconds
+  ) %>%
+  select(algorithm, time_seconds, speedup_vs_jenkins, n_runs) %>%
+  kable(digits = 2, col.names = c("Algorithm", "Mean Time (s)", 
+                                   "Speedup vs Jenkins-Traub", "N Runs"),
+        format = "markdown")
 ```
 
 # Multithreading Performance Analysis
@@ -267,10 +343,14 @@ ggplot(threading_data, aes(x = core_count, y = time_seconds)) +
     panel.grid.minor = element_blank(),
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 11),
+    axis.title.x = element_text(size = 11, margin = margin(t = 15)),
     plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
     plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
-    plot.margin = margin(20, 20, 20, 20)
+    plot.margin = margin(5, 0, 10, 5)
   )
+
+  ggsave("~/Documents/bisam-thesis/graphics/parallelization.png",
+       width = 9, height = 5.5, dpi = 300, units = "in")
 ```
 
 ```{r multithreading_analysis}
@@ -318,14 +398,9 @@ cat(sprintf("Best parallel efficiency: %.1f%% with %d cores\n",
 # Step Size Analysis
 
 ```{r}
-# Load and prepare step size data
-step_size_data <- load_experiment_data(step_size_experiment_name, results_dir)
-step_size_timing_data <- step_size_data$timing
-step_size_estimates_data <- step_size_data$estimates  
-step_size_validation_data <- step_size_data$validation
 
 # Extract algorithm and step size from run_name
-step_size_estimates_clean <- step_size_estimates_data %>%
+step_size_estimates_clean <- step_size_fixed_estimates_data %>%
   filter(run_name != "experiment_name") %>%  # Remove header row if present
   mutate(
     algorithm = str_extract(run_name, "^[a-z]+"),
@@ -359,7 +434,6 @@ cat("  Datasets:", length(unique(step_size_estimates_clean$dataset_name)), "\n")
 
 ```
 
-
 ```{r}
 # Analyze beta coefficient accuracy across algorithms
 beta_accuracy <- step_size_estimates_clean %>%
@@ -379,6 +453,7 @@ beta_accuracy <- step_size_estimates_clean %>%
     mean_abs_error = mean(beta_mean_abs_error, na.rm = TRUE),
     sd_mse = sd(beta_mse, na.rm = TRUE),
     sd_max_error = sd(beta_max_error, na.rm = TRUE),
+    sd_abs_error = sd(beta_mean_abs_error, na.rm = TRUE),  # Added this line
     n_runs = n(),
     .groups = "drop"
   )
@@ -404,29 +479,36 @@ print(kable(beta_comparison %>%
             format = "markdown", caption = "Beta estimation accuracy comparison"))
 ```
 
-
 ```{r}
 # Plot beta estimation accuracy across algorithms and step sizes
-ggplot(beta_comparison, aes(x = step_size, y = mean_mse, color = algorithm_factor)) +
-  geom_line(size = 1.2, alpha = 0.8) +
+ggplot(beta_comparison, aes(x = factor(step_size), y = mean_abs_error, color = algorithm_factor, fill = algorithm_factor)) +
+  geom_ribbon(aes(ymin = mean_abs_error - sd_abs_error, 
+                  ymax = mean_abs_error + sd_abs_error,
+                  group = algorithm_factor), 
+              alpha = 0.1, color = NA) +
+  geom_line(size = 1.2, alpha = 0.8, aes(group = algorithm_factor)) +
   geom_point(size = 3, alpha = 0.9) +
   scale_color_manual(
     values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
     labels = c("Jenkins (Baseline)", "Newton-Raphson", "Aberth-Ehrlich")
   ) +
-  scale_x_continuous(
-    breaks = unique(beta_comparison$step_size),
-    labels = paste0(unique(beta_comparison$step_size) * 100, "%")
+  scale_fill_manual(
+    values = c("jenkins" = "#2c3e50", "newton" = "#e74c3c", "aberth" = "#3498db"),
+    labels = c("Jenkins (Baseline)", "Newton-Raphson", "Aberth-Ehrlich"),
+    guide = "none"  # Hide fill legend since it's the same as color
+  ) +
+  scale_x_discrete(
+    labels = c("0.5", "0.75", "1", "1.5", "3", "5")
   ) +
   scale_y_continuous(
-    limits = c(0, max(beta_comparison$mean_mse) * 1.05),
+    limits = c(min(beta_comparison$mean_abs_error) * 0.8, max(beta_comparison$mean_abs_error) * 1.1),
     expand = c(0, 0)
   ) +
   labs(
     title = "Beta Coefficient Estimation Accuracy",
-    subtitle = "Mean Squared Error by Root Finding Algorithm and Step Size",
+    subtitle = "Mean Absolute Error by Root Finding Algorithm and Step Size",
     x = "Step Size",
-    y = "Mean Squared Error",
+    y = "Mean Absolute Error",
     color = "Algorithm"
   ) +
   theme_minimal() +
@@ -436,14 +518,18 @@ ggplot(beta_comparison, aes(x = step_size, y = mean_mse, color = algorithm_facto
     axis.text = element_text(size = 10),
     axis.title = element_text(size = 11),
     plot.title = element_text(size = 14, face = "bold", margin = margin(b = 5)),
+    axis.title.x = element_text(size = 11, margin = margin(t = 15)),
+    axis.title.y = element_text(size = 11, margin = margin(r = 15)),
     plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20)),
     legend.position = "bottom",
     legend.title = element_text(size = 10),
     legend.text = element_text(size = 9),
-    plot.margin = margin(20, 20, 20, 20)
+    plot.margin = margin(5, 0, 10, 5)
   )
-```
 
+ggsave("~/Documents/bisam-thesis/graphics/step-size-beta.png",
+       width = 9, height = 5.5, dpi = 300, units = "in")
+```
 
 ```{r}
 # Analyze break detection accuracy
@@ -488,7 +574,6 @@ print(kable(break_comparison %>%
             format = "markdown", caption = "Break detection comparison"))
 ```
 
-
 ```{r}
 # Plot break detection probability
 ggplot(break_comparison, aes(x = step_size, y = mean_detection_prob, color = algorithm_factor)) +
@@ -511,7 +596,7 @@ ggplot(break_comparison, aes(x = step_size, y = mean_detection_prob, color = alg
     labels = paste0(unique(break_comparison$step_size) * 100, "%")
   ) +
   scale_y_continuous(
-    limits = c(0.9, 1.0),
+    limits = c(0.39, 1.0),
     labels = scales::percent_format(accuracy = 0.1)
   ) +
   labs(
@@ -536,15 +621,18 @@ ggplot(break_comparison, aes(x = step_size, y = mean_detection_prob, color = alg
   )
 ```
 
-
 ```{r}
 # Calculate detailed differences from Jenkins baseline
 detailed_comparison <- step_size_estimates_clean %>%
   filter(parameter_type %in% c("beta", "break_indicator")) %>%
   select(algorithm, step_size, dataset_name, run_number, parameter_type, 
          parameter_index, estimated_value, probability) %>%
-  pivot_wider(names_from = algorithm, values_from = c(estimated_value, probability),
-              names_sep = "_") %>%
+  pivot_wider(
+    names_from = algorithm, 
+    values_from = c(estimated_value, probability),
+    names_sep = "_",
+    values_fn = mean  # This will average any duplicate values
+  ) %>%
   mutate(
     newton_estimate_diff = estimated_value_newton - estimated_value_jenkins,
     aberth_estimate_diff = estimated_value_aberth - estimated_value_jenkins,
@@ -566,11 +654,10 @@ difference_summary <- detailed_comparison %>%
     .groups = "drop"
   )
 
-print(kable(difference_summary %>%
-              mutate(across(where(is.numeric), ~round(.x, 6))),
-            format = "markdown", caption = "Absolute differences from Jenkins baseline"))
+# print(kable(difference_summary %>%
+#               mutate(across(where(is.numeric), ~round(.x, 6))),
+#             format = "markdown", caption = "Absolute differences from Jenkins baseline"))
 ```
-
 
 ```{r}
 # Plot error distributions for each algorithm
@@ -615,7 +702,6 @@ ggplot(error_distributions, aes(x = abs(error), fill = algorithm_factor)) +
   )
 ```
 
-
 ```{r}
 # Analyze consistency across step sizes for each algorithm
 consistency_analysis <- step_size_estimates_clean %>%
@@ -640,7 +726,6 @@ print(kable(consistency_analysis %>%
               mutate(across(where(is.numeric), ~round(.x, 6))),
             format = "markdown", caption = "Algorithm consistency across step sizes"))
 ```
-
 
 ```{r}
 # Create final performance summary
@@ -711,7 +796,6 @@ if(min(newton_performance, aberth_performance, na.rm = TRUE) < 1.02) {
 cat("\n=================================================\n")
 ```
 
-
 # OPUS
 
 ```{r}
@@ -743,7 +827,6 @@ sigma_estimates <- step_size_estimates_data %>%
   select(algorithm, step_size, dataset_name, run_number, 
          true_value, estimated_value, error)
 ```
-
 
 ```{r}
 # Compare beta estimates across algorithms
@@ -783,7 +866,6 @@ ggplot(beta_comparison, aes(x = factor(step_size), y = mse, color = algorithm)) 
     plot.subtitle = element_text(size = 11, color = "#666666", margin = margin(b = 20))
   )
 ```
-
 
 ```{r}
 # Analyze break detection accuracy
@@ -861,7 +943,6 @@ ggplot(break_detection_performance %>% filter(is_true_break),
   )
 ```
 
-
 ```{r}
 # Calculate agreement between algorithms
 algorithm_pairs <- list(
@@ -931,7 +1012,6 @@ ggplot(agreement_summary, aes(x = factor(step_size), y = mean_prob_diff,
   )
 ```
 
-
 ```{r}
 # Analyze break localization accuracy (fuzziness around true break)
 # For each true break, look at probability distribution around it
@@ -984,9 +1064,7 @@ ggplot(break_profiles %>% filter(distance_from_true <= 5),
 
 # GPT
 
-
 # Original Data
-
 
 ```{r}
 # Function to load original simulation datasets
@@ -1017,7 +1095,6 @@ for (size in step_sizes) {
 
 cat("Original datasets loaded for step sizes:", paste(step_sizes, collapse = ", "), "\n")
 ```
-
 
 ```{r}
 # Extract detected breaks for each algorithm at each step size
@@ -1051,7 +1128,6 @@ primary_detected_breaks <- step_size_estimates_clean %>%
 
 cat("Break detection data prepared\n")
 ```
-
 
 ```{r}
 # Create time series plots for each step size
@@ -1156,7 +1232,6 @@ for (step_size in step_sizes) {
       nrow(detected_for_this_size %>% filter(algorithm == "aberth")), "\n")
 }
 ```
-
 
 ```{r}
 # Create an aggregate view showing just the units with breaks
@@ -1265,7 +1340,6 @@ for (step_size in step_sizes) {
 }
 ```
 
-
 ```{r}
 # Create a summary table of detection accuracy
 detection_accuracy_table <- data.frame()
@@ -1336,7 +1410,6 @@ for (i in 1:nrow(accuracy_summary)) {
 }
 ```
 
-
 ```{r}
 # Focus on PIPs (Posterior Inclusion Probabilities) for break indicators
 pip_data <- step_size_estimates_clean %>%
@@ -1356,7 +1429,6 @@ cat("  Break indicators per dataset:", max(pip_data$parameter_index) + 1, "\n")
 cat("  Units:", paste(sort(unique(pip_data$unit)), collapse = ", "), "\n")
 cat("  Time range:", min(pip_data$time_within_unit), "to", max(pip_data$time_within_unit), "\n")
 ```
-
 
 ```{r}
 # Calculate PIP differences between algorithms for each break size
@@ -1404,6 +1476,7 @@ print(kable(pip_diff_summary %>%
             format = "html", 
             caption = "PIP Differences between Root Finding Algorithms by Break Size"))
 ```
+
 ```{r}
 # Plot PIP distributions for each algorithm and step size
 pip_long <- pip_data %>%
@@ -1443,7 +1516,6 @@ ggplot(pip_long, aes(x = avg_pip, fill = algorithm_factor)) +
     legend.position = "bottom"
   )
 ```
-
 
 ```{r}
 # Create heatmap showing PIP differences for high-probability indicators
@@ -1489,7 +1561,6 @@ ggplot(high_pip_data, aes(x = step_size_pct, y = position_label, fill = pip_diff
   )
 ```
 
-
 ```{r}
 # Scatter plots comparing PIPs directly between algorithms
 pip_scatter_data <- pip_comparison %>%
@@ -1533,7 +1604,6 @@ ggplot(pip_scatter_data, aes(x = pip_jenkins, y = pip_alternative)) +
     strip.text = element_text(size = 9)
   )
 ```
-
 
 ```{r}
 # Calculate correlation and agreement metrics

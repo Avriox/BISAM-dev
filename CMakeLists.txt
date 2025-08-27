@@ -12,7 +12,6 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -mtune=native -funroll-loops -fomit-frame-pointer ") # -flto Link time optimizations
 
 
-
 # macOS-specific compiler approach
 if (APPLE)
     # First try to find OpenMP normally
@@ -121,8 +120,8 @@ add_executable(BISAM main.cpp
         include/globals.h
         include/fast_polynomial_solver.h
         src/fast_polynomial_solver.cpp
-        include/validation.h
-        include/result_storage.h
+        validation_include/validation.h
+        validation_include/result_storage.h
 )
 
 # Include all necessary directories for header lookup

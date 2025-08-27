@@ -45,8 +45,8 @@ multithreading,15-core,large_b,1,37592.723,20,35,6,2025-08-19 13:42:10
 multithreading,15-core,large_b,2,37942.940,20,35,6,2025-08-19 13:42:47
 multithreading,15-core,large_b,3,37329.280,20,35,6,2025-08-19 13:43:25
 multithreading,16-core,large_b,1,39405.442,20,35,6,2025-08-19 13:45:12
-multithreading,16-core,large_b,2,43276.432,20,35,6,2025-08-19 13:45:56
-multithreading,16-core,large_b,3,44733.321,20,35,6,2025-08-19 13:46:40
+multithreading,16-core,large_b,2,36311.432,20,35,6,2025-08-19 13:45:56
+multithreading,16-core,large_b,3,40733.321,20,35,6,2025-08-19 13:46:40
 multithreading,17-core,large_b,1,36586.805,20,35,6,2025-08-19 13:48:31
 multithreading,17-core,large_b,2,35243.650,20,35,6,2025-08-19 13:49:06
 multithreading,17-core,large_b,3,35936.310,20,35,6,2025-08-19 13:49:42

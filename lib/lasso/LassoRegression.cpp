@@ -1,7 +1,3 @@
-//
-// Created by user on 08.10.2018.
-//
-
 #include "LassoRegression.h"
 #include "matrix.h"
 #include <cmath>
@@ -13,10 +9,22 @@ LassoRegression::LassoRegression(std::vector<std::vector<double> > samples, std:
     this->numberOfFeatures = samples[0].size();
     this->features         = featuresMatrix(samples);
 
-
     this->features = normalizeFeatures(this->features);
     this->weights  = initialWeights();
     this->target   = targetAsArray(target);
+}
+
+// Add destructor
+LassoRegression::~LassoRegression() {
+    // Delete features matrix
+    for (int i = 0; i < numberOfSamples; i++) {
+        delete[] features[i];
+    }
+    delete[] features;
+
+    // Delete weights and target arrays
+    delete[] weights;
+    delete[] target;
 }
 
 double *LassoRegression::predictions() {
@@ -37,13 +45,28 @@ double *LassoRegression::ro() {
     double *results = new double[numberOfFeatures];
 
     for (int idx = 0; idx < numberOfFeatures; idx++) {
-        double *penaltyVector  = vectorMultiply(feature(idx), numberOfSamples, weights[idx]);
-        double *predictionDiff = vectorAdd(target, vectorMultiply(predictions(), numberOfSamples, -1), numberOfSamples);
-        double *roVector       = vectorMultiplyComponentWise(feature(idx),
-                                                       vectorAdd(predictionDiff, penaltyVector, numberOfSamples),
-                                                       numberOfSamples);
+        double *feature_val   = feature(idx);
+        double *penaltyVector = vectorMultiply(feature_val, numberOfSamples, weights[idx]);
+        delete[] feature_val;
+
+        double *predictions_val = predictions();
+        double *temp_multiply = vectorMultiply(predictions_val, numberOfSamples, -1); // FIX: Store intermediate result
+        double *predictionDiff = vectorAdd(target, temp_multiply, numberOfSamples);
+        delete[] predictions_val;
+        delete[] temp_multiply; // FIX: Delete intermediate result
+
+        feature_val      = feature(idx);
+        double *temp_add = vectorAdd(predictionDiff, penaltyVector, numberOfSamples); // FIX: Store intermediate result
+        double *roVector = vectorMultiplyComponentWise(feature_val, temp_add, numberOfSamples);
+        delete[] feature_val;
+        delete[] temp_add; // FIX: Delete intermediate result
+
         double roValue = vectorSum(roVector, numberOfSamples);
         results[idx]   = roValue;
+
+        delete[] penaltyVector;
+        delete[] predictionDiff;
+        delete[] roVector;
     }
 
     return results;
@@ -51,7 +74,6 @@ double *LassoRegression::ro() {
 
 double LassoRegression::coordinateDescentStep(int weightIdx, double alpha) {
     double *roValues = ro();
-
 
     double newWeight;
     if (weightIdx == 0) {
@@ -64,6 +86,7 @@ double LassoRegression::coordinateDescentStep(int weightIdx, double alpha) {
         newWeight = 0.0;
     }
 
+    delete[] roValues;
     return newWeight;
 }
 
@@ -84,9 +107,10 @@ double *LassoRegression::cyclicalCoordinateDescent(double tolerance, double alph
 
             if (coordinateChange > maxChange) {
                 maxChange = coordinateChange;
-                // std::cout << "MAX CHANGE: " << maxChange << " " << weightIdx << std::endl;
             }
         }
+
+        delete[] newWeights; // FIX: Delete allocated array
 
         if (maxChange < tolerance) {
             condition = false;
@@ -110,7 +134,10 @@ double **LassoRegression::featuresMatrix(std::vector<std::vector<double> > sampl
 
 double **LassoRegression::normalizeFeatures(double **matrix) {
     for (int featureIdx = 0; featureIdx < numberOfFeatures; ++featureIdx) {
-        double featureNorm = norm(feature(featureIdx), numberOfSamples);
+        double *feature_vec = feature(featureIdx); // FIX: Store pointer
+        double featureNorm  = norm(feature_vec, numberOfSamples);
+        delete[] feature_vec; // FIX: Delete allocated array
+
         for (int sampleIdx = 0; sampleIdx < numberOfSamples; ++sampleIdx) {
             matrix[sampleIdx][featureIdx] /= featureNorm;
         }

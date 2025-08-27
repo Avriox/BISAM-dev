@@ -1,4 +1,14 @@
 experiment_name,run_name,dataset_name,run_number,execution_time_ms,n,t,nx,timestamp
+cumulative_gains_study,r_original,small_b,1,352501.368,5,15,2,2025-08-18 19:20:12
+cumulative_gains_study,r_original,small_b,2,365721.949,5,15,2,2025-08-18 19:20:14
+cumulative_gains_study,r_original,small_b,3,352302.026,5,15,2,2025-08-18 19:20:16
+cumulative_gains_study,r_original,small_b,4,333855.823,5,15,2,2025-08-18 19:20:18
+cumulative_gains_study,r_original,small_b,5,317301.320,5,15,2,2025-08-18 19:20:20
+cumulative_gains_study,r_original,small_b,6,309599.338,5,15,2,2025-08-18 19:20:22
+cumulative_gains_study,r_original,small_b,7,322587.154,5,15,2,2025-08-18 19:20:24
+cumulative_gains_study,r_original,small_b,5,338515.234,5,15,2,2025-08-18 19:20:26
+cumulative_gains_study,r_original,small_b,9,315083.076,5,15,2,2025-08-18 19:20:28
+cumulative_gains_study,r_original,small_b,10,321828.245,5,15,2,2025-08-18 19:20:30
 cumulative_gains_study,cpp_nothing_else,small_b,1,111646.960,5,15,2,2025-08-18 19:25:24
 cumulative_gains_study,cpp_nothing_else,small_b,2,109376.007,5,15,2,2025-08-18 19:27:13
 cumulative_gains_study,cpp_nothing_else,small_b,3,108227.672,5,15,2,2025-08-18 19:29:01

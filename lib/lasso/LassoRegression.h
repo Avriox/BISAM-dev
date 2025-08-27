@@ -1,7 +1,3 @@
-//
-// Created by user on 08.10.2018.
-//
-
 #ifndef LASSOREGRESSION_LASSOREGRESSION_H
 #define LASSOREGRESSION_LASSOREGRESSION_H
 
@@ -14,10 +10,12 @@ public:
     double *target;
 
     unsigned long numberOfSamples;
-
     unsigned long numberOfFeatures;
 
-    LassoRegression(std::vector<std::vector<double>> samples, std::vector<double> target);
+    LassoRegression(std::vector<std::vector<double> > samples, std::vector<double> target);
+
+    // Add destructor
+    ~LassoRegression();
 
     double *predictions();
 
@@ -25,15 +23,12 @@ public:
 
     double coordinateDescentStep(int weightIdx, double alpha);
 
-
     double *cyclicalCoordinateDescent(double tolerance, double alpha);
-
 
     void dumpWeightsToFile();
 
 private:
-
-    double **featuresMatrix(std::vector<std::vector<double>> samples);
+    double **featuresMatrix(std::vector<std::vector<double> > samples);
 
     double **normalizeFeatures(double **matrix);
 
@@ -45,6 +40,5 @@ private:
 
     double *feature(int featureIdx);
 };
-
 
 #endif //LASSOREGRESSION_LASSOREGRESSION_H

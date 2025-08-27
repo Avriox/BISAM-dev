@@ -42,7 +42,7 @@ namespace bisam {
 
 #ifdef _OPENMP
         // Force re-initialization with new thread count
-        initialized = false;
+        initialized            = false;
         g_omp_pool_initialized = false;
 #endif
     }
@@ -107,7 +107,7 @@ namespace bisam {
         double alpha,
         double lambda,
         int n,
-        int max_threads  // NEW: Use this parameter
+        int max_threads // NEW: Use this parameter
     ) {
         // Set thread count based on max_threads parameter
         int desired_threads;
@@ -149,7 +149,7 @@ namespace bisam {
 #pragma omp parallel for num_threads(num_threads) schedule(dynamic)
         for (int part = 0; part < n; part++) {
             // Set thread count for nested regions within modelSelection
-            omp_set_num_threads(1);  // Force serial execution in nested regions
+            omp_set_num_threads(1); // Force serial execution in nested regions
 
             results[part] = modelSelection(
                 split_data.y_parts[part],
@@ -250,7 +250,7 @@ namespace bisam {
                                                  int prDelta,
                                                  double prDeltap,
                                                  std::vector<double> parprDeltap,
-                                                 int max_threads  // NEW: Thread control parameter
+                                                 int max_threads // NEW: Thread control parameter
     ) {
         // Only apply thread limiting for SPLIT_PARALLEL strategy
         if (strategy == ComputationStrategy::SPLIT_PARALLEL) {
@@ -381,7 +381,7 @@ namespace bisam {
                     alpha,
                     lambda,
                     n,
-                    max_threads  // Pass the thread control parameter
+                    max_threads // Pass the thread control parameter
                 );
             }
 
@@ -400,8 +400,12 @@ namespace bisam {
     ) {
         DataPartition data;
 
-        size_t n_rows      = y.size();
-        size_t n_cols      = x.n_cols;
+        size_t n_rows = y.size();
+        size_t n_cols = x.n_cols;
+
+        // size_t n_rows = x.n_cols;
+        // size_t n_cols = y.size();
+
         size_t thinit_size = theta_init.size();
 
         // Calculate sizes for each part

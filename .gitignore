@@ -4,4 +4,7 @@ mombf_3.5.4.tar.gz
 section_header.py
 .Rproj.user
 
-r-testing-files/simulation_data/*.rds
+r-testing-files/simulation_data/*
+simulations
+simulation_data
+

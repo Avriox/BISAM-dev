@@ -3,18 +3,26 @@
 # Configuration
 EXECUTABLE="./cmake-build-release/BISAM"  # Replace with your actual executable path
 MAX_RETRIES=10  # Maximum number of retries per dataset
-TOTAL_RUNS=20  # Total runs per dataset
-TIMING_CSV="./simulations/step_size_fixed_timing.csv"  # Path to timing CSV
-RUN_NAME_PREFIX="jenkins"
+TOTAL_RUNS=1  # Total runs per dataset
+TIMING_CSV="./simulations/step_size_investigation_timing.csv"  # Path to timing CSV
+RUN_NAME_PREFIX="aberth"
 
-DATASETS=(
-    "rootfind_stepsize_050"
-    "rootfind_stepsize_075"
-    "rootfind_stepsize_100"
-    "rootfind_stepsize_150"
-    "rootfind_stepsize_300"
-    "rootfind_stepsize_500"
-)
+DATASETS=()
+# "050" "075" "100" "150"300" "500""
+for step in "300"; do
+    for i in $(seq -f "%03g" 1 5); do
+        DATASETS+=("rootfind_stepsize_${step}_${i}")
+    done
+done
+
+#DATASETS=(
+#    "rootfind_stepsize_050"
+#    "rootfind_stepsize_075"
+#    "rootfind_stepsize_100"
+#    "rootfind_stepsize_150"
+#    "rootfind_stepsize_300"
+#    "rootfind_stepsize_500"
+#)
 
 # Colors for output
 RED='\033[0;31m'
@@ -261,7 +269,7 @@ for dataset in "${DATASETS[@]}"; do
     # Add a pause between datasets to let system recover
     if [ ${#DATASETS[@]} -gt 1 ]; then
         echo -e "${YELLOW}Pausing 10 seconds before next dataset...${NC}"
-        sleep 10
+        sleep 0.5
         echo ""
     fi
 done
