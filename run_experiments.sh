@@ -8,9 +8,9 @@ TIMING_CSV="./simulations/step_size_investigation_timing.csv"  # Path to timing 
 RUN_NAME_PREFIX="aberth"
 
 DATASETS=()
-# "050" "075" "100" "150"300" "500""
-for step in "300"; do
-    for i in $(seq -f "%03g" 1 5); do
+# "050" "075" "100" "150" "300" "500""
+for step in "050" "075" "100" "150" "300" "500"; do
+    for i in $(seq -f "%03g" 1 10); do
         DATASETS+=("rootfind_stepsize_${step}_${i}")
     done
 done

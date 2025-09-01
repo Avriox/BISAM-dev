@@ -40,7 +40,7 @@ contr_sim_breaks <- function(
   require(mvtnorm)
   
     print( pos.outl)
-  print(pos.step)
+    print(pos.step)
 
   # Create individual and time indicators
   n_<- c(t(matrix(rep(1:n,t), ncol = rep(t,n)))) # unit index

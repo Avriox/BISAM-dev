@@ -153,7 +153,7 @@ namespace bisam {
 
             results[part] = modelSelection(
                 split_data.y_parts[part],
-                split_data.common_x,
+                split_data.x_parts[part],
                 niter,
                 thinning,
                 burnin,
@@ -317,7 +317,7 @@ namespace bisam {
                 for (int part = 0; part < n; part++) {
                     results[part] = modelSelection(
                         split_data.y_parts[part],
-                        split_data.common_x,
+                        split_data.x_parts[part],
                         niter,
                         thinning,
                         burnin,
@@ -421,7 +421,9 @@ namespace bisam {
         size_t x_end_col   = cols_per_part + (cols_remainder > 0 ? 1 : 0) - 1;
 
         // Extract the submatrix for x (same for all parts)
-        data.common_x = x.submat(x_start_row, x_start_col, x_end_row, x_end_col);
+        // data.common_x = x.submat(x_start_row, x_start_col, x_end_row, x_end_col);
+
+        data.x_parts.resize(num_partitions);
 
         // Prepare vectors for all parts
         data.y_parts.resize(num_partitions);
@@ -445,6 +447,8 @@ namespace bisam {
 
             // Extract the corresponding part of y
             data.y_parts[part] = y.subvec(start_row, end_row);
+
+            data.x_parts[part] = x.submat(start_row, start_col, end_row, end_col);
 
             // Extract the corresponding part of deltaini_input
             data.delta_init_parts[part] = delta_initial.subvec(start_col, end_col);

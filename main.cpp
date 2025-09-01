@@ -177,13 +177,13 @@ int main(int argc, char *argv[]) {
                         false,
                         false, // no fixed effects for performance testing
                         true,
-                        true,                                         // IIS, SIS
-                        2, 1, 2, 0,                                   // method parameters
-                        100000, 1, 1,                                 // MCMC parameters
-                        0.01, 0.01,                                   // alpha, lambda
-                        1, 0.5, {1, 1},                               // additional parameters
-                        bisam::ComputationStrategy::SPLIT_SEQUENTIAL, // Use optimized strategy
-                        8                                             // Use current thread count
+                        true,                                       // IIS, SIS
+                        2, 1, 2, 0,                                 // method parameters
+                        100000, 1, 1,                               // MCMC parameters
+                        0.01, 0.01,                                 // alpha, lambda
+                        1, 0.5, {1, 1},                             // additional parameters
+                        bisam::ComputationStrategy::SPLIT_PARALLEL, // Use optimized strategy
+                        8                                           // Use current thread count
                     );
 
                     // End timing for this individual run

@@ -8,3 +8,4 @@ r-testing-files/simulation_data/*
 simulations
 simulation_data
 
+*.log
