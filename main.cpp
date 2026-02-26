@@ -12,9 +12,9 @@
 // ========================================================================
 // CONFIGURATION SECTION
 // ========================================================================
-const bool ENABLE_VALIDATION_OUTPUT = false; // Set to false to disable all validation printing
+const bool ENABLE_VALIDATION_OUTPUT = true;  // Set to false to disable all validation printing
 const int RUNS_PER_DATASET          = 1;     // Number of times to run each dataset for timing
-const bool APPEND_TO_EXISTING_FILES = true;  // Set to true to append to existing result files
+const bool APPEND_TO_EXISTING_FILES = false; // Set to true to append to existing result files
 
 // MCMC Settings
 const int MCMC_ITERATIONS = 2000; // Total MCMC iterations
