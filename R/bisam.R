@@ -176,3 +176,163 @@ modelbinomprior <- function(p = 0.5) {
     class = "modelbinomprior"
   )
 }
+
+# Updated Wrapper
+
+#' Fast Bayesian model selection (optimized backend)
+#'
+#' Exposes the package's optimized C++ model-selection step (a Gibbs-style update for
+#' the model indicator \eqn{\delta}) so you can prepare inputs in R and avoid the extra
+#' BISAM preparation done inside `estimate_model()`.
+#'
+#' This is intended as a near drop-in for the *matrix-interface* of `mombf::modelSelection()`
+#' (i.e., `y` numeric vector and `x` numeric matrix), but note the return type differs:
+#' this function returns a single sampled inclusion vector (0/1), not an `msfit` object.
+#'
+#' @param y Numeric vector of length n. Typically the current residual-like target, e.g.
+#'   `y_hat = y - X %*% beta` in your BISAM Gibbs loop.
+#' @param x Numeric matrix n x p. Candidate regressors to be selected (e.g., your Z matrix).
+#'
+#' @param center,scale Logical. Whether to center/scale internally in the model-selection code.
+#' @param XtXprecomp Logical. Whether to precompute X'X internally.
+#'
+#' @param niter Integer. Number of internal Gibbs iterations.
+#' @param thinning Integer. Thinning factor.
+#' @param burnin Integer. Burn-in. Default `round(niter/10)`.
+#'
+#' @param deltaini Optional initial inclusion vector (logical/integer) length p.
+#'
+#' @param priorCoef Either NULL, a scalar `tau`, or an object/list with element `$tau`.
+#'   Only `tau` is used by this wrapper.
+#' @param tau Numeric. Prior scale parameter (used if `priorCoef` is NULL).
+#'
+#' @param priorDelta Model-space prior: `modelbbprior(a,b)` or `modelbinomprior(p)`.
+#'
+#' @param phi Numeric. Residual variance passed to the underlying routine.
+#' @param knownphi Integer 0/1. Passed through.
+#' @param priorSkew Numeric. Passed through to your translated mombf internals.
+#'
+#' @param thinit Optional numeric vector length p for initialization of continuous parameters
+#'   inside the marginal-likelihood computations.
+#' @param initpar_type Integer. Cast to your internal `InitType` enum (0 typically means AUTO).
+#'
+#' @param method,hesstype,optimMethod,optim_maxit,B,r,alpha,lambda Passed through to the C++
+#'   internals (these are your integer-coded options, not mombf character strings).
+#'
+#' @param computation_strategy One of `STANDARD()`, `SPLIT_SEQUENTIAL()`, `SPLIT_PARALLEL()`.
+#' @param n_units Integer. Number of partitions/units used by split strategies (often the number
+#'   of individuals `n` in your panel setting).
+#' @param max_threads Integer. Only used for `SPLIT_PARALLEL()`. 0 means "use all available".
+#'
+#' @return Integer vector (length p) with 0/1 inclusion indicators (one sampled draw).
+#' @export
+fast_model_selection <- function(
+    y, x,
+    center = TRUE,
+    scale = TRUE,
+    XtXprecomp = ifelse(ncol(x) < 1e4, TRUE, FALSE),
+    niter = 5000L,
+    thinning = 1L,
+    burnin = round(niter / 10),
+    deltaini = NULL,
+    priorCoef = NULL,
+    tau = 0.348,
+    priorDelta = modelbbprior(1, 1),
+    phi = 1.0,
+    knownphi = 0L,
+    priorSkew = 0.348,
+    thinit = NULL,
+    initpar_type = 0L,
+    method = 1L,
+    hesstype = 1L,
+    optimMethod = 1L,
+    optim_maxit = 10L,
+    B = 100000L,
+    r = 1L,
+    alpha = 0.05,
+    lambda = 1.0,
+    computation_strategy = STANDARD(),
+    n_units = 1L,
+    max_threads = 0L
+) {
+  if (is.data.frame(x)) x <- as.matrix(x)
+  y <- as.numeric(y)
+  storage.mode(x) <- "double"
+
+  p <- ncol(x)
+
+  # allow priorCoef to mimic mombf-ish usage
+  if (!is.null(priorCoef)) {
+    if (is.numeric(priorCoef) && length(priorCoef) == 1) {
+      tau <- as.double(priorCoef)
+    } else if (is.list(priorCoef) && !is.null(priorCoef$tau)) {
+      tau <- as.double(priorCoef$tau)
+    } else {
+      stop("priorCoef must be NULL, a scalar tau, or a list/object with element $tau.")
+    }
+  }
+
+  # decode priorDelta exactly like your estimate_model wrapper
+  prDelta <- 1L
+  prDeltap <- 0.5
+  a <- 1.0
+  b <- 1.0
+  if (inherits(priorDelta, "modelbbprior")) {
+    a <- as.double(priorDelta$a)
+    b <- as.double(priorDelta$b)
+    prDelta <- 2L
+  } else if (inherits(priorDelta, "modelbinomprior")) {
+    prDeltap <- as.double(priorDelta$p)
+    prDelta <- 1L
+  } else {
+    stop("priorDelta must be either a modelbbprior() or modelbinomprior() object.")
+  }
+
+  if (is.null(deltaini)) deltaini <- integer(p)
+  if (length(deltaini) != p) stop("deltaini must have length ncol(x).")
+  deltaini <- as.integer(deltaini)
+
+  if (!is.null(thinit) && length(thinit) != p) {
+    stop("thinit must be NULL or have length ncol(x).")
+  }
+
+  rcpp_fast_model_selection(
+    y = y,
+    x = x,
+    niter = as.integer(niter),
+    thinning = as.integer(thinning),
+    burnin = as.integer(burnin),
+    deltaini = deltaini,
+    center = isTRUE(center),
+    scale = isTRUE(scale),
+    XtXprecomp = isTRUE(XtXprecomp),
+    phi = as.double(phi),
+    tau = as.double(tau),
+    priorSkew = as.double(priorSkew),
+    thinit = thinit,
+    initpar_type = as.integer(initpar_type),
+    method = as.integer(method),
+    hesstype = as.integer(hesstype),
+    optimMethod = as.integer(optimMethod),
+    optim_maxit = as.integer(optim_maxit),
+    B = as.integer(B),
+    knownphi = as.integer(knownphi),
+    r = as.integer(r),
+    alpha = as.double(alpha),
+    lambda = as.double(lambda),
+    prDelta = as.integer(prDelta),
+    prDeltap = as.double(prDeltap),
+    prDelta_a = as.double(a),
+    prDelta_b = as.double(b),
+    computation_strategy = as.integer(computation_strategy),
+    n_units = as.integer(n_units),
+    max_threads = as.integer(max_threads)
+  )
+}
+
+#' Minimal MOM prior spec (tau only)
+#' @param tau numeric scalar
+#' @export
+momprior <- function(tau = 0.348) {
+  structure(list(tau = as.double(tau)), class = "momprior")
+}
