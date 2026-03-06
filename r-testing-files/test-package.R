@@ -5,11 +5,13 @@ remove.packages(c("BISAM", "bisam"))
 
 library(Rcpp)
 # 
-setwd("~/Documents/Uni/WU/BISAM")
+setwd("~/coding/BISAM")
 Rcpp::compileAttributes(verbose = TRUE)
 install.packages("./", repos = NULL, type = "source", verbose = TRUE, clean = TRUE)
 
 library(BISAM)
+
+
 
 # Create the data matrix
 data <- matrix(c(

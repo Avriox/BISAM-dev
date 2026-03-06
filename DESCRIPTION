@@ -1,7 +1,7 @@
 Package: BISAM
 Type: Package
 Title: Bayesian Indicator Saturation Model
-Version: 0.1.0
+Version: 0.2.0
 Date: 2025-04-08
 Author: Jakob Goldmann, Lucas D. Konrad
 Maintainer: Jakob Goldmann <jakob.goldmann@s.wu.ac.at>
