@@ -651,13 +651,50 @@ SEXP pmomLM_I(SEXP niter, SEXP thinning, SEXP burnin, SEXP niniModel, SEXP iniMo
   }
   postOther = REAL(VECTOR_ELT(ans, 5));
 
-  set_modavgPars(&pars, INTEGER(n), INTEGER(p1), INTEGER(p2), INTEGER(isbinary), INTEGER(ybinary), REAL(y), REAL(sumy2),
-                 REAL(x1), REAL(x2), XtX, REAL(ytX), REAL(cholS2), REAL(S2inv), REAL(cholS2inv), REAL(colsumx1sq),
-                 REAL(alpha), REAL(lambda), INTEGER(priorCoef), INTEGER(r), &tau1copy, REAL(tau2), INTEGER(priorTau1),
-                 REAL(atau1), REAL(btau1), INTEGER(priorModel), REAL(prModelpar));
-  pmomLM(postModel, margpp, postCoef1, postCoef2, postPhi, postOther, &pars, INTEGER(niter), INTEGER(thinning),
-         INTEGER(burnin), INTEGER(niniModel), INTEGER(iniModel), REAL(iniCoef1), REAL(iniCoef2), REAL(iniPhi),
-         REAL(iniOthers), INTEGER(verbose));
+  set_modavgPars(&pars,
+                 INTEGER(n),
+                 INTEGER(p1),
+                 INTEGER(p2),
+                 INTEGER(isbinary),
+                 INTEGER(ybinary),
+                 REAL(y),
+                 REAL(sumy2),
+                 REAL(x1),
+                 REAL(x2),
+                 XtX,
+                 REAL(ytX),
+                 REAL(cholS2),
+                 REAL(S2inv),
+                 REAL(cholS2inv),
+                 REAL(colsumx1sq),
+                 REAL(alpha),
+                 REAL(lambda),
+                 INTEGER(priorCoef),
+                 INTEGER(r),
+                 &tau1copy,
+                 REAL(tau2),
+                 INTEGER(priorTau1),
+                 REAL(atau1),
+                 REAL(btau1),
+                 INTEGER(priorModel),
+                 REAL(prModelpar));
+  pmomLM(postModel,
+         margpp,
+         postCoef1,
+         postCoef2,
+         postPhi,
+         postOther,
+         &pars,
+         INTEGER(niter),
+         INTEGER(thinning),
+         INTEGER(burnin),
+         INTEGER(niniModel),
+         INTEGER(iniModel),
+         REAL(iniCoef1),
+         REAL(iniCoef2),
+         REAL(iniPhi),
+         REAL(iniOthers),
+         INTEGER(verbose));
 
   delete XtX;
   UNPROTECT(1);
@@ -704,7 +741,7 @@ void pmomLM(int *postModel, double *margpp, double *postCoef1, double *postCoef2
   Avecx((*pars).x2, curCoef2, linpred2, 0, n - 1, 0, p2 - 1);
   if (isbinary) sample_latentProbit((*pars).y, res, &sumres2, (*pars).ybinary, linpred1, linpred2, pars);
   for (i = 0, sumres2 = 0; i < n; i++) {
-    res[i] = partialres[i] = (*pars).y[i] - linpred1[i] - linpred2[i];
+    res[i]  = partialres[i] = (*pars).y[i] - linpred1[i] - linpred2[i];
     sumres2 += res[i] * res[i];
   }
   sumpartialres2 = sumres2;
@@ -714,12 +751,24 @@ void pmomLM(int *postModel, double *margpp, double *postCoef1, double *postCoef2
     for (j = 0; j < *(*pars).p1; j++) {
       if (curModel[j]) {
         for (k = 0, sumpartialres2 = 0; k < n; k++) {
-          partialres[k] = res[k] + curCoef1[j] * ((*pars).x1[n * j + k]);
+          partialres[k]  = res[k] + curCoef1[j] * ((*pars).x1[n * j + k]);
           sumpartialres2 += partialres[k] * partialres[k];
         }
       }
-      MHTheta1pmom(&newdelta, &newcoef, &pinclude, &resupdate, res, partialres, &sumres2, &sumpartialres2, j, &nsel,
-                   curModel, curCoef1, &curPhi, pars);
+      MHTheta1pmom(&newdelta,
+                   &newcoef,
+                   &pinclude,
+                   &resupdate,
+                   res,
+                   partialres,
+                   &sumres2,
+                   &sumpartialres2,
+                   j,
+                   &nsel,
+                   curModel,
+                   curCoef1,
+                   &curPhi,
+                   pars);
       if (newdelta > curModel[j]) { nsel++; } else if (newdelta < curModel[j]) { nsel--; }
       curModel[j] = newdelta;
       curCoef1[j] = newcoef;
@@ -735,7 +784,7 @@ void pmomLM(int *postModel, double *margpp, double *postCoef1, double *postCoef2
     simTheta2(curCoef2, res, &curPhi, pars);
     Avecx((*pars).x2, curCoef2, linpred2, 0, n - 1, 0, p2 - 1);
     for (k = 0, sumres2 = 0; k < n; k++) {
-      res[k] -= linpred2[k];
+      res[k]  -= linpred2[k];
       sumres2 += res[k] * res[k];
     }
     //Sample phi
@@ -798,9 +847,9 @@ void sample_latentProbit(double *y, double *res, double *sumres2, int *ybinary, 
     } else {
       u = plinpred * runif(); //u ~ Unif(0,plinpred)
     }
-    res[i] = qnormC(u, 0, 1);
-    (*sumres2) += res[i] * res[i];
-    y[i] = linpred + res[i];
+    res[i]           = qnormC(u, 0, 1);
+    (*sumres2)       += res[i] * res[i];
+    y[i]             = linpred + res[i];
     (*(*pars).sumy2) += y[i] * y[i];
   }
   Atvecx((*pars).x1, y, (*pars).ytX, 0, *(*pars).p1 - 1, 0, *(*pars).n - 1); //update ytX=Xty
@@ -834,7 +883,14 @@ void MHTheta1pmom(int *newdelta, double *newcoef, double *pinclude, int *resupda
   priorFunction = set_priorFunction_modavg((*pars).priorModel);
   //Propose delta
   if (curModel[j]) {
-    m1 = pmomMargKuniv(partialres, xj, sumpartialres2, (*pars).colsumx1sq + j, &n, curPhi, (*pars).tau1, (*pars).r,
+    m1 = pmomMargKuniv(partialres,
+                       xj,
+                       sumpartialres2,
+                       (*pars).colsumx1sq + j,
+                       &n,
+                       curPhi,
+                       (*pars).tau1,
+                       (*pars).r,
                        &logscale);
     m0    = dnormC_jvec(partialres, *(*pars).n, 0, sqrtPhi, 1);
     nsel0 = *nsel - 1;
@@ -876,21 +932,32 @@ void MHTheta1pmom(int *newdelta, double *newcoef, double *pinclude, int *resupda
       thetaprop = rtmixC(propPars, propPars + 2, propPars + 4, nu, 2);
       for (i = 0, lhood = 0; i < n; i++) {
         partialres[i] -= thetaprop * xj[i];
-        lhood += dnormC(partialres[i], 0, sqrtPhi, 1) - dnormC(res[i], 0, sqrtPhi, 1);
+        lhood         += dnormC(partialres[i], 0, sqrtPhi, 1) - dnormC(res[i], 0, sqrtPhi, 1);
       }
       lprior = dmom(thetaprop, 0, *(*pars).tau1, *curPhi, *(*pars).r, 1) - dmom(
-                 curCoef1[j], 0, *(*pars).tau1, *curPhi, *(*pars).r, 1);
+                 curCoef1[j],
+                 0,
+                 *(*pars).tau1,
+                 *curPhi,
+                 *(*pars).r,
+                 1);
       lprop = dtmixC(curCoef1[j], propPars, propPars + 2, propPars + 4, nu, 2, 1) - dtmixC(
-                thetaprop, propPars, propPars + 2, propPars + 4, nu, 2, 1);
+                thetaprop,
+                propPars,
+                propPars + 2,
+                propPars + 4,
+                nu,
+                2,
+                1);
       lambda = exp(lhood + lprior + lprop);
     } else if ((curModel[j] == 0) && deltaprop) {
       //proposal is to add variable to the model
       thetaprop = rtmixC(propPars, propPars + 2, propPars + 4, nu, 2);
       for (i = 0, num = 0; i < n; i++) {
         partialres[i] = res[i] - thetaprop * xj[i];
-        num += dnormC(partialres[i], 0, sqrtPhi, 1);
+        num           += dnormC(partialres[i], 0, sqrtPhi, 1);
       }
-      num += dmom(thetaprop, 0, *(*pars).tau1, *curPhi, *(*pars).r, 1);
+      num    += dmom(thetaprop, 0, *(*pars).tau1, *curPhi, *(*pars).r, 1);
       den    = dtmixC(thetaprop, propPars, propPars + 2, propPars + 4, nu, 2, 1) + m1;
       lambda = exp(num - den);
     } else {
@@ -898,7 +965,7 @@ void MHTheta1pmom(int *newdelta, double *newcoef, double *pinclude, int *resupda
       thetaprop = 0;
       num       = dtmixC(curCoef1[j], propPars, propPars + 2, propPars + 4, nu, 2, 1) + m1;
       for (i = 0, den = 0; i < n; i++) { den += dnormC(res[i], 0, sqrtPhi, 1); }
-      den += dmom(curCoef1[j], 0, *(*pars).tau1, *curPhi, *(*pars).r, 1);
+      den    += dmom(curCoef1[j], 0, *(*pars).tau1, *curPhi, *(*pars).r, 1);
       lambda = exp(num - den);
     }
     if (runif() < lambda) {
@@ -978,7 +1045,7 @@ double pmomMargKuniv(double *y, double *x, double *sumy2, double *sumxsq, int *n
   double ans, m, s, I, doubler = 2.0 * (*r);
   s                            = *sumxsq + 1.0 / (*tau);
   for (i = 0, m = 0; i < *n; i++) { m += y[i] * x[i]; }
-  m /= s;
+  m   /= s;
   I   = log(mnorm(doubler, m, sqrt(*phi / s)));
   ans = I - .5 * (*sumy2 - s * m * m) / (*phi) - .5 * (*n) * log(2 * M_PI * (*phi)) - .5 * (log(s) + log(*tau)) -
         ldoublefact(doubler - 1) - (*r) * log((*tau) * (*phi));
@@ -1216,8 +1283,16 @@ SEXP modelSelectionEnumCI(SEXP Snmodels, SEXP Smodels, SEXP Sknownphi, SEXP Sfam
   isgroup         = ivector(0, INTEGER(Sp)[0]);
   nconstraints    = ivector(0, INTEGER(Sngroups)[0]);
   ninvconstraints = ivector(0, INTEGER(Sngroups)[0]);
-  countConstraints(nconstraints, &constraints, ninvconstraints, &invconstraints, &ngroupsconstr, isgroup,
-                   INTEGER(Sngroups), INTEGER(Snvaringroup), Sconstraints, Sinvconstraints);
+  countConstraints(nconstraints,
+                   &constraints,
+                   ninvconstraints,
+                   &invconstraints,
+                   &ngroupsconstr,
+                   isgroup,
+                   INTEGER(Sngroups),
+                   INTEGER(Snvaringroup),
+                   Sconstraints,
+                   Sinvconstraints);
 
   if (hasXtX) {
     XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
@@ -1239,20 +1314,65 @@ SEXP modelSelectionEnumCI(SEXP Snmodels, SEXP Smodels, SEXP Sknownphi, SEXP Sfam
   } else { nuncens = INTEGER(Sn)[0]; }
 
 
-  set_marginalPars(&pars, INTEGER(Sfamily), INTEGER(Sn), &nuncens, INTEGER(Sp), REAL(Sy), INTEGER(Suncens),
-                   REAL(Ssumy2), REAL(Ssumy), REAL(Ssumlogyfact), REAL(Sx), REAL(Scolsumsx), XtX, REAL(SytX),
-                   INTEGER(Smethod), INTEGER(Sadjoverdisp), INTEGER(Shesstype), INTEGER(SoptimMethod),
-                   INTEGER(Soptim_maxit), &usethinit, thinit, INTEGER(SB), REAL(Salpha), REAL(Slambda),
-                   INTEGER(Sknownphi), REAL(Sphi), REAL(Stau), REAL(Staugroup), REAL(Staualpha), REAL(Sfixatanhalpha),
-                   INTEGER(Sr), REAL(SprDeltap), REAL(SparprDeltap), REAL(SprConstrp), REAL(SparprConstrp), &logscale,
-                   &offset, INTEGER(Sgroups), isgroup, INTEGER(Sngroups), &ngroupsconstr, INTEGER(Snvaringroup),
-                   nconstraints, ninvconstraints, XtXuncens, ytXuncens);
+  set_marginalPars(&pars,
+                   INTEGER(Sfamily),
+                   INTEGER(Sn),
+                   &nuncens,
+                   INTEGER(Sp),
+                   REAL(Sy),
+                   INTEGER(Suncens),
+                   REAL(Ssumy2),
+                   REAL(Ssumy),
+                   REAL(Ssumlogyfact),
+                   REAL(Sx),
+                   REAL(Scolsumsx),
+                   XtX,
+                   REAL(SytX),
+                   INTEGER(Smethod),
+                   INTEGER(Sadjoverdisp),
+                   INTEGER(Shesstype),
+                   INTEGER(SoptimMethod),
+                   INTEGER(Soptim_maxit),
+                   &usethinit,
+                   thinit,
+                   INTEGER(SB),
+                   REAL(Salpha),
+                   REAL(Slambda),
+                   INTEGER(Sknownphi),
+                   REAL(Sphi),
+                   REAL(Stau),
+                   REAL(Staugroup),
+                   REAL(Staualpha),
+                   REAL(Sfixatanhalpha),
+                   INTEGER(Sr),
+                   REAL(SprDeltap),
+                   REAL(SparprDeltap),
+                   REAL(SprConstrp),
+                   REAL(SparprConstrp),
+                   &logscale,
+                   &offset,
+                   INTEGER(Sgroups),
+                   isgroup,
+                   INTEGER(Sngroups),
+                   &ngroupsconstr,
+                   INTEGER(Snvaringroup),
+                   nconstraints,
+                   ninvconstraints,
+                   XtXuncens,
+                   ytXuncens);
 
   priorcode      = mspriorCode(INTEGER(SpriorCoef), INTEGER(SpriorGroup), &pars);
   pars.priorcode = &priorcode;
 
-  modelSelectionEnum(postMode, postModeProb, postProb, INTEGER(Snmodels), INTEGER(Smodels), INTEGER(SpriorDelta),
-                     INTEGER(SpriorConstr), INTEGER(Sverbose), &pars);
+  modelSelectionEnum(postMode,
+                     postModeProb,
+                     postProb,
+                     INTEGER(Snmodels),
+                     INTEGER(Smodels),
+                     INTEGER(SpriorDelta),
+                     INTEGER(SpriorConstr),
+                     INTEGER(Sverbose),
+                     &pars);
 
   delete XtX;
   free_ivector(nconstraints, 0, INTEGER(Sngroups)[0]);
@@ -1413,8 +1533,16 @@ SEXP modelSelectionGibbsCI(SEXP SpostModeini, SEXP SpostModeiniProb, SEXP Sknown
   isgroup         = ivector(0, INTEGER(Sp)[0]);
   nconstraints    = ivector(0, INTEGER(Sngroups)[0]);
   ninvconstraints = ivector(0, INTEGER(Sngroups)[0]);
-  countConstraints(nconstraints, &constraints, ninvconstraints, &invconstraints, &ngroupsconstr, isgroup,
-                   INTEGER(Sngroups), INTEGER(Snvaringroup), Sconstraints, Sinvconstraints);
+  countConstraints(nconstraints,
+                   &constraints,
+                   ninvconstraints,
+                   &invconstraints,
+                   &ngroupsconstr,
+                   isgroup,
+                   INTEGER(Sngroups),
+                   INTEGER(Snvaringroup),
+                   Sconstraints,
+                   Sinvconstraints);
 
   if (hasXtX) {
     XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
@@ -1435,14 +1563,52 @@ SEXP modelSelectionGibbsCI(SEXP SpostModeini, SEXP SpostModeiniProb, SEXP Sknown
     }
   } else { nuncens = INTEGER(Sn)[0]; }
 
-  set_marginalPars(&pars, INTEGER(Sfamily), INTEGER(Sn), &nuncens, INTEGER(Sp), REAL(Sy), INTEGER(Suncens),
-                   REAL(Ssumy2), REAL(Ssumy), REAL(Ssumlogyfact), REAL(Sx), REAL(Scolsumsx), XtX, REAL(SytX),
-                   INTEGER(Smethod), INTEGER(Sadjoverdisp), INTEGER(Shesstype), INTEGER(SoptimMethod),
-                   INTEGER(Soptim_maxit), &usethinit, thinit, INTEGER(SB), REAL(Salpha), REAL(Slambda),
-                   INTEGER(Sknownphi), REAL(Sphi), REAL(Stau), REAL(Staugroup), REAL(Staualpha), REAL(Sfixatanhalpha),
-                   INTEGER(Sr), REAL(SprDeltap), REAL(SparprDeltap), REAL(SprConstrp), REAL(SparprConstrp), &logscale,
-                   &offset, INTEGER(Sgroups), isgroup, INTEGER(Sngroups), &ngroupsconstr, INTEGER(Snvaringroup),
-                   nconstraints, ninvconstraints, XtXuncens, ytXuncens);
+  set_marginalPars(&pars,
+                   INTEGER(Sfamily),
+                   INTEGER(Sn),
+                   &nuncens,
+                   INTEGER(Sp),
+                   REAL(Sy),
+                   INTEGER(Suncens),
+                   REAL(Ssumy2),
+                   REAL(Ssumy),
+                   REAL(Ssumlogyfact),
+                   REAL(Sx),
+                   REAL(Scolsumsx),
+                   XtX,
+                   REAL(SytX),
+                   INTEGER(Smethod),
+                   INTEGER(Sadjoverdisp),
+                   INTEGER(Shesstype),
+                   INTEGER(SoptimMethod),
+                   INTEGER(Soptim_maxit),
+                   &usethinit,
+                   thinit,
+                   INTEGER(SB),
+                   REAL(Salpha),
+                   REAL(Slambda),
+                   INTEGER(Sknownphi),
+                   REAL(Sphi),
+                   REAL(Stau),
+                   REAL(Staugroup),
+                   REAL(Staualpha),
+                   REAL(Sfixatanhalpha),
+                   INTEGER(Sr),
+                   REAL(SprDeltap),
+                   REAL(SparprDeltap),
+                   REAL(SprConstrp),
+                   REAL(SparprConstrp),
+                   &logscale,
+                   &offset,
+                   INTEGER(Sgroups),
+                   isgroup,
+                   INTEGER(Sngroups),
+                   &ngroupsconstr,
+                   INTEGER(Snvaringroup),
+                   nconstraints,
+                   ninvconstraints,
+                   XtXuncens,
+                   ytXuncens);
 
   priorcode      = mspriorCode(INTEGER(SpriorCoef), INTEGER(SpriorGroup), &pars);
   pars.priorcode = &priorcode;
@@ -1600,9 +1766,23 @@ SEXP modelSelectionGibbsCI(SEXP SpostModeini, SEXP SpostModeiniProb, SEXP Sknown
   // --- End of Debugging Print Statements ---
 
 
-  modelSelectionGibbs(postSample, margpp, postMode, postModeProb, postProb, INTEGER(SpriorDelta), INTEGER(SpriorConstr),
-                      INTEGER(Sniter), INTEGER(Sthinning), INTEGER(Sburnin), INTEGER(Sndeltaini), INTEGER(Sdeltaini),
-                      INTEGER(Sincludevars), &constraints, &invconstraints, INTEGER(Sverbose), &pars);
+  modelSelectionGibbs(postSample,
+                      margpp,
+                      postMode,
+                      postModeProb,
+                      postProb,
+                      INTEGER(SpriorDelta),
+                      INTEGER(SpriorConstr),
+                      INTEGER(Sniter),
+                      INTEGER(Sthinning),
+                      INTEGER(Sburnin),
+                      INTEGER(Sndeltaini),
+                      INTEGER(Sdeltaini),
+                      INTEGER(Sincludevars),
+                      &constraints,
+                      &invconstraints,
+                      INTEGER(Sverbose),
+                      &pars);
 
   free_dvector(thinit, 0, mycols2 + 1);
   free_ivector(isgroup, 0, INTEGER(Sp)[0]);
@@ -1738,8 +1918,18 @@ void modelSelectionGibbs(int *postSample, double *margpp, int *postMode, double 
           ndropgroups  = 0;
           addgroups[0] = jgroup;
         }
-        validmodel = checkConstraints(addgroups, &naddgroups, dropgroups, &ndropgroups, constraints, nconstraints,
-                                      invconstraints, ninvconstraints, (*pars).groups, nvaringroup, sel, &nsel);
+        validmodel = checkConstraints(addgroups,
+                                      &naddgroups,
+                                      dropgroups,
+                                      &ndropgroups,
+                                      constraints,
+                                      nconstraints,
+                                      invconstraints,
+                                      ninvconstraints,
+                                      (*pars).groups,
+                                      nvaringroup,
+                                      sel,
+                                      &nsel);
         if (nselnew > (*(*pars).n)) validmodel = false;
 
         ppnew[0] = ppnewsum = 1;
@@ -1823,7 +2013,7 @@ void modelSelectionGibbs(int *postSample, double *margpp, int *postMode, double 
           }
 
           //update model
-          u = runif();
+          u        = runif();
           ppnew[0] /= ppnewsum;
           ppnew[1] /= ppnewsum;
           ppnew[2] /= ppnewsum;
@@ -1859,7 +2049,7 @@ void modelSelectionGibbs(int *postSample, double *margpp, int *postMode, double 
             if (modelidx[k] == 1) {
               margpp[firstingroup[jgroup]] += ppnew[k];
             } else if (modelidx[k] == 2) {
-              margpp[firstingroup[jgroup]] += ppnew[k];
+              margpp[firstingroup[jgroup]]  += ppnew[k];
               margpp[firstingroup[jgroup2]] += ppnew[k];
             }
           }
@@ -1948,7 +2138,7 @@ void modelSelectionGibbs(int *postSample, double *margpp, int *postMode, double 
     for (j = 0; j < (*(*pars).p); j++) { margpp[j] /= (iupper - imax_xy(0, ilow) + .0); }
   } //from sum to average
   if (*family == 0) {
-    margpp[(*(*pars).p)] /= (iupper - imax_xy(0, ilow) + .0);
+    margpp[(*(*pars).p)]     /= (iupper - imax_xy(0, ilow) + .0);
     margpp[(*(*pars).p) + 1] /= (iupper - imax_xy(0, ilow) + .0);
     margpp[(*(*pars).p) + 2] /= (iupper - imax_xy(0, ilow) + .0);
     margpp[(*(*pars).p) + 3] /= (iupper - imax_xy(0, ilow) + .0);
@@ -2026,8 +2216,16 @@ SEXP greedyVarSelCI(SEXP Sknownphi, SEXP Sfamily, SEXP SpriorCoef, SEXP SpriorGr
   isgroup         = ivector(0, INTEGER(Sp)[0]);
   nconstraints    = ivector(0, INTEGER(Sngroups)[0]);
   ninvconstraints = ivector(0, INTEGER(Sngroups)[0]);
-  countConstraints(nconstraints, &constraints, ninvconstraints, &invconstraints, &ngroupsconstr, isgroup,
-                   INTEGER(Sngroups), INTEGER(Snvaringroup), Sconstraints, Sinvconstraints);
+  countConstraints(nconstraints,
+                   &constraints,
+                   ninvconstraints,
+                   &invconstraints,
+                   &ngroupsconstr,
+                   isgroup,
+                   INTEGER(Sngroups),
+                   INTEGER(Snvaringroup),
+                   Sconstraints,
+                   Sinvconstraints);
 
   if (hasXtX) {
     XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
@@ -2048,21 +2246,68 @@ SEXP greedyVarSelCI(SEXP Sknownphi, SEXP Sfamily, SEXP SpriorCoef, SEXP SpriorGr
     }
   } else { nuncens = INTEGER(Sn)[0]; }
 
-  set_marginalPars(&pars, INTEGER(Sfamily), INTEGER(Sn), &nuncens, INTEGER(Sp), REAL(Sy), INTEGER(Suncens),
-                   REAL(Ssumy2), REAL(Ssumy), REAL(Ssumlogyfact), REAL(Sx), REAL(Scolsumsx), XtX, REAL(SytX),
-                   INTEGER(Smethod), INTEGER(Sadjoverdisp), INTEGER(Shesstype), INTEGER(SoptimMethod),
-                   INTEGER(Soptim_maxit), &usethinit, thinit, INTEGER(SB), REAL(Salpha), REAL(Slambda),
-                   INTEGER(Sknownphi), REAL(Sphi), REAL(Stau), REAL(Staugroup), REAL(Staualpha), REAL(Sfixatanhalpha),
-                   INTEGER(Sr), REAL(SprDeltap), REAL(SparprDeltap), REAL(SprConstrp), REAL(SparprConstrp), &logscale,
-                   &offset, INTEGER(Sgroups), isgroup, INTEGER(Sngroups), &ngroupsconstr, INTEGER(Snvaringroup),
-                   nconstraints, ninvconstraints, XtXuncens, ytXuncens);
+  set_marginalPars(&pars,
+                   INTEGER(Sfamily),
+                   INTEGER(Sn),
+                   &nuncens,
+                   INTEGER(Sp),
+                   REAL(Sy),
+                   INTEGER(Suncens),
+                   REAL(Ssumy2),
+                   REAL(Ssumy),
+                   REAL(Ssumlogyfact),
+                   REAL(Sx),
+                   REAL(Scolsumsx),
+                   XtX,
+                   REAL(SytX),
+                   INTEGER(Smethod),
+                   INTEGER(Sadjoverdisp),
+                   INTEGER(Shesstype),
+                   INTEGER(SoptimMethod),
+                   INTEGER(Soptim_maxit),
+                   &usethinit,
+                   thinit,
+                   INTEGER(SB),
+                   REAL(Salpha),
+                   REAL(Slambda),
+                   INTEGER(Sknownphi),
+                   REAL(Sphi),
+                   REAL(Stau),
+                   REAL(Staugroup),
+                   REAL(Staualpha),
+                   REAL(Sfixatanhalpha),
+                   INTEGER(Sr),
+                   REAL(SprDeltap),
+                   REAL(SparprDeltap),
+                   REAL(SprConstrp),
+                   REAL(SparprConstrp),
+                   &logscale,
+                   &offset,
+                   INTEGER(Sgroups),
+                   isgroup,
+                   INTEGER(Sngroups),
+                   &ngroupsconstr,
+                   INTEGER(Snvaringroup),
+                   nconstraints,
+                   ninvconstraints,
+                   XtXuncens,
+                   ytXuncens);
 
   priorcode      = mspriorCode(INTEGER(SpriorCoef), INTEGER(SpriorGroup), &pars);
   pars.priorcode = &priorcode;
 
-  greedyVarSelC(postMode, postModeProb, INTEGER(SpriorDelta), INTEGER(SpriorConstr), INTEGER(Sniter),
-                INTEGER(Sndeltaini), INTEGER(Sdeltaini), INTEGER(Sincludevars), &constraints, &invconstraints,
-                INTEGER(Sverbose), &pars);
+  greedyVarSelC(postMode,
+                postModeProb,
+                INTEGER(SpriorDelta),
+                INTEGER(SpriorConstr),
+                INTEGER(Sniter),
+                INTEGER(Sndeltaini),
+                INTEGER(Sdeltaini),
+                INTEGER(Sincludevars),
+                &constraints,
+                &invconstraints,
+                INTEGER(Sverbose),
+                &pars);
 
   free_dvector(thinit, 0, mycols + 1);
   free_ivector(isgroup, 0, INTEGER(Sp)[0]);
@@ -2139,7 +2384,7 @@ void greedyVarSelC(int *postMode, double *postModeProb, int *prDelta, int *prCon
             nchanges++;
             for (l = 0; l < nvaringroup[k]; l++) {
               postMode[firstingroup[k] + l] = 1;
-              nselnew += nvaringroup[k];
+              nselnew                       += nvaringroup[k];
             }
           }
         }
@@ -2483,12 +2728,12 @@ double gmompenalty_approx(bool momsingle, bool momgroup, double *thopt, double *
 
       trgroup = th2group = 0;
       for (i = 1; i <= ningroup; i++) {
-        Sij = getelem_Sinv(groupid, i, i, Sinv, cholSini, ningroup);
-        trgroup += Sij * Hinv[idx + i][idx + i];
+        Sij      = getelem_Sinv(groupid, i, i, Sinv, cholSini, ningroup);
+        trgroup  += Sij * Hinv[idx + i][idx + i];
         th2group += thopt[idx + i - 1] * thopt[idx + i - 1] * Sij;
         for (j = i + 1; j <= ningroup; j++) {
-          Sij = getelem_Sinv(groupid, i, j, Sinv, cholSini, ningroup);
-          trgroup += 2.0 * Sij * Hinv[idx + j][idx + i]; //Sinv[i][j] * Hinv[j][i]
+          Sij      = getelem_Sinv(groupid, i, j, Sinv, cholSini, ningroup);
+          trgroup  += 2.0 * Sij * Hinv[idx + j][idx + i]; //Sinv[i][j] * Hinv[j][i]
           th2group += 2.0 * thopt[idx + i - 1] * thopt[idx + j - 1] * Sij;
         }
       }
@@ -2586,8 +2831,11 @@ double betabinPrior(int *sel, int *nsel, struct marginalPars *pars) {
   nselConstraints(&ngroups0, &ngroups1, sel, nsel, (*pars).groups, (*pars).nconstraints, (*pars).nvaringroup);
   ans = bbPrior(ngroups0, *(*pars).ngroups - *(*pars).ngroupsconstr, (*pars).parprDeltap[0], (*pars).parprDeltap[1], 1);
   if ((*(*pars).ngroupsconstr) > 0)
-    ans += bbPrior(ngroups1, *(*pars).ngroupsconstr, (*pars).parprConstrp[0],
-                   (*pars).parprConstrp[1], 1);
+    ans += bbPrior(ngroups1,
+                   *(*pars).ngroupsconstr,
+                   (*pars).parprConstrp[0],
+                   (*pars).parprConstrp[1],
+                   1);
   return ans;
   //return bbPrior(*nsel, *(*pars).p, (*pars).parprDeltap[0], (*pars).parprDeltap[1],1);
 }
@@ -2598,8 +2846,11 @@ double betabinPriorTP(int *sel, int *nsel, struct marginalPars *pars) {
   nselConstraints(&ngroups0, &ngroups1, sel, &nselminus, (*pars).groups, (*pars).nconstraints, (*pars).nvaringroup);
   ans = bbPrior(ngroups0, *(*pars).ngroups - *(*pars).ngroupsconstr, (*pars).parprDeltap[0], (*pars).parprDeltap[1], 1);
   if ((*(*pars).ngroupsconstr) > 0)
-    ans += bbPrior(ngroups1, *(*pars).ngroupsconstr, (*pars).parprConstrp[0],
-                   (*pars).parprConstrp[1], 1);
+    ans += bbPrior(ngroups1,
+                   *(*pars).ngroupsconstr,
+                   (*pars).parprConstrp[0],
+                   (*pars).parprConstrp[1],
+                   1);
   return ans - 2.0 * log(2.0);
   //return bbPrior(*nsel -1, *(*pars).p, (*pars).parprDeltap[0], (*pars).parprDeltap[1], 1) - 2.0*log(2.0);
 }
@@ -2794,7 +3045,7 @@ void gzell_Sinv(double *Sinv, double *cholSinv, double *ldetSinv, int *ngroups, 
     if ((!orthoapprox) || (groupsize > 1)) {
       for (j = 0, l = 0, k = 0; j < groupsize * (groupsize + 1) / 2; j++) {
         (*(cholSinv + Sidxini + j)) *= sqrtct;
-        Sinv[Sidxini + j] = ct * XtX->at(sel[firstingroup + l], sel[firstingroup + k]);
+        Sinv[Sidxini + j]           = ct * XtX->at(sel[firstingroup + l], sel[firstingroup + k]);
         if (l < groupsize - 1) { l++; } else {
           k++;
           l = k;
@@ -2878,7 +3129,7 @@ void gzell_Sinv_byprior(double *Sinv, double *cholSinv, double *ldetSinv, int *n
 
       for (j = 0, l = 0, k = 0; j < groupsize * (groupsize + 1) / 2; j++) {
         (*(cholSinv + Sidxini + j)) *= sqrtct;
-        Sinv[Sidxini + j] = ct * XtX->at(sel[firstingroup + l], sel[firstingroup + k]);
+        Sinv[Sidxini + j]           = ct * XtX->at(sel[firstingroup + l], sel[firstingroup + k]);
         if (l < groupsize - 1) { l++; } else {
           k++;
           l = k;
@@ -2925,8 +3176,8 @@ void cholSini_indexes(double *cholSini, int *cholSsize, int ngroups, double *nva
   int i, groupsize, nelem;
   cholSini[0] = (*cholSsize) = 0;
   for (i = 0; i < ngroups; i++) {
-    groupsize = (int) (nvaringroups[i] + .1);
-    nelem     = groupsize * (groupsize + 1) / 2;
+    groupsize    = (int) (nvaringroups[i] + .1);
+    nelem        = groupsize * (groupsize + 1) / 2;
     (*cholSsize) += nelem;
     if (i < ngroups - 1) cholSini[i + 1] = cholSini[i] + nelem;
   }
@@ -2941,8 +3192,15 @@ void cholSini_indexes(double *cholSini, int *cholSsize, int ngroups, double *nva
 //Evaluate negative log-likelihood + log-prior (pMOM + group Zellner) and initialize funargs
 void pmomgzell_log(double *f, double *th, int *sel, int *thlength, struct marginalPars *pars,
                    std::map<string, double *> *funargs) {
-  dmomgzell(f, th, (*pars).tau, (*funargs)["nvarinselgroups"], (*funargs)["nselgroups"], (*funargs)["ldetSinv"],
-            (*funargs)["cholSinv"], (*funargs)["cholSini"], true);
+  dmomgzell(f,
+            th,
+            (*pars).tau,
+            (*funargs)["nvarinselgroups"],
+            (*funargs)["nselgroups"],
+            (*funargs)["ldetSinv"],
+            (*funargs)["cholSinv"],
+            (*funargs)["cholSini"],
+            true);
   (*f) = -(*f);
 }
 
@@ -2961,7 +3219,7 @@ void pmomgzell_grad(double *priorgrad, int j, double *th, int *sel, int *thlengt
     jingroup = j - firstingroup;
     jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
     for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-      ll = idxini + l * ningroup - l * (l - 1) / 2;
+      ll           = idxini + l * ningroup - l * (l - 1) / 2;
       (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
     } //Sinv[jingroup,] %*% th
     for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -2985,7 +3243,7 @@ void pmomgzell_gradhess(double *priorgrad, double *priorhess, int j, double *th,
     jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
     (*priorhess) = Sinv[jj];
     for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-      ll = idxini + l * ningroup - l * (l - 1) / 2;
+      ll           = idxini + l * ningroup - l * (l - 1) / 2;
       (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
     } //Sinv[jingroup,] %*% th
     for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3032,8 +3290,15 @@ void pmomgzell_hess(double **hess, double *th, int *sel, int *thlength, struct m
 //Evaluate negative log-likelihood + log-prior (peMOM + group Zellner) and initialize funargs
 void pemomgzell_log(double *f, double *th, int *sel, int *thlength, struct marginalPars *pars,
                     std::map<string, double *> *funargs) {
-  demomgzell(f, th, (*pars).tau, (*funargs)["nvarinselgroups"], (*funargs)["nselgroups"], (*funargs)["ldetSinv"],
-             (*funargs)["cholSinv"], (*funargs)["cholSini"], true);
+  demomgzell(f,
+             th,
+             (*pars).tau,
+             (*funargs)["nvarinselgroups"],
+             (*funargs)["nselgroups"],
+             (*funargs)["ldetSinv"],
+             (*funargs)["cholSinv"],
+             (*funargs)["cholSini"],
+             true);
   (*f) = -(*f);
 }
 
@@ -3055,7 +3320,7 @@ void pemomgzell_gradhess(double *priorgrad, double *priorhess, int j, double *th
     jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
     (*priorhess) = Sinv[jj];
     for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-      ll = idxini + l * ningroup - l * (l - 1) / 2;
+      ll           = idxini + l * ningroup - l * (l - 1) / 2;
       (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
     } //Sinv[jingroup,] %*% th
     for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3078,7 +3343,7 @@ void pemomgzell_grad(double *priorgrad, int j, double *th, int *sel, int *thleng
     jingroup = j - firstingroup;
     jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
     for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-      ll = idxini + l * ningroup - l * (l - 1) / 2;
+      ll           = idxini + l * ningroup - l * (l - 1) / 2;
       (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
     } //Sinv[jingroup,] %*% th
     for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3124,8 +3389,14 @@ void pemomgzell_hess(double **hess, double *th, int *sel, int *thlength, struct 
 //Evaluate negative log-likelihood + log-prior (group Zellner + group Zellner) and initialize funargs
 void gzellgzell_log(double *f, double *th, int *sel, int *thlength, struct marginalPars *pars,
                     std::map<string, double *> *funargs) {
-  dgzellgzell(f, th, (*funargs)["nvarinselgroups"], (*funargs)["nselgroups"], (*funargs)["ldetSinv"],
-              (*funargs)["cholSinv"], (*funargs)["cholSini"], true);
+  dgzellgzell(f,
+              th,
+              (*funargs)["nvarinselgroups"],
+              (*funargs)["nselgroups"],
+              (*funargs)["ldetSinv"],
+              (*funargs)["cholSinv"],
+              (*funargs)["cholSini"],
+              true);
   (*f) = -(*f);
 }
 
@@ -3142,7 +3413,7 @@ void gzellgzell_gradhess(double *priorgrad, double *priorhess, int j, double *th
   jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
   (*priorhess) = Sinv[jj];
   for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-    ll = idxini + l * ningroup - l * (l - 1) / 2;
+    ll           = idxini + l * ningroup - l * (l - 1) / 2;
     (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
   } //Sinv[jingroup,] %*% th
   for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3159,7 +3430,7 @@ void gzellgzell_grad(double *priorgrad, int j, double *th, int *sel, int *thleng
   jingroup = j - firstingroup;
   jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
   for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-    ll = idxini + l * ningroup - l * (l - 1) / 2;
+    ll           = idxini + l * ningroup - l * (l - 1) / 2;
     (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
   } //Sinv[jingroup,] %*% th
   for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3229,7 +3500,7 @@ void pmomgzellig_gradhess(double *priorgrad, double *priorhess, int j, double *t
       jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
       (*priorhess) = -Sinv[jj];
       for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-        ll = idxini + l * ningroup - l * (l - 1) / 2;
+        ll           = idxini + l * ningroup - l * (l - 1) / 2;
         (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
       } //Sinv[jingroup,] %*% th
       for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3261,7 +3532,7 @@ void pmomgzellig_grad(double *priorgrad, int j, double *th, int *sel, int *thlen
       jingroup = j - firstingroup;
       jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
       for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-        ll = idxini + l * ningroup - l * (l - 1) / 2;
+        ll           = idxini + l * ningroup - l * (l - 1) / 2;
         (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
       } //Sinv[jingroup,] %*% th
       for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3331,7 +3602,7 @@ void pemomgzellig_gradhess(double *priorgrad, double *priorhess, int j, double *
       jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
       (*priorhess) = -Sinv[jj];
       for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-        ll = idxini + l * ningroup - l * (l - 1) / 2;
+        ll           = idxini + l * ningroup - l * (l - 1) / 2;
         (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
       } //Sinv[jingroup,] %*% th
       for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3361,7 +3632,7 @@ void pemomgzellig_grad(double *priorgrad, int j, double *th, int *sel, int *thle
       jingroup = j - firstingroup;
       jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
       for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-        ll = idxini + l * ningroup - l * (l - 1) / 2;
+        ll           = idxini + l * ningroup - l * (l - 1) / 2;
         (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
       } //Sinv[jingroup,] %*% th
       for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3426,7 +3697,7 @@ void gzellgzellig_gradhess(double *priorgrad, double *priorhess, int j, double *
     jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
     (*priorhess) = -Sinv[jj];
     for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-      ll = idxini + l * ningroup - l * (l - 1) / 2;
+      ll           = idxini + l * ningroup - l * (l - 1) / 2;
       (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
     } //Sinv[jingroup,] %*% th
     for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3452,7 +3723,7 @@ void gzellgzellig_grad(double *priorgrad, int j, double *th, int *sel, int *thle
     jingroup = j - firstingroup;
     jj = idxini + jingroup * ningroup - jingroup * (jingroup - 1) / 2;
     for (l = 0, (*priorgrad) = 0; l < jingroup; l++) {
-      ll = idxini + l * ningroup - l * (l - 1) / 2;
+      ll           = idxini + l * ningroup - l * (l - 1) / 2;
       (*priorgrad) += Sinv[ll + jingroup - l] * th[firstingroup + l];
     } //Sinv[jingroup,] %*% th
     for (l = jingroup; l < ningroup; l++) { (*priorgrad) += Sinv[jj + l - jingroup] * th[firstingroup + l]; }
@@ -3531,7 +3802,7 @@ void leastsquares(double *theta, double *phi, double *ypred, double *y, double *
     //MLE for residual variance
     Aselvecx(x, theta + 1, ypred, 0, (*n) - 1, sel, nsel);
     for (i = 0; i < (*n); i++) {
-      e = y[i] - ypred[i];
+      e      = y[i] - ypred[i];
       (*phi) += e * e;
     }
   } else {
@@ -3566,7 +3837,13 @@ double pmomgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
     nvarinselgroups = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     firstingroup    = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     selgroups       = dvector(0, *nsel - 1);
-    findselgroups(nvarinselgroups, firstingroup, &nselgroups, selgroups, sel, nsel, (*pars).nvaringroup,
+    findselgroups(nvarinselgroups,
+                  firstingroup,
+                  &nselgroups,
+                  selgroups,
+                  sel,
+                  nsel,
+                  (*pars).nvaringroup,
                   (*pars).ngroups); //copy subset of nvaringroup into nvarinselgroups
     m         = dvector(1, *nsel);
     S         = dmatrix(1, *nsel, 1, *nsel);
@@ -3583,7 +3860,7 @@ double pmomgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
       p_i = (int) nvarinselgroups[groupcount];
       if (p_i == 1) {
         Vinv[varcount][varcount] = tauinv;
-        S[varcount][varcount] += tauinv;
+        S[varcount][varcount]    += tauinv;
         varcount++;
         singlevarcount++;
       } else {
@@ -3593,12 +3870,12 @@ double pmomgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
           for (j_var = i_var, j = i; j < p_i; j_var++, j++) {
             if (V0inv->computed_at(groupsel[i], groupsel[j])) {
               Vinv[i_var][j_var] = V0inv->at(groupsel[i], groupsel[j]);
-              S[i_var][j_var] += Vinv[i_var][j_var];
+              S[i_var][j_var]    += Vinv[i_var][j_var];
             } else {
               aux = (*pars).XtX->at(groupsel[i], groupsel[j]) * taugroupinv * p_i;
               V0inv->set(groupsel[i], groupsel[j], aux);
               Vinv[i_var][j_var] = aux;
-              S[i_var][j_var] += aux;
+              S[i_var][j_var]    += aux;
             }
           }
         }
@@ -3658,7 +3935,13 @@ double pmomgmomMarg(int *sel, int *nsel, struct marginalPars *pars) {
     nvarinselgroups = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     firstingroup    = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     selgroups       = dvector(0, *nsel - 1);
-    findselgroups(nvarinselgroups, firstingroup, &nselgroups, selgroups, sel, nsel, (*pars).nvaringroup,
+    findselgroups(nvarinselgroups,
+                  firstingroup,
+                  &nselgroups,
+                  selgroups,
+                  sel,
+                  nsel,
+                  (*pars).nvaringroup,
                   (*pars).ngroups); //copy subset of nvaringroup into nvarinselgroups
     free_dvector(firstingroup, 0, min_xy(*nsel, *((*pars).ngroups)));
     free_dvector(selgroups, 0, *nsel - 1);
@@ -3677,7 +3960,7 @@ double pmomgmomMarg(int *sel, int *nsel, struct marginalPars *pars) {
       p_i = (int) nvarinselgroups[groupcount];
       if (p_i == 1) {
         Vinv[varcount][varcount] = tauinv;
-        S[varcount][varcount] += tauinv;
+        S[varcount][varcount]    += tauinv;
         varcount++;
         singlevarcount++;
       } else {
@@ -3687,12 +3970,12 @@ double pmomgmomMarg(int *sel, int *nsel, struct marginalPars *pars) {
           for (j_var = i_var, j = i; j < p_i; j_var++, j++) {
             if (V0inv->computed_at(groupsel[i], groupsel[j])) {
               Vinv[i_var][j_var] = V0inv->at(groupsel[i], groupsel[j]);
-              S[i_var][j_var] += Vinv[i_var][j_var];
+              S[i_var][j_var]    += Vinv[i_var][j_var];
             } else {
               aux = (*pars).XtX->at(groupsel[i], groupsel[j]) * taugroupinv * (p_i + 2);
               V0inv->set(groupsel[i], groupsel[j], aux);
               Vinv[i_var][j_var] = aux;
-              S[i_var][j_var] += aux;
+              S[i_var][j_var]    += aux;
             }
           }
         }
@@ -3728,15 +4011,15 @@ double pmomgmomMarg(int *sel, int *nsel, struct marginalPars *pars) {
         mj    = dvector(1, p_i);
         for (i = 1, i_var = varcount; i <= p_i; i++, i_var++) {
           Vinvj[i][i] = Vinv[i_var][i_var] / p_i;
-          trSV += Vinvj[i][i] * Sinv[i_var][i_var];
-          mj[i] = m[i_var];
+          trSV        += Vinvj[i][i] * Sinv[i_var][i_var];
+          mj[i]       = m[i_var];
           for (j = i + 1, j_var = i_var + 1; j <= p_i; j++, j_var++) {
             Vinvj[i][j] = Vinv[i_var][j_var] / p_i;
-            trSV += 2 * Vinvj[i][j] * Sinv[i_var][j_var];
+            trSV        += 2 * Vinvj[i][j] * Sinv[i_var][j_var];
           }
         }
-        aux = quadratic_xtAx(mj, Vinvj, 1, p_i);
-        ans += log(trSV + aux / term1);
+        aux      = quadratic_xtAx(mj, Vinvj, 1, p_i);
+        ans      += log(trSV + aux / term1);
         varcount = varcount + p_i;
         free_dmatrix(Vinvj, 1, p_i, 1, p_i);
         free_dvector(mj, 1, p_i);
@@ -3781,7 +4064,13 @@ double zellgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
     nvarinselgroups = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     firstingroup    = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     selgroups       = dvector(0, *nsel - 1);
-    findselgroups(nvarinselgroups, firstingroup, &nselgroups, selgroups, sel, nsel, (*pars).nvaringroup,
+    findselgroups(nvarinselgroups,
+                  firstingroup,
+                  &nselgroups,
+                  selgroups,
+                  sel,
+                  nsel,
+                  (*pars).nvaringroup,
                   (*pars).ngroups); //copy subset of nvaringroup into nvarinselgroups
     free_dvector(selgroups, 0, *nsel - 1);
     m         = dvector(1, *nsel);
@@ -3803,12 +4092,12 @@ double zellgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
             j_var = firstingroup[j_group] + 1;
             if (V0inv->computed_at(sel[varcount - 1], sel[j_var - 1])) {
               Vinv[varcount][j_var] = V0inv->at(sel[varcount - 1], sel[j_var - 1]);
-              S[varcount][j_var] += Vinv[varcount][j_var];
+              S[varcount][j_var]    += Vinv[varcount][j_var];
             } else {
               aux = (*pars).XtX->at(sel[varcount - 1], sel[j_var - 1]) / tau;
               V0inv->set(sel[varcount - 1], sel[j_var - 1], aux);
               Vinv[varcount][j_var] = aux;
-              S[varcount][j_var] += aux;
+              S[varcount][j_var]    += aux;
             }
           }
         }
@@ -3821,12 +4110,12 @@ double zellgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
           for (j_var = i_var, j = i; j < p_i; j_var++, j++) {
             if (V0inv->computed_at(groupsel[i], groupsel[j])) {
               Vinv[i_var][j_var] = V0inv->at(groupsel[i], groupsel[j]);
-              S[i_var][j_var] += Vinv[i_var][j_var];
+              S[i_var][j_var]    += Vinv[i_var][j_var];
             } else {
               aux = (*pars).XtX->at(groupsel[i], groupsel[j]) / taugroup * p_i;
               V0inv->set(groupsel[i], groupsel[j], aux);
               Vinv[i_var][j_var] = aux;
-              S[i_var][j_var] += aux;
+              S[i_var][j_var]    += aux;
             }
           }
         }
@@ -3878,7 +4167,13 @@ double normidgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
     nvarinselgroups = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     firstingroup    = dvector(0, min_xy(*nsel, *((*pars).ngroups)));
     selgroups       = dvector(0, *nsel - 1);
-    findselgroups(nvarinselgroups, firstingroup, &nselgroups, selgroups, sel, nsel, (*pars).nvaringroup,
+    findselgroups(nvarinselgroups,
+                  firstingroup,
+                  &nselgroups,
+                  selgroups,
+                  sel,
+                  nsel,
+                  (*pars).nvaringroup,
                   (*pars).ngroups); //copy subset of nvaringroup into nvarinselgroups
     free_dvector(firstingroup, 0, min_xy(*nsel, *((*pars).ngroups)));
     free_dvector(selgroups, 0, *nsel - 1);
@@ -3897,7 +4192,7 @@ double normidgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
       p_i = (int) nvarinselgroups[groupcount];
       if (p_i == 1) {
         Vinv[varcount][varcount] = tauinv;
-        S[varcount][varcount] += tauinv;
+        S[varcount][varcount]    += tauinv;
         varcount++;
         singlevarcount++;
       } else {
@@ -3907,12 +4202,12 @@ double normidgzellMarg(int *sel, int *nsel, struct marginalPars *pars) {
           for (j_var = i_var, j = i; j < p_i; j_var++, j++) {
             if (V0inv->computed_at(groupsel[i], groupsel[j])) {
               Vinv[i_var][j_var] = V0inv->at(groupsel[i], groupsel[j]);
-              S[i_var][j_var] += Vinv[i_var][j_var];
+              S[i_var][j_var]    += Vinv[i_var][j_var];
             } else {
               aux = (*pars).XtX->at(groupsel[i], groupsel[j]) * taugroupinv * p_i;
               V0inv->set(groupsel[i], groupsel[j], aux);
               Vinv[i_var][j_var] = aux;
-              S[i_var][j_var] += aux;
+              S[i_var][j_var]    += aux;
             }
           }
         }
@@ -4140,9 +4435,28 @@ double nlpMargAlapl(int *sel, int *nsel, struct marginalPars *pars, int *prior, 
   hess   = dmatrix(1, p + fixedalpha, 1, p + fixedalpha);
   ypred  = dvector(0, n - 1);
 
-  postmodeAlaplCDA(thmode, &fmode, hess, sel, nsel, (*pars).n, (*pars).p, (*pars).y, (*pars).x, (*pars).XtX,
-                   (*pars).ytX, &maxit, &ftol, &thtol, &taulapl, (*pars).taualpha, (*pars).fixatanhalpha, (*pars).alpha,
-                   &lambdalapl, prior, hesstype, symmetric);
+  postmodeAlaplCDA(thmode,
+                   &fmode,
+                   hess,
+                   sel,
+                   nsel,
+                   (*pars).n,
+                   (*pars).p,
+                   (*pars).y,
+                   (*pars).x,
+                   (*pars).XtX,
+                   (*pars).ytX,
+                   &maxit,
+                   &ftol,
+                   &thtol,
+                   &taulapl,
+                   (*pars).taualpha,
+                   (*pars).fixatanhalpha,
+                   (*pars).alpha,
+                   &lambdalapl,
+                   prior,
+                   hesstype,
+                   symmetric);
 
   int method = *((*pars).method);
   if ((method != 0) & (method != 1)) method = 0; //If unrecognized method, set to Laplace
@@ -4194,11 +4508,25 @@ double nlpMargAlapl(int *sel, int *nsel, struct marginalPars *pars, int *prior, 
     for (i = 1; i <= (*(*pars).B); i++) {
       rmvtC(thsim, p, thmode, cholV, nu);
       if ((*symmetric == 0) & (fixedalpha == 1)) { thsim[p + 1] = *((*pars).fixatanhalpha); }
-      fnegAlapl(&term1, ypred, thsim, sel, nsel, (*pars).n, (*pars).y, (*pars).x, &taulapl, (*pars).taualpha,
-                (*pars).alpha, &lambdalapl, prior, true, symmetric, fixedalpha);
+      fnegAlapl(&term1,
+                ypred,
+                thsim,
+                sel,
+                nsel,
+                (*pars).n,
+                (*pars).y,
+                (*pars).x,
+                &taulapl,
+                (*pars).taualpha,
+                (*pars).alpha,
+                &lambdalapl,
+                prior,
+                true,
+                symmetric,
+                fixedalpha);
       term1 -= thsim[*nsel + 1];
       term2 = -dmvtC(thsim, p, thmode, cholVinv, detVinv, nu, 1);
-      ans += exp(-term1 + fmode + term2);
+      ans   += exp(-term1 + fmode + term2);
     }
     ans = log(ans / ((*(*pars).B) + .0)) - fmode;
 
@@ -4293,19 +4621,63 @@ void postmodeAlaplCDA(double *thmode, double *fmode, double **hess, int *sel, in
 
   it  = 1;
   err = ferr = 1;
-  fnegAlapl(fmode, ypred, thmode, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior, true, symmetric,
+  fnegAlapl(fmode,
+            ypred,
+            thmode,
+            sel,
+            nsel,
+            n,
+            y,
+            x,
+            tau,
+            taualpha,
+            alphaphi,
+            lambdaphi,
+            prior,
+            true,
+            symmetric,
             fixedalpha);
   (*fmode) -= thmode[*nsel + 1];
 
   while ((err > *thtol) & (it < (*maxit)) & (ferr > *ftol)) {
     err = ferr = 0;
     for (j = 1; j <= p; j++) {
-      fpnegAlaplUniv(j, &g, &H, thmode, ypred, sel, nsel, n, pvar, y, x, XtX, tau, taualpha, alphaphi, lambdaphi, prior,
+      fpnegAlaplUniv(j,
+                     &g,
+                     &H,
+                     thmode,
+                     ypred,
+                     sel,
+                     nsel,
+                     n,
+                     pvar,
+                     y,
+                     x,
+                     XtX,
+                     tau,
+                     taualpha,
+                     alphaphi,
+                     lambdaphi,
+                     prior,
                      symmetric); //gradient and hessian
       if (j == *nsel + 1) g -= 1.0;
       delta    = g / H;
       thnew[j] = thmode[j] - fudgeh[j] * delta;
-      fnegAlapl(&fnew, ypred, thnew, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior, true, symmetric,
+      fnegAlapl(&fnew,
+                ypred,
+                thnew,
+                sel,
+                nsel,
+                n,
+                y,
+                x,
+                tau,
+                taualpha,
+                alphaphi,
+                lambdaphi,
+                prior,
+                true,
+                symmetric,
                 fixedalpha);
       fnew -= thnew[*nsel + 1];
 
@@ -4314,7 +4686,21 @@ void postmodeAlaplCDA(double *thmode, double *fmode, double **hess, int *sel, in
       while ((fnew > *fmode) && (jj < 5)) {
         fudgeh[j] = fudgeh[j] / 2;
         thnew[j]  = thmode[j] - fudgeh[j] * delta;
-        fnegAlapl(&fnew, ypred, thnew, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior, true, symmetric,
+        fnegAlapl(&fnew,
+                  ypred,
+                  thnew,
+                  sel,
+                  nsel,
+                  n,
+                  y,
+                  x,
+                  tau,
+                  taualpha,
+                  alphaphi,
+                  lambdaphi,
+                  prior,
+                  true,
+                  symmetric,
                   fixedalpha);
         fnew -= thnew[*nsel + 1];
         jj++;
@@ -4322,8 +4708,8 @@ void postmodeAlaplCDA(double *thmode, double *fmode, double **hess, int *sel, in
 
       //If new value improves target function, update thmode, fmode
       if (fnew < (*fmode)) {
-        err = max_xy(err, fabs(thmode[j] - thnew[j]));
-        ferr += *fmode - fnew;
+        err       = max_xy(err, fabs(thmode[j] - thnew[j]));
+        ferr      += *fmode - fnew;
         thmode[j] = thnew[j];
         (*fmode)  = fnew;
       } else {
@@ -4335,7 +4721,22 @@ void postmodeAlaplCDA(double *thmode, double *fmode, double **hess, int *sel, in
     it++;
   }
 
-  fppnegAlapl(hess, thmode, ypred, sel, nsel, n, pvar, y, x, XtX, tau, taualpha, alphaphi, lambdaphi, prior, symmetric,
+  fppnegAlapl(hess,
+              thmode,
+              ypred,
+              sel,
+              nsel,
+              n,
+              pvar,
+              y,
+              x,
+              XtX,
+              tau,
+              taualpha,
+              alphaphi,
+              lambdaphi,
+              prior,
+              symmetric,
               hesstype); //Hessian
 
   thmode[*nsel + 1] = exp(thmode[*nsel + 1]);
@@ -4544,12 +4945,18 @@ void fnegAlapl(double *ans, double *ypred, double *th, int *sel, int *nsel, int 
             dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
       } else {
         (*ans) += -dmom(th[*nsel + 2], 0.0, *taualpha, 1.0, 1, 1) - dinvgammaC(
-          scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+          scale,
+          0.5 * (*alphaphi),
+          0.5 * (*lambdaphi),
+          1);
       }
     } else {
       if ((*nsel) > 0) {
         (*ans) += -dmomvec(th + 1, *nsel, 0.0, *tau, scale, 1, 1) - dinvgammaC(
-          scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+          scale,
+          0.5 * (*alphaphi),
+          0.5 * (*lambdaphi),
+          1);
       } else {
         (*ans) += -dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
       }
@@ -4561,12 +4968,18 @@ void fnegAlapl(double *ans, double *ypred, double *th, int *sel, int *nsel, int 
             dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
       } else {
         (*ans) += -dimom(th[*nsel + 2], 0.0, *taualpha, 1.0, 1) - dinvgammaC(
-          scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+          scale,
+          0.5 * (*alphaphi),
+          0.5 * (*lambdaphi),
+          1);
       }
     } else {
       if ((*nsel) > 0) {
         (*ans) += -dimomvec(th + 1, *nsel, 0.0, *tau, scale, 1) - dinvgammaC(
-          scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+          scale,
+          0.5 * (*alphaphi),
+          0.5 * (*lambdaphi),
+          1);
       } else {
         (*ans) += -dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
       }
@@ -4575,7 +4988,10 @@ void fnegAlapl(double *ans, double *ypred, double *th, int *sel, int *nsel, int 
     if ((*symmetric == 0) & (fixedalpha == 0)) {
       if ((*nsel) > 0) {
         (*ans) += -demomvec(th + 1, *nsel, *tau, scale, 1) - demom(th[*nsel + 2], *taualpha, 1.0, 1) - dinvgammaC(
-          scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+          scale,
+          0.5 * (*alphaphi),
+          0.5 * (*lambdaphi),
+          1);
       } else {
         (*ans) += -demom(th[*nsel + 2], *taualpha, 1.0, 1) -
             dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
@@ -4658,7 +5074,7 @@ void fpnegAlaplUniv(int j, double *g, double *H, double *th, double *ypred, int 
       gprior = demomgraduniv(th + j, th + (*nsel) + 1, tau);
     } else if (j == (*nsel) + 1) {
       for (i = 1, sumth2 = 0, suminvth2 = 0; i <= (*nsel); i++) {
-        sumth2 += th[i] * th[i];
+        sumth2    += th[i] * th[i];
         suminvth2 += 1.0 / (th[i] * th[i]);
       }
       gprior = -0.5 * (*nsel) - 0.5 * (*alphaphi) - 1.0 + 0.5 * (sumth2 / (*tau) + *lambdaphi) * exp(-th[*nsel + 1]) -
@@ -4673,7 +5089,7 @@ void fpnegAlaplUniv(int j, double *g, double *H, double *th, double *ypred, int 
       hprior = demomhessuniv(th + j, th + (*nsel) + 1, tau);
     } else if (j == (*nsel) + 1) {
       for (i = 1, sumth2 = 0, suminvth2 = 0; i <= (*nsel); i++) {
-        sumth2 += pow(th[i], 2.0);
+        sumth2    += pow(th[i], 2.0);
         suminvth2 += pow(1.0 / th[i], 2.0);
       }
       hprior = -0.5 * (*nsel) - 0.5 * (*alphaphi) - 1.0 + 0.5 * (sumth2 / (*tau) + (*lambdaphi)) * exp(-th[*nsel + 1]) -
@@ -4839,20 +5255,20 @@ void loglnegHessAlapl(double **H, double *th, int *nsel, int *sel, int *n, int *
     for (i = 0; i < *n; i++) {
       y0[i] = y[i] - ypred[i];
       if (y[i] < ypred[i]) {
-        wy0 -= w1 * y0[i];
-        sumwsy0 -= ws1 * y0[i];
+        wy0        -= w1 * y0[i];
+        sumwsy0    -= ws1 * y0[i];
         sumwsbary0 -= wsbar1 * y0[i];
         for (j = 0; j < *nsel; j++) {
           Xtwbar[j] += w1 * x[sel[j] * (*n) + i];
-          Xtws[j] += ws1 * x[sel[j] * (*n) + i];
+          Xtws[j]   += ws1 * x[sel[j] * (*n) + i];
         }
       } else {
-        wy0 += w2 * y0[i];
-        sumwsy0 += ws2 * y0[i];
+        wy0        += w2 * y0[i];
+        sumwsy0    += ws2 * y0[i];
         sumwsbary0 += wsbar2 * y0[i];
         for (j = 0; j < *nsel; j++) {
           Xtwbar[j] -= w2 * x[sel[j] * (*n) + i];
-          Xtws[j] += ws2 * x[sel[j] * (*n) + i];
+          Xtws[j]   += ws2 * x[sel[j] * (*n) + i];
         }
       }
     }
@@ -4966,9 +5382,9 @@ void quadapproxALaplace(double *hdiag, double **H, int *nsel, int *sel, int *n, 
           if (e[i] < 0) { fl[k] -= e[i]; } else { fl[k] += e[i]; }
         }
       }
-      l2 = l[k] * l[k];
-      suml2 += l2 * (fl[k] - f0);
-      suml4 += l2 * l2;
+      l2       = l[k] * l[k];
+      suml2    += l2 * (fl[k] - f0);
+      suml4    += l2 * l2;
       hdiag[j] = ct * suml2 / suml4;
     }
   }
@@ -5020,13 +5436,45 @@ double nlpMargSkewNorm(int *sel, int *nsel, struct marginalPars *pars, int *prio
 
   if ((*symmetric == 1) | (*((*pars).optimMethod) != 1)) {
     //Coordinate Descent Algorithm
-    postmodeSkewNormCDA(thmode, &fmode, hess, sel, nsel, (*pars).n, (*pars).p, (*pars).y, (*pars).x, (*pars).XtX,
-                        (*pars).ytX, &maxit, &ftol, &thtol, (*pars).tau, (*pars).taualpha, (*pars).alpha,
-                        (*pars).lambda, prior, symmetric);
+    postmodeSkewNormCDA(thmode,
+                        &fmode,
+                        hess,
+                        sel,
+                        nsel,
+                        (*pars).n,
+                        (*pars).p,
+                        (*pars).y,
+                        (*pars).x,
+                        (*pars).XtX,
+                        (*pars).ytX,
+                        &maxit,
+                        &ftol,
+                        &thtol,
+                        (*pars).tau,
+                        (*pars).taualpha,
+                        (*pars).alpha,
+                        (*pars).lambda,
+                        prior,
+                        symmetric);
   } else {
     //LMA (modified Newton-Raphson)
-    postmodeSkewNorm(thmode, &fmode, hess, sel, nsel, (*pars).n, (*pars).p, (*pars).y, (*pars).x, (*pars).XtX,
-                     (*pars).ytX, &maxit, (*pars).tau, (*pars).taualpha, (*pars).alpha, (*pars).lambda, &initmle,
+    postmodeSkewNorm(thmode,
+                     &fmode,
+                     hess,
+                     sel,
+                     nsel,
+                     (*pars).n,
+                     (*pars).p,
+                     (*pars).y,
+                     (*pars).x,
+                     (*pars).XtX,
+                     (*pars).ytX,
+                     &maxit,
+                     (*pars).tau,
+                     (*pars).taualpha,
+                     (*pars).alpha,
+                     (*pars).lambda,
+                     &initmle,
                      prior);
   }
 
@@ -5076,11 +5524,25 @@ double nlpMargSkewNorm(int *sel, int *nsel, struct marginalPars *pars, int *prio
     ans = 0;
     for (i = 1; i <= (*(*pars).B); i++) {
       rmvtC(thsim, p, thmode, cholV, nu);
-      fnegSkewnorm(&term1, ypred, thsim, sel, nsel, (*pars).n, (*pars).y, (*pars).x, (*pars).XtX, (*pars).tau,
-                   (*pars).taualpha, (*pars).alpha, (*pars).lambda, prior, true, symmetric);
+      fnegSkewnorm(&term1,
+                   ypred,
+                   thsim,
+                   sel,
+                   nsel,
+                   (*pars).n,
+                   (*pars).y,
+                   (*pars).x,
+                   (*pars).XtX,
+                   (*pars).tau,
+                   (*pars).taualpha,
+                   (*pars).alpha,
+                   (*pars).lambda,
+                   prior,
+                   true,
+                   symmetric);
       term1 -= thsim[*nsel + 1];
       term2 = -dmvtC(thsim, p, thmode, cholVinv, detVinv, nu, 1);
-      ans += exp(-term1 + fmode + term2);
+      ans   += exp(-term1 + fmode + term2);
     }
     ans = log(ans / ((*(*pars).B) + .0)) - fmode;
 
@@ -5197,7 +5659,21 @@ void postmodeSkewNorm(double *thmode, double *fmode, double **hess, int *sel, in
         inv_posdef(H, p, Hinv, &posdef);
         Ax(Hinv, g, delta, 1, p, 1, p);
         for (j = 1; j <= p; j++) { thnew[j] = thmode[j] - delta[j]; }
-        fnegSkewnorm(&fnew, ypred, thnew, sel, nsel, n, y, x, XtX, tau, taualpha, alpha, lambda, prior, true,
+        fnegSkewnorm(&fnew,
+                     ypred,
+                     thnew,
+                     sel,
+                     nsel,
+                     n,
+                     y,
+                     x,
+                     XtX,
+                     tau,
+                     taualpha,
+                     alpha,
+                     lambda,
+                     prior,
+                     true,
                      &symmetric);
         fnew -= thnew[p - 1];
         ii++;
@@ -5345,7 +5821,21 @@ void postmodeSkewNormCDA(double *thmode, double *fmode, double **hess, int *sel,
   it  = 1;
   err = ferr = 1;
 
-  fnegSkewnorm(fmode, ypred, thmode, sel, nsel, n, y, x, XtX, tau, taualpha, alphaphi, lambdaphi, prior, true,
+  fnegSkewnorm(fmode,
+               ypred,
+               thmode,
+               sel,
+               nsel,
+               n,
+               y,
+               x,
+               XtX,
+               tau,
+               taualpha,
+               alphaphi,
+               lambdaphi,
+               prior,
+               true,
                symmetric);
   (*fmode) -= thmode[*nsel + 1];
 
@@ -5366,33 +5856,99 @@ void postmodeSkewNormCDA(double *thmode, double *fmode, double **hess, int *sel,
           bb       = (s1 / pow(1 + acur, 2.0) + s2 / pow(1 - acur, 2.0) + sumth2 / (*tau) + *lambdaphi);
           thnew[j] = log(bb / aa);
         } else {
-          fpnegSkewnormUniv(j, &g, thmode, ypred, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior,
+          fpnegSkewnormUniv(j,
+                            &g,
+                            thmode,
+                            ypred,
+                            sel,
+                            nsel,
+                            n,
+                            y,
+                            x,
+                            tau,
+                            taualpha,
+                            alphaphi,
+                            lambdaphi,
+                            prior,
                             symmetric); //gradient
           g -= 1.0;                     //jacobian term from tvartheta=log(tvartheta)
-          fppnegSkewnormUniv(j, &H, thmode, ypred, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior,
+          fppnegSkewnormUniv(j,
+                             &H,
+                             thmode,
+                             ypred,
+                             sel,
+                             nsel,
+                             n,
+                             y,
+                             x,
+                             tau,
+                             taualpha,
+                             alphaphi,
+                             lambdaphi,
+                             prior,
                              symmetric); //Hessian
           delta    = g / H;
           thnew[j] = thmode[j] - delta;
         }
       } else {
         //update for theta, alpha
-        fpnegSkewnormUniv(j, &g, thmode, ypred, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior,
+        fpnegSkewnormUniv(j,
+                          &g,
+                          thmode,
+                          ypred,
+                          sel,
+                          nsel,
+                          n,
+                          y,
+                          x,
+                          tau,
+                          taualpha,
+                          alphaphi,
+                          lambdaphi,
+                          prior,
                           symmetric); //gradient
-        fppnegSkewnormUniv(j, &H, thmode, ypred, sel, nsel, n, y, x, tau, taualpha, alphaphi, lambdaphi, prior,
+        fppnegSkewnormUniv(j,
+                           &H,
+                           thmode,
+                           ypred,
+                           sel,
+                           nsel,
+                           n,
+                           y,
+                           x,
+                           tau,
+                           taualpha,
+                           alphaphi,
+                           lambdaphi,
+                           prior,
                            symmetric); //Hessian
         delta    = g / H;
         thnew[j] = thmode[j] - delta;
       }
 
-      fnegSkewnorm(&fnew, ypred, thnew, sel, nsel, n, y, x, XtX, tau, taualpha, alphaphi, lambdaphi, prior, true,
+      fnegSkewnorm(&fnew,
+                   ypred,
+                   thnew,
+                   sel,
+                   nsel,
+                   n,
+                   y,
+                   x,
+                   XtX,
+                   tau,
+                   taualpha,
+                   alphaphi,
+                   lambdaphi,
+                   prior,
+                   true,
                    symmetric);
       fnew -= thnew[*nsel + 1];
       //If new value improves target function, update thmode, fmode
       if (fnew < (*fmode)) {
         err       = max_xy(err, fabs(thmode[j] - thnew[j]));
         thmode[j] = thnew[j];
-        ferr += *fmode - fnew;
-        (*fmode) = fnew;
+        ferr      += *fmode - fnew;
+        (*fmode)  = fnew;
       } else {
         thnew[j] = thmode[j];
       }
@@ -5434,7 +5990,10 @@ void fnegSkewnorm(double *ans, double *ypred, double *th, int *sel, int *nsel, i
   if ((*prior) == 1) {
     if ((*nsel) > 0) {
       (*ans) += -dmomvec(th + 1, *nsel, 0.0, *tau, scale, 1, 1) - dinvgammaC(
-        scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+        scale,
+        0.5 * (*alphaphi),
+        0.5 * (*lambdaphi),
+        1);
     } else {
       (*ans) += -dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
     }
@@ -5442,7 +6001,10 @@ void fnegSkewnorm(double *ans, double *ypred, double *th, int *sel, int *nsel, i
   } else if ((*prior) == 2) {
     if ((*nsel) > 0) {
       (*ans) += -dimomvec(th + 1, *nsel, 0.0, *tau, scale, 1) - dinvgammaC(
-        scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
+        scale,
+        0.5 * (*alphaphi),
+        0.5 * (*lambdaphi),
+        1);
     } else {
       (*ans) += -dinvgammaC(scale, 0.5 * (*alphaphi), 0.5 * (*lambdaphi), 1);
     }
@@ -5534,7 +6096,7 @@ void fpnegSkewnormUniv(int j, double *g, double *th, double *ypred, int *sel, in
       gprior = demomgraduniv(th + j, th + (*nsel) + 1, tau);
     } else if (j == (*nsel) + 1) {
       for (i = 1, sumth2 = 0, suminvth2 = 0; i <= (*nsel); i++) {
-        sumth2 += th[i] * th[i];
+        sumth2    += th[i] * th[i];
         suminvth2 += 1.0 / (th[i] * th[i]);
       }
       gprior = -0.5 * (*nsel) - 0.5 * (*alphaphi) - 1 + 0.5 * (sumth2 / (*tau) + *lambdaphi) * exp(-th[*nsel + 1]) -
@@ -5638,7 +6200,7 @@ void fppnegSkewnormUniv(int j, double *H, double *th, double *ypred, int *sel, i
       hprior = demomhessuniv(th + j, th + (*nsel) + 1, tau);
     } else if (j == (*nsel) + 1) {
       for (i = 1, sumth2 = 0, suminvth2 = 0; i <= (*nsel); i++) {
-        sumth2 += pow(th[i], 2.0);
+        sumth2    += pow(th[i], 2.0);
         suminvth2 += pow(1.0 / th[i], 2.0);
       }
       hprior = -0.5 * (*nsel) - 0.5 * (*alphaphi) - 1.0 + 0.5 * (sumth2 / (*tau) + (*lambdaphi)) * exp(-th[*nsel + 1]) -
@@ -5831,12 +6393,12 @@ void loglnegHessSkewNorm(double **H, double *th, int *nsel, int *sel, int *n, do
       if (y[i] < ypred[i]) {
         Wy0[i]  = w1 * y0[i];
         Wsy0[i] = ws1 * y0[i];
-        y0Wsy0 += pow(y0[i], 2) * ws1;
+        y0Wsy0  += pow(y0[i], 2) * ws1;
         y0Wssy0 += pow(y0[i], 2) * wss1;
       } else {
         Wy0[i]  = w2 * y0[i];
         Wsy0[i] = ws2 * y0[i];
-        y0Wsy0 += pow(y0[i], 2) * ws2;
+        y0Wsy0  += pow(y0[i], 2) * ws2;
         y0Wssy0 += pow(y0[i], 2) * wss2;
       }
       y0Wy0 += y0[i] * Wy0[i];
@@ -5881,12 +6443,12 @@ void loglnegHessSkewNorm(double **H, double *th, int *nsel, int *sel, int *n, do
       if (y[i] < 0) {
         Wy0[i]  = w1 * y[i];
         Wsy0[i] = ws1 * y[i];
-        y0Wsy0 += pow(y[i], 2) * ws1;
+        y0Wsy0  += pow(y[i], 2) * ws1;
         y0Wssy0 += pow(y[i], 2) * wss1;
       } else {
         Wy0[i]  = w2 * y[i];
         Wsy0[i] = ws2 * y[i];
-        y0Wsy0 += pow(y[i], 2) * ws2;
+        y0Wsy0  += pow(y[i], 2) * ws2;
         y0Wssy0 += pow(y[i], 2) * wss2;
       }
       y0Wy0 += y[i] * Wy0[i];
@@ -5950,12 +6512,12 @@ void loglnegHessSkewNormUniv(int jj, double *H, double *th, int *nsel, int *sel,
       if (y[i] < ypred[i]) {
         Wy0[i]  = w1 * y0[i];
         Wsy0[i] = ws1 * y0[i];
-        y0Wsy0 += pow(y0[i], 2) * ws1;
+        y0Wsy0  += pow(y0[i], 2) * ws1;
         y0Wssy0 += pow(y0[i], 2) * wss1;
       } else {
         Wy0[i]  = w2 * y0[i];
         Wsy0[i] = ws2 * y0[i];
-        y0Wsy0 += pow(y0[i], 2) * ws2;
+        y0Wsy0  += pow(y0[i], 2) * ws2;
         y0Wssy0 += pow(y0[i], 2) * wss2;
       }
       y0Wy0 += y0[i] * Wy0[i];
@@ -5977,12 +6539,12 @@ void loglnegHessSkewNormUniv(int jj, double *H, double *th, int *nsel, int *sel,
       if (y[i] < 0) {
         Wy0[i]  = w1 * y[i];
         Wsy0[i] = ws1 * y[i];
-        y0Wsy0 += pow(y[i], 2) * ws1;
+        y0Wsy0  += pow(y[i], 2) * ws1;
         y0Wssy0 += pow(y[i], 2) * wss1;
       } else {
         Wy0[i]  = w2 * y[i];
         Wsy0[i] = ws2 * y[i];
-        y0Wsy0 += pow(y[i], 2) * ws2;
+        y0Wsy0  += pow(y[i], 2) * ws2;
         y0Wssy0 += pow(y[i], 2) * wss2;
       }
       y0Wy0 += y[i] * Wy0[i];
@@ -6129,8 +6691,14 @@ void mleSkewnorm(double *thmode, double *ypred, int *sel, int *nsel, int *n, int
 //*************************************************************************************
 
 double f2opt_mom(double *th) {
-  return fmomNegC_non0(th + 1, f2opt_pars.m + 1, f2opt_pars.S, f2opt_pars.phi, f2opt_pars.tau, f2opt_pars.r,
-                       f2opt_pars.n, f2opt_pars.nsel);
+  return fmomNegC_non0(th + 1,
+                       f2opt_pars.m + 1,
+                       f2opt_pars.S,
+                       f2opt_pars.phi,
+                       f2opt_pars.tau,
+                       f2opt_pars.r,
+                       f2opt_pars.n,
+                       f2opt_pars.nsel);
 }
 
 //Note: th and m are assumed to be indexed at 0; S indexed at 1
@@ -6140,7 +6708,7 @@ double fmomNegC_non0(double *th, double *m, double **S, double *phi, double *tau
   z = dvector(0, *nsel);
   for (i = 0, sumlogth = 0; i < (*nsel); i++) {
     sumlogth += log(th[i] * th[i]);
-    z[i] = th[i] - m[i];
+    z[i]     = th[i] - m[i];
   }
   ans = .5 * quadratic_xtAx(z - 1, S, 1, *nsel) / (*phi) - (*r + .0) * sumlogth;
   free_dvector(z, 0, *nsel);
@@ -6162,7 +6730,19 @@ void momIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doubl
   XtX   = new crossprodmat(&emptydouble, 0, 0, true);
   Vopt  = dmatrix(1, *nsel, 1, *nsel);
   dirth = dmatrix(1, *nsel, 1, *nsel);
-  set_f2opt_pars(m, S, &emptydouble, XtX, &emptydouble, &emptydouble, &emptydouble, phi, tau, r, n, nsel, &emptyint,
+  set_f2opt_pars(m,
+                 S,
+                 &emptydouble,
+                 XtX,
+                 &emptydouble,
+                 &emptydouble,
+                 &emptydouble,
+                 phi,
+                 tau,
+                 r,
+                 n,
+                 nsel,
+                 &emptyint,
                  nsel);
 
   //Minimization
@@ -6254,11 +6834,47 @@ SEXP pmomMarginalKI(SEXP Ssel, SEXP Snsel, SEXP Sn, SEXP Sp, SEXP Sy, SEXP Ssumy
 
   XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
 
-  set_marginalPars(&pars, &emptyint, INTEGER(Sn), INTEGER(Sn), INTEGER(Sp), REAL(Sy), &emptyint, REAL(Ssumy2),
-                   &emptydouble, &emptydouble, &emptydouble, &emptydouble, XtX, REAL(SytX), INTEGER(Smethod), &emptyint,
-                   &emptyint, &SoptimMethod, &Soptim_maxit, &usethinit, &emptydouble, INTEGER(SB), &emptydouble,
-                   &emptydouble, &knownphi, REAL(Sphi), REAL(Stau), &emptydouble, taualpha, taualpha, INTEGER(Sr),NULL,
-                   NULL,NULL,NULL, INTEGER(Slogscale), &offset,NULL,NULL, INTEGER(Sngroups),NULL,
+  set_marginalPars(&pars,
+                   &emptyint,
+                   INTEGER(Sn),
+                   INTEGER(Sn),
+                   INTEGER(Sp),
+                   REAL(Sy),
+                   &emptyint,
+                   REAL(Ssumy2),
+                   &emptydouble,
+                   &emptydouble,
+                   &emptydouble,
+                   &emptydouble,
+                   XtX,
+                   REAL(SytX),
+                   INTEGER(Smethod),
+                   &emptyint,
+                   &emptyint,
+                   &SoptimMethod,
+                   &Soptim_maxit,
+                   &usethinit,
+                   &emptydouble,
+                   INTEGER(SB),
+                   &emptydouble,
+                   &emptydouble,
+                   &knownphi,
+                   REAL(Sphi),
+                   REAL(Stau),
+                   &emptydouble,
+                   taualpha,
+                   taualpha,
+                   INTEGER(Sr),
+                   NULL,
+                   NULL,
+                   NULL,
+                   NULL,
+                   INTEGER(Slogscale),
+                   &offset,
+                   NULL,
+                   NULL,
+                   INTEGER(Sngroups),
+                   NULL,
                    INTEGER(Snvaringroup));
   PROTECT(ans = Rf_allocVector(REALSXP, 1));
   rans  = REAL(ans);
@@ -6307,7 +6923,18 @@ double pmomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
 
       thopt   = dvector(1, *nsel);
       Voptinv = dmatrix(1, *nsel, 1, *nsel);
-      momIntegralApproxC(&ans, thopt, Voptinv, &fopt, (*pars).n, nsel, m, S, &detS, (*pars).phi, (*pars).tau, (*pars).r,
+      momIntegralApproxC(&ans,
+                         thopt,
+                         Voptinv,
+                         &fopt,
+                         (*pars).n,
+                         nsel,
+                         m,
+                         S,
+                         &detS,
+                         (*pars).phi,
+                         (*pars).tau,
+                         (*pars).r,
                          (*pars).logscale);
       free_dvector(thopt, 1, *nsel);
       free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
@@ -6328,7 +6955,7 @@ double pmomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
 
       Voptinv = dmatrix(1, *nsel, 1, *nsel);
       for (i = 1; i <= *nsel; i++)
-        for (j          = i; j <= *nsel; j++)
+        for (j = i; j <= *nsel; j++)
           Voptinv[i][j] = Voptinv[j][i] = Sinv[i][j] * (*(*pars).phi);
       ans = log(mvtexpect(m, Voptinv, *nsel, 2, -1));
       free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
@@ -6355,11 +6982,47 @@ SEXP pmomMarginalUI(SEXP Ssel, SEXP Snsel, SEXP Sn, SEXP Sp, SEXP Sy, SEXP Ssumy
 
   XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
 
-  set_marginalPars(&pars, &emptyint, INTEGER(Sn), INTEGER(Sn), INTEGER(Sp), REAL(Sy), &emptyint, REAL(Ssumy2),
-                   &emptydouble, &emptydouble, REAL(Sx), &emptydouble, XtX, REAL(SytX), INTEGER(Smethod), &emptyint,
-                   &emptyint, &SoptimMethod, &Soptim_maxit, &usethinit, &emptydouble, INTEGER(SB), REAL(Salpha),
-                   REAL(Slambda), &knownphi, &emptydouble, REAL(Stau), &emptydouble, taualpha, taualpha, INTEGER(Sr),
-                   NULL,NULL,NULL,NULL, INTEGER(Slogscale), &offset,NULL,NULL, INTEGER(Sngroups),NULL,
+  set_marginalPars(&pars,
+                   &emptyint,
+                   INTEGER(Sn),
+                   INTEGER(Sn),
+                   INTEGER(Sp),
+                   REAL(Sy),
+                   &emptyint,
+                   REAL(Ssumy2),
+                   &emptydouble,
+                   &emptydouble,
+                   REAL(Sx),
+                   &emptydouble,
+                   XtX,
+                   REAL(SytX),
+                   INTEGER(Smethod),
+                   &emptyint,
+                   &emptyint,
+                   &SoptimMethod,
+                   &Soptim_maxit,
+                   &usethinit,
+                   &emptydouble,
+                   INTEGER(SB),
+                   REAL(Salpha),
+                   REAL(Slambda),
+                   &knownphi,
+                   &emptydouble,
+                   REAL(Stau),
+                   &emptydouble,
+                   taualpha,
+                   taualpha,
+                   INTEGER(Sr),
+                   NULL,
+                   NULL,
+                   NULL,
+                   NULL,
+                   INTEGER(Slogscale),
+                   &offset,
+                   NULL,
+                   NULL,
+                   INTEGER(Sngroups),
+                   NULL,
                    INTEGER(Snvaringroup));
   PROTECT(ans = Rf_allocVector(REALSXP, 1));
   rans  = REAL(ans);
@@ -6437,7 +7100,7 @@ double pmomMarginalUC(int *sel, int *nsel, struct marginalPars *pars) {
 
         Voptinv = dmatrix(1, *nsel, 1, *nsel);
         for (i = 1; i <= *nsel; i++)
-          for (j          = i; j <= *nsel; j++)
+          for (j = i; j <= *nsel; j++)
             Voptinv[i][j] = Voptinv[j][i] = Sinv[i][j] * ss / (nu + .0);
         ans = log(mvtexpect(m, Voptinv, *nsel, 2, nu));
         free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
@@ -6485,7 +7148,18 @@ double pmomMarginalUC_old(int *sel, int *nsel, struct marginalPars *pars) {
       thopt   = dvector(1, *nsel);
       Voptinv = dmatrix(1, *nsel, 1, *nsel);
       phiadj  = (nu + .0) / (nu - 2.0);
-      momIntegralApproxC(&ans, thopt, Voptinv, &fopt, (*pars).n, nsel, m, S, &detS, &phiadj, (*pars).tau, (*pars).r,
+      momIntegralApproxC(&ans,
+                         thopt,
+                         Voptinv,
+                         &fopt,
+                         (*pars).n,
+                         nsel,
+                         m,
+                         S,
+                         &detS,
+                         &phiadj,
+                         (*pars).tau,
+                         (*pars).r,
                          (*pars).logscale);
       free_dvector(thopt, 1, *nsel);
       free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
@@ -6506,7 +7180,7 @@ double pmomMarginalUC_old(int *sel, int *nsel, struct marginalPars *pars) {
 
       Voptinv = dmatrix(1, *nsel, 1, *nsel);
       for (i = 1; i <= *nsel; i++)
-        for (j          = i; j <= *nsel; j++)
+        for (j = i; j <= *nsel; j++)
           Voptinv[i][j] = Voptinv[j][i] = Sinv[i][j] * ss / (nu + .0);
       ans = log(mvtexpect(m, Voptinv, *nsel, 2, nu));
       free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
@@ -6544,8 +7218,8 @@ double fimomNegC(double *th, crossprodmat *XtX, double *ytX, double *phi, double
   int i;
   double ans, ytXth, sumlogth, suminvth, th2;
   for (i = 0, ytXth = 0, sumlogth = 0, suminvth = 0; i < (*nsel); i++) {
-    ytXth += ytX[sel[i]] * th[sel[i]];
-    th2 = th[sel[i]] * th[sel[i]];
+    ytXth    += ytX[sel[i]] * th[sel[i]];
+    th2      = th[sel[i]] * th[sel[i]];
     suminvth += 1 / th2;
     sumlogth += log(th2);
   }
@@ -6557,8 +7231,15 @@ double fimomNegC(double *th, crossprodmat *XtX, double *ytX, double *phi, double
 
 double f2opt_imom(double *th) {
   double ans;
-  ans = fimomNegC_non0(th + 1, f2opt_pars.XtX, f2opt_pars.ytX, f2opt_pars.phi, f2opt_pars.tau, f2opt_pars.n,
-                       f2opt_pars.p, f2opt_pars.sel, f2opt_pars.nsel);
+  ans = fimomNegC_non0(th + 1,
+                       f2opt_pars.XtX,
+                       f2opt_pars.ytX,
+                       f2opt_pars.phi,
+                       f2opt_pars.tau,
+                       f2opt_pars.n,
+                       f2opt_pars.p,
+                       f2opt_pars.sel,
+                       f2opt_pars.nsel);
   return (ans);
 }
 
@@ -6568,8 +7249,8 @@ double fimomNegC_non0(double *th, crossprodmat *XtX, double *ytX, double *phi, d
   int i;
   double ans, ytXth, sumlogth, suminvth, th2;
   for (i = 0, ytXth = 0, sumlogth = 0, suminvth = 0; i < (*nsel); i++) {
-    ytXth += ytX[sel[i]] * th[i];
-    th2 = th[i] * th[i];
+    ytXth    += ytX[sel[i]] * th[i];
+    th2      = th[i] * th[i];
     suminvth += 1 / th2;
     sumlogth += log(th2);
   }
@@ -6695,9 +7376,9 @@ void imomIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doub
 
   // TODO MODEL STORAGE DOES NOT WORK FOR PARALLEL RUNS!
   if (model_thopt_mapping.count(current_model) > 0) {
-  for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
-  thopt[i + 1] = model_thopt_mapping[current_model][i];
-  }
+    for (int i = 0; i < model_thopt_mapping[current_model].size(); i++) {
+      thopt[i + 1] = model_thopt_mapping[current_model][i];
+    }
   } else {
     Asym_xsel(Vinv, *nsel, ytX, sel, thopt);
   }
@@ -6705,8 +7386,20 @@ void imomIntegralApproxC(double *ILaplace, double *thopt, double **Voptinv, doub
   //Minimization
   imomModeK(thopt, &status, XtX, ytX, phi, tau, sel, nsel, p);
 
-  set_f2opt_pars(&emptydouble, emptymatrix, &emptydouble, XtX, ytX, &emptydouble, &emptydouble, phi, tau, &emptyint, n,
-                 p, sel, nsel);
+  set_f2opt_pars(&emptydouble,
+                 emptymatrix,
+                 &emptydouble,
+                 XtX,
+                 ytX,
+                 &emptydouble,
+                 &emptydouble,
+                 phi,
+                 tau,
+                 &emptyint,
+                 n,
+                 p,
+                 sel,
+                 nsel);
   if (status == PolynomialRootFinder::SUCCESS) {
     (*fopt) = f2opt_imom(thopt);
   } else {
@@ -6761,10 +7454,48 @@ SEXP pimomMarginalKI(SEXP Ssel, SEXP Snsel, SEXP Sn, SEXP Sp, SEXP Sy, SEXP Ssum
   SEXP ans;
 
   XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
-  set_marginalPars(&pars, &emptyint, n, n, p, y, &emptyint, sumy2, &emptydouble, &emptydouble, &emptydouble,
-                   &emptydouble, XtX, ytX, method, &emptyint, &emptyint, &SoptimMethod, &Soptim_maxit, &usethinit,
-                   &emptydouble, B, &emptydouble, &emptydouble, &knownphi, phi, tau, &emptydouble, taualpha, taualpha,
-                   &r,NULL,NULL,NULL,NULL, logscale, &offset,NULL,NULL, INTEGER(Sngroups),NULL, INTEGER(Snvaringroup));
+  set_marginalPars(&pars,
+                   &emptyint,
+                   n,
+                   n,
+                   p,
+                   y,
+                   &emptyint,
+                   sumy2,
+                   &emptydouble,
+                   &emptydouble,
+                   &emptydouble,
+                   &emptydouble,
+                   XtX,
+                   ytX,
+                   method,
+                   &emptyint,
+                   &emptyint,
+                   &SoptimMethod,
+                   &Soptim_maxit,
+                   &usethinit,
+                   &emptydouble,
+                   B,
+                   &emptydouble,
+                   &emptydouble,
+                   &knownphi,
+                   phi,
+                   tau,
+                   &emptydouble,
+                   taualpha,
+                   taualpha,
+                   &r,
+                   NULL,
+                   NULL,
+                   NULL,
+                   NULL,
+                   logscale,
+                   &offset,
+                   NULL,
+                   NULL,
+                   INTEGER(Sngroups),
+                   NULL,
+                   INTEGER(Snvaringroup));
   PROTECT(ans = Rf_allocVector(REALSXP, 1));
   rans  = REAL(ans);
   *rans = pimomMarginalKC(sel, nsel, &pars);
@@ -6774,7 +7505,7 @@ SEXP pimomMarginalKI(SEXP Ssel, SEXP Snsel, SEXP Sn, SEXP Sp, SEXP Sy, SEXP Ssum
 }
 
 // [BISAM] store thopt
-
+//
 double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
   int one = 1, hessian;
   double k, ans, m, s, ILaplace, *thopt, **Voptinv, fopt;
@@ -6786,15 +7517,36 @@ double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
     ans = dnormC_jvec((*pars).y, *(*pars).n, m, s, 1);
   } else {
     if (*(*pars).method == 2) { hessian = 0; } else { hessian = 1; }
-    imomIntegralApproxC(&ILaplace, thopt, Voptinv, &fopt, sel, nsel, (*pars).n, (*pars).p, (*pars).XtX, (*pars).ytX,
-                        (*pars).phi, (*pars).tau, &one, &hessian);
+    imomIntegralApproxC(&ILaplace,
+                        thopt,
+                        Voptinv,
+                        &fopt,
+                        sel,
+                        nsel,
+                        (*pars).n,
+                        (*pars).p,
+                        (*pars).XtX,
+                        (*pars).ytX,
+                        (*pars).phi,
+                        (*pars).tau,
+                        &one,
+                        &hessian);
     k = .5 * ((*nsel) * log(*(*pars).tau) - (*(*pars).sumy2) / (*(*pars).phi) - (*(*pars).n + .0) * LOG_M_2PI - (
                 *(*pars).n - *nsel) * log(*(*pars).phi) - (*nsel) * LOG_M_PI);
     if (((*(*pars).method) == 0) || ((*(*pars).method) == 2)) {
       ans = k + ILaplace;
     } else {
-      ans = k + IS_imom(thopt, Voptinv, sel, nsel, (*pars).n, (*pars).p, (*pars).XtX, (*pars).ytX, (*pars).phi,
-                        (*pars).tau, (*pars).B);
+      ans = k + IS_imom(thopt,
+                        Voptinv,
+                        sel,
+                        nsel,
+                        (*pars).n,
+                        (*pars).p,
+                        (*pars).XtX,
+                        (*pars).ytX,
+                        (*pars).phi,
+                        (*pars).tau,
+                        (*pars).B);
     }
   }
   if ((*(*pars).logscale) != 1) { ans = exp(ans); }
@@ -6802,6 +7554,55 @@ double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
   free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
   return (ans);
 }
+
+// double pimomMarginalKC(int *sel, int *nsel, struct marginalPars *pars) {
+//   int one = 1, hessian;
+//   double k, ans, m, s, ILaplace, *thopt, **Voptinv, fopt;
+//   thopt   = dvector(1, *nsel);
+//   Voptinv = dmatrix(1, *nsel, 1, *nsel);
+//   if ((*nsel) == 0) {
+//     m   = 0;
+//     s   = sqrt(*(*pars).phi);
+//     ans = dnormC_jvec((*pars).y, *(*pars).n, m, s, 1);
+//   } else {
+//     if (*(*pars).method == 2) { hessian = 0; } else { hessian = 1; }
+//     imomIntegralApproxC(&ILaplace,
+//                         thopt,
+//                         Voptinv,
+//                         &fopt,
+//                         sel,
+//                         nsel,
+//                         (*pars).n,
+//                         (*pars).p,
+//                         (*pars).XtX,
+//                         (*pars).ytX,
+//                         (*pars).phi,
+//                         (*pars).tau,
+//                         &one,
+//                         &hessian);
+//     k = .5 * ((*nsel) * log(*(*pars).tau) - (*(*pars).sumy2) / (*(*pars).phi) - (*(*pars).n + .0) * LOG_M_2PI - (
+//                 *(*pars).n - *nsel) * log(*(*pars).phi) - (*nsel) * LOG_M_PI);
+//     if (((*(*pars).method) == 0) || ((*(*pars).method) == 2)) {
+//       ans = k + ILaplace;
+//     } else {
+//       ans = k + IS_imom(thopt,
+//                         Voptinv,
+//                         sel,
+//                         nsel,
+//                         (*pars).n,
+//                         (*pars).p,
+//                         (*pars).XtX,
+//                         (*pars).ytX,
+//                         (*pars).phi,
+//                         (*pars).tau,
+//                         (*pars).B);
+//     }
+//   }
+//   if ((*(*pars).logscale) != 1) { ans = exp(ans); }
+//   free_dvector(thopt, 1, *nsel);
+//   free_dmatrix(Voptinv, 1, *nsel, 1, *nsel);
+//   return (ans);
+// }
 
 
 //Evaluation of iMOM integral via Importance Sampling (result is returned in log-scale)
@@ -6835,18 +7636,36 @@ double IS_imom(double *thopt, double **Voptinv, int *sel, int *nsel, int *n, int
   detVpropinv = choldc_det(cholVpropinv, *nsel);
   rmvtC(thsim, *nsel, mprop, cholVprop, 1);
   maxlogr = logr[0] = -fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) - dmvtC(
-                        thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1);
+                        thsim,
+                        *nsel,
+                        mprop,
+                        cholVpropinv,
+                        detVpropinv,
+                        1,
+                        1);
   for (i = 1; i < 1000; i++) {
     rmvtC(thsim, *nsel, mprop, cholVprop, 1);
     logr[i] = -fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) - dmvtC(
-                thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1);
+                thsim,
+                *nsel,
+                mprop,
+                cholVpropinv,
+                detVpropinv,
+                1,
+                1);
     if (logr[i] > maxlogr) { maxlogr = logr[i]; }
   }
   for (i = 0, ans = 0; i < 1000; i++) { ans += exp(logr[i] - maxlogr + 500); }
   for (i = 1000; i < (*B); i++) {
     rmvtC(thsim, *nsel, mprop, cholVprop, 1);
     ans += exp(-fimomNegC_non0(thsim + 1, XtX, ytX, phi, tau, n, p, sel, nsel) - dmvtC(
-                 thsim, *nsel, mprop, cholVpropinv, detVpropinv, 1, 1) - maxlogr + 500);
+                 thsim,
+                 *nsel,
+                 mprop,
+                 cholVpropinv,
+                 detVpropinv,
+                 1,
+                 1) - maxlogr + 500);
   }
   ans = log(ans / (.0 + (*B))) + maxlogr - 500;
 
@@ -6865,8 +7684,17 @@ double IS_imom(double *thopt, double **Voptinv, int *sel, int *nsel, int *n, int
 double f2opt_imomU(double *th) {
   //last element in th corresponds to eta=log(tau), i.e. log residual variance
   double ans;
-  ans = fimomUNegC_non0(th + 1, f2opt_pars.sumy2, f2opt_pars.XtX, f2opt_pars.ytX, f2opt_pars.alpha, f2opt_pars.lambda,
-                        f2opt_pars.tau, f2opt_pars.n, f2opt_pars.p, f2opt_pars.sel, f2opt_pars.nsel);
+  ans = fimomUNegC_non0(th + 1,
+                        f2opt_pars.sumy2,
+                        f2opt_pars.XtX,
+                        f2opt_pars.ytX,
+                        f2opt_pars.alpha,
+                        f2opt_pars.lambda,
+                        f2opt_pars.tau,
+                        f2opt_pars.n,
+                        f2opt_pars.p,
+                        f2opt_pars.sel,
+                        f2opt_pars.nsel);
   return (ans);
 }
 
@@ -6879,8 +7707,8 @@ double fimomUNegC_non0(double *th, double *sumy2, crossprodmat *XtX, double *ytX
   eta = th[*nsel];
   phi = exp(eta);
   for (i = 0, ytXth = 0, sumlogth = 0, suminvth = 0; i < (*nsel); i++) {
-    ytXth += ytX[sel[i]] * th[i];
-    th2 = th[i] * th[i];
+    ytXth    += ytX[sel[i]] * th[i];
+    th2      = th[i] * th[i];
     suminvth += 1 / th2;
     sumlogth += log(th2);
   }
@@ -6907,8 +7735,8 @@ void fppimomUNegC_non0(double **ans, double *th, double *sumy2, crossprodmat *Xt
     th2               = th[i] * th[i];
     ans[i][i]         = (XtX->at(sel[i - 1] * (*p) + sel[i - 1])) / phi + 6.0 * (*tau) * phi / (th2 * th2) - 2.0 / th2;
     ans[i][*nsel + 1] = ans[*nsel + 1][i] = -2.0 * (*tau) * phi / (th2 * th[i]) - (XtXth[i] - ytX[sel[i - 1]]) / phi;
-    ytXth += ytX[sel[i - 1]] * th[i];
-    suminvth += 1 / (th[i] * th[i]);
+    ytXth             += ytX[sel[i - 1]] * th[i];
+    suminvth          += 1 / (th[i] * th[i]);
   }
   for (i = 1; i <= (*nsel); i++) {
     for (j = i + 1; j <= (*nsel); j++) {
@@ -6960,10 +7788,10 @@ void imomModeU(double *th, PolynomialRootFinder::RootStatus_T *status, double *s
       while ((!found) & (j <= 4)) {
         if (fabs(imag_vector[j]) < 1.0e-5) {
           if (((real_vector[j] > 0) & (th[i] > 0)) | ((real_vector[j] < 0) & (th[i] < 0))) {
-            err   = max_xy(err, fabs(th[i] - real_vector[j]));
-            th[i] = real_vector[j];
+            err       = max_xy(err, fabs(th[i] - real_vector[j]));
+            th[i]     = real_vector[j];
             suminvth2 += 1.0 / (th[i] * th[i]);
-            found = true;
+            found     = true;
           }
         }
         j++;
@@ -7006,12 +7834,36 @@ void imomUIntegralApproxC(double *ILaplace, double *thopt, int *sel, int *nsel, 
   dirth       = dmatrix(1, *nsel + 1, 1, *nsel + 1);
   emptymatrix = dmatrix(1, 1, 1, 1);
   //Initialize
-  set_f2opt_pars(&emptydouble, emptymatrix, sumy2, XtX, ytX, alpha, lambda, &emptydouble, tau, &emptyint, n, p, sel,
+  set_f2opt_pars(&emptydouble,
+                 emptymatrix,
+                 sumy2,
+                 XtX,
+                 ytX,
+                 alpha,
+                 lambda,
+                 &emptydouble,
+                 tau,
+                 &emptyint,
+                 n,
+                 p,
+                 sel,
                  nsel);
 
   //Minimization
   imomModeU(thopt, &status, sumy2, XtX, ytX, tau, alpha, lambda, sel, nsel, n, p);
-  set_f2opt_pars(&emptydouble, emptymatrix, sumy2, XtX, ytX, alpha, lambda, &emptydouble, tau, &emptyint, n, p, sel,
+  set_f2opt_pars(&emptydouble,
+                 emptymatrix,
+                 sumy2,
+                 XtX,
+                 ytX,
+                 alpha,
+                 lambda,
+                 &emptydouble,
+                 tau,
+                 &emptyint,
+                 n,
+                 p,
+                 sel,
                  nsel);
   if (status == PolynomialRootFinder::SUCCESS) {
     fopt = f2opt_imomU(thopt);
@@ -7059,7 +7911,10 @@ double f2int_imom(double phi) {
   f2int_pars.phi        = &phi;
   f2int_pars.logscale   = &one;
   ans                   = exp(pimomMarginalKC(f2int_pars.sel, f2int_pars.nsel, &f2int_pars) + dinvgammaC(
-              phi, .5 * (*f2int_pars.alpha), .5 * (*f2int_pars.lambda), 1) - *(f2int_pars.offset));
+              phi,
+              .5 * (*f2int_pars.alpha),
+              .5 * (*f2int_pars.lambda),
+              1) - *(f2int_pars.offset));
   f2int_pars.phi      = inputphi;
   f2int_pars.logscale = inputlog;
   return (ans);
@@ -7080,10 +7935,48 @@ SEXP pimomMarginalUI(SEXP Ssel, SEXP Snsel, SEXP Sn, SEXP Sp, SEXP Sy, SEXP Ssum
   SEXP ans;
 
   XtX = new crossprodmat(REAL(SXtX), INTEGER(Sn)[0], INTEGER(Sp)[0], true);
-  set_marginalPars(&pars, &emptyint, n, n, p, y, &emptyint, sumy2, &emptydouble, &emptydouble, x, &emptydouble, XtX,
-                   ytX, method, &emptyint, &emptyint, &SoptimMethod, &Soptim_maxit, &usethinit, &emptydouble, B, alpha,
-                   lambda, &knownphi, &emptydouble, tau, &emptydouble, taualpha, taualpha, &r,NULL,NULL,NULL,NULL,
-                   logscale, &offset,NULL,NULL, INTEGER(Sngroups),NULL, INTEGER(Snvaringroup));
+  set_marginalPars(&pars,
+                   &emptyint,
+                   n,
+                   n,
+                   p,
+                   y,
+                   &emptyint,
+                   sumy2,
+                   &emptydouble,
+                   &emptydouble,
+                   x,
+                   &emptydouble,
+                   XtX,
+                   ytX,
+                   method,
+                   &emptyint,
+                   &emptyint,
+                   &SoptimMethod,
+                   &Soptim_maxit,
+                   &usethinit,
+                   &emptydouble,
+                   B,
+                   alpha,
+                   lambda,
+                   &knownphi,
+                   &emptydouble,
+                   tau,
+                   &emptydouble,
+                   taualpha,
+                   taualpha,
+                   &r,
+                   NULL,
+                   NULL,
+                   NULL,
+                   NULL,
+                   logscale,
+                   &offset,
+                   NULL,
+                   NULL,
+                   INTEGER(Sngroups),
+                   NULL,
+                   INTEGER(Snvaringroup));
   PROTECT(ans = Rf_allocVector(REALSXP, 1));
   rans  = REAL(ans);
   *rans = pimomMarginalUC(sel, nsel, &pars);
@@ -7119,7 +8012,7 @@ double pimomMarginalUC(int *sel, int *nsel, struct marginalPars *pars) {
       Asym_xsel(Vinv, *nsel, (*pars).ytX, sel, thest);
       for (i = 0, sumer2 = 0; i < (*(*pars).n); i++) {
         for (j = 1, ypred = 0; j <= (*nsel); j++) { ypred += (*pars).x[i + (*(*pars).n) * sel[j - 1]] * thest[j]; }
-        er = (*pars).y[i] - ypred;
+        er     = (*pars).y[i] - ypred;
         sumer2 += er * er;
       }
       phiest = (sumer2 + (*(*pars).lambda)) / (*(*pars).alpha + *(*pars).n);
@@ -7128,13 +8021,37 @@ double pimomMarginalUC(int *sel, int *nsel, struct marginalPars *pars) {
 
         hessian          = 0;
         thest[*nsel + 1] = log(phiest);
-        imomUIntegralApproxC(&ans, thest, sel, nsel, (*pars).n, (*pars).p, (*pars).sumy2, (*pars).XtX, (*pars).ytX,
-                             (*pars).alpha, (*pars).lambda, (*pars).tau, &one, &hessian);
+        imomUIntegralApproxC(&ans,
+                             thest,
+                             sel,
+                             nsel,
+                             (*pars).n,
+                             (*pars).p,
+                             (*pars).sumy2,
+                             (*pars).XtX,
+                             (*pars).ytX,
+                             (*pars).alpha,
+                             (*pars).lambda,
+                             (*pars).tau,
+                             &one,
+                             &hessian);
         ans = ans + alphahalf * log(.5 * (*(*pars).lambda)) - .5 * (*(*pars).n) * LOG_M_2PI - gamln(&alphahalf);
       } else if ((*(*pars).method) == 1) {
         //MC for each fixed phi + univariate integration
-        set_f2int_pars((*pars).XtX, (*pars).ytX, (*pars).tau, (*pars).n, (*pars).p, sel, nsel, (*pars).y, (*pars).sumy2,
-                       (*pars).method, (*pars).B, (*pars).alpha, (*pars).lambda, &zero);
+        set_f2int_pars((*pars).XtX,
+                       (*pars).ytX,
+                       (*pars).tau,
+                       (*pars).n,
+                       (*pars).p,
+                       sel,
+                       nsel,
+                       (*pars).y,
+                       (*pars).sumy2,
+                       (*pars).method,
+                       (*pars).B,
+                       (*pars).alpha,
+                       (*pars).lambda,
+                       &zero);
         inputphi          = (*pars).phi;
         (*pars).phi       = &phiest;
         (*(*pars).method) = 0;
@@ -7148,8 +8065,20 @@ double pimomMarginalUC(int *sel, int *nsel, struct marginalPars *pars) {
         ans               = intlapl + log(qromo(f2int_imom, 0.0, 100, midpnt) + qromo(f2int_imom, 100, 1.0e30, midinf));
       } else if ((*(*pars).method) == 3) {
         //Hybrid Laplace - MC - Univariate integration
-        set_f2int_pars((*pars).XtX, (*pars).ytX, (*pars).tau, (*pars).n, (*pars).p, sel, nsel, (*pars).y, (*pars).sumy2,
-                       (*pars).method, (*pars).B, (*pars).alpha, (*pars).lambda, &zero);
+        set_f2int_pars((*pars).XtX,
+                       (*pars).ytX,
+                       (*pars).tau,
+                       (*pars).n,
+                       (*pars).p,
+                       sel,
+                       nsel,
+                       (*pars).y,
+                       (*pars).sumy2,
+                       (*pars).method,
+                       (*pars).B,
+                       (*pars).alpha,
+                       (*pars).lambda,
+                       &zero);
         inputphi          = (*pars).phi;
         (*pars).phi       = &phiest;
         (*(*pars).method) = 1; //IS evaluation of marginal for phi=phiest
@@ -7159,7 +8088,7 @@ double pimomMarginalUC(int *sel, int *nsel, struct marginalPars *pars) {
         (*pars).phi       = inputphi;
         (*(*pars).method) = 2; //reset input values for phi, method
         if (intlapl == 0) {
-          intmc += 1.0e-300;
+          intmc   += 1.0e-300;
           intlapl += 1.0e-300;
         }                             //avoid numerical zero
         f2int_pars.method = &zero;    //set method to eval marginal for known phi to Laplace approx
