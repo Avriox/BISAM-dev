@@ -457,7 +457,7 @@ namespace bisam {
                                                                        parprDeltap,
                                                                        num_threads
 
-            );
+            ).post_sample;
 
             w_i = post_sample;
 

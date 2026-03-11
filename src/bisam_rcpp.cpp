@@ -122,10 +122,8 @@ int comp_strategy_split_parallel() {
     return static_cast<int>(bisam::ComputationStrategy::SPLIT_PARALLEL);
 }
 
-
-// Updated Wrapper
 // [[Rcpp::export]]
-Rcpp::IntegerVector rcpp_fast_model_selection(
+Rcpp::List rcpp_fast_model_selection(
     const arma::vec &y,
     const arma::mat &x,
     int niter                = 5000,
@@ -196,7 +194,7 @@ Rcpp::IntegerVector rcpp_fast_model_selection(
 
     std::vector<double> parprDeltap = {prDelta_a, prDelta_b};
 
-    arma::Col<int> out = bisam::model_selection_with_strategy(
+    bisam::ModelSelectionOutput out = bisam::model_selection_with_strategy(
         y,
         x,
         niter,
@@ -228,5 +226,10 @@ Rcpp::IntegerVector rcpp_fast_model_selection(
         max_threads
     );
 
-    return Rcpp::IntegerVector(out.begin(), out.end());
+    return Rcpp::List::create( // CHANGED: return both fields
+        Rcpp::Named("post_sample") =
+        Rcpp::IntegerVector(out.post_sample.begin(), out.post_sample.end()),
+        Rcpp::Named("margpp") =
+        Rcpp::NumericVector(out.margpp.begin(), out.margpp.end())
+    );
 }

@@ -78,7 +78,7 @@ namespace bisam {
     }
 
     // The main execution method that handles parallel processing
-    arma::Col<int> ModelSelectionParallelExecutor::execute_parallel(
+    ModelSelectionOutput ModelSelectionParallelExecutor::execute_parallel( // CHANGED
         const arma::vec &y,
         const arma::mat &x,
         int niter,
@@ -137,7 +137,7 @@ namespace bisam {
                                                   n);
 
         // Initialize vector for results
-        std::vector<arma::Col<int> > results(n);
+        std::vector<ModelSelectionOutput> results(n); // CHANGED
 
 #ifdef _OPENMP
         // CRITICAL: Set threads before any parallel region
@@ -219,38 +219,40 @@ namespace bisam {
 
         // Combine and return results
         return combine_partition_results(results, split_data.start_columns, split_data.end_columns, x.n_cols);
+        // CHANGED (results type)
     }
 
-    arma::Col<int> model_selection_with_strategy(const arma::vec &y,
-                                                 const arma::mat &x,
-                                                 int niter,
-                                                 int thinning,
-                                                 int burnin,
-                                                 arma::Col<int> &deltaini_input,
-                                                 bool center,
-                                                 bool scale,
-                                                 bool XtXprecomp,
-                                                 double phi,
-                                                 double tau,
-                                                 double priorSkew,
-                                                 arma::vec thinit,
-                                                 InitType initpar_type,
-                                                 // arma::Col<int> &include_vars,
-                                                 int method,
-                                                 int hesstype,
-                                                 int optimMethod,
-                                                 int optim_maxit,
-                                                 int B,
-                                                 int knownphi,
-                                                 int r,
-                                                 double alpha,
-                                                 double lambda,
-                                                 ComputationStrategy strategy,
-                                                 int n,
-                                                 int prDelta,
-                                                 double prDeltap,
-                                                 std::vector<double> parprDeltap,
-                                                 int max_threads // NEW: Thread control parameter
+    ModelSelectionOutput model_selection_with_strategy( // CHANGED
+        const arma::vec &y,
+        const arma::mat &x,
+        int niter,
+        int thinning,
+        int burnin,
+        arma::Col<int> &deltaini_input,
+        bool center,
+        bool scale,
+        bool XtXprecomp,
+        double phi,
+        double tau,
+        double priorSkew,
+        arma::vec thinit,
+        InitType initpar_type,
+        // arma::Col<int> &include_vars,
+        int method,
+        int hesstype,
+        int optimMethod,
+        int optim_maxit,
+        int B,
+        int knownphi,
+        int r,
+        double alpha,
+        double lambda,
+        ComputationStrategy strategy,
+        int n,
+        int prDelta,
+        double prDeltap,
+        std::vector<double> parprDeltap,
+        int max_threads // NEW: Thread control parameter
     ) {
         // Only apply thread limiting for SPLIT_PARALLEL strategy
         if (strategy == ComputationStrategy::SPLIT_PARALLEL) {
@@ -313,7 +315,7 @@ namespace bisam {
                                                           n);
 
                 // Process each part sequentially
-                std::vector<arma::Col<int> > results(n);
+                std::vector<ModelSelectionOutput> results(n); // CHANGED
                 for (int part = 0; part < n; part++) {
                     results[part] = modelSelection(
                         split_data.y_parts[part],
@@ -348,7 +350,7 @@ namespace bisam {
                 return combine_partition_results(results,
                                                  split_data.start_columns,
                                                  split_data.end_columns,
-                                                 x.n_cols);
+                                                 x.n_cols); // CHANGED (results type)
             }
 
             case ComputationStrategy::SPLIT_PARALLEL: {
@@ -402,9 +404,6 @@ namespace bisam {
 
         size_t n_rows = y.size();
         size_t n_cols = x.n_cols;
-
-        // size_t n_rows = x.n_cols;
-        // size_t n_cols = y.size();
 
         size_t thinit_size = theta_init.size();
 
@@ -469,17 +468,22 @@ namespace bisam {
         return data;
     }
 
-    arma::Col<int> combine_partition_results(
-        const std::vector<arma::Col<int> > &results,
+    ModelSelectionOutput combine_partition_results(       // CHANGED
+        const std::vector<ModelSelectionOutput> &results, // CHANGED
         const std::vector<size_t> &start_columns,
         const std::vector<size_t> &end_columns,
         size_t total_columns
     ) {
-        arma::Col<int> combined_result(total_columns, arma::fill::zeros);
+        ModelSelectionOutput combined_result; // CHANGED
+        combined_result.post_sample.set_size(total_columns);
+        combined_result.post_sample.fill(0);
+        combined_result.margpp.set_size(total_columns);
+        combined_result.margpp.fill(0.0);
 
         for (size_t part = 0; part < results.size(); part++) {
             for (size_t j = 0; j <= (end_columns[part] - start_columns[part]); j++) {
-                combined_result(start_columns[part] + j) = results[part](j);
+                combined_result.post_sample(start_columns[part] + j) = results[part].post_sample(j); // CHANGED
+                combined_result.margpp(start_columns[part] + j)      = results[part].margpp(j);      // CHANGED
             }
         }
 
