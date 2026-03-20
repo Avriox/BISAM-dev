@@ -91,7 +91,7 @@ static Eval EvaluatePolynomial(const double a[MAX_COEFF], int n, double z_re, do
 
 // Precomputed constant for machine epsilon (calculate once at startup)
 // static constexpr double MACHINE_EPSILON = 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
-static const double MACHINE_EPSILON = 0.5 * pow((double)_DBL_RADIX, -DBL_MANT_DIG + 1);
+static const double MACHINE_EPSILON = 0.5 * pow((double) _DBL_RADIX, -DBL_MANT_DIG + 1);
 
 
 // Calculate upper bound for rounding errors (Adam's test)
@@ -127,7 +127,7 @@ static void RealDeflation(double a[MAX_COEFF], int &n, double x) {
     double r = 0.0;
 
     for (int i = 0; i < n; i++)
-        a[i]   = r = r * x + a[i];
+        a[i] = r = r * x + a[i];
 
     n--; // Reduce polynomial degree by 1
 }
@@ -139,7 +139,7 @@ static void ComplexDeflation(double a[MAX_COEFF], int &n, double z_re, double z_
 
     a[1] -= r * a[0];
     for (int i = 2; i < n - 1; i++)
-        a[i]   = a[i] - r * a[i - 1] - u * a[i - 2];
+        a[i] = a[i] - r * a[i - 1] - u * a[i - 2];
 
     n -= 2; // Reduce polynomial degree by 2 (complex conjugate roots)
 }
@@ -280,6 +280,7 @@ int PolynomialRootsNewton(
         usingCachedRoots = true;
     }
 
+
     // Step 1 eliminate all simple roots
     while (n > 0 && coeff[n] == 0.0) {
         real_zero_vector_ptr[rootIndex]      = 0.0; // Store real part of zero root
@@ -307,7 +308,7 @@ int PolynomialRootsNewton(
         double coeffprime[MAX_COEFF - 1];
 
         // Calculate coefficients of p'(x)
-        for (int i        = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
             coeffprime[i] = coeff[i] * double(n - i);
 
         // Step 2 find a suitable starting point z
@@ -332,8 +333,8 @@ int PolynomialRootsNewton(
             double abs_z = sqrt(z_re * z_re + z_im * z_im);
             if (abs_z > 0.0) {
                 double scale = rprev / abs_z;
-                z_re *= scale;
-                z_im *= scale;
+                z_re         *= scale;
+                z_im         *= scale;
             }
         }
 
@@ -516,8 +517,14 @@ int PolynomialRootsNewton(
 
     // Solve any remaining linear or quadratic polynomial
     if (n > 0)
-        rootIndex = SolveQuadratic(coeff, n, real_zero_vector_ptr, imaginary_zero_vector_ptr,
-                                   rootIndex, newReal, newImag, newRootIndex);
+        rootIndex = SolveQuadratic(coeff,
+                                   n,
+                                   real_zero_vector_ptr,
+                                   imaginary_zero_vector_ptr,
+                                   rootIndex,
+                                   newReal,
+                                   newImag,
+                                   newRootIndex);
 
     // Store the roots in the cache for future use
     RootStorage storage;
@@ -586,7 +593,7 @@ static void StartPoints(int n, const double apolyr[], double Z_re[], double Z_im
 
     // Place starting points uniformly on a circle with radius r0
     const double PI = 3.14159265358979323846;
-    r0 *= 1.1; // Slightly larger radius for better convergence
+    r0              *= 1.1; // Slightly larger radius for better convergence
 
     for (int k = 1; k <= n; k++) {
         double angle = 2 * PI * (k - 1) / n;
@@ -704,11 +711,11 @@ static void AberthEhrlich(int n, const double coeff_re[], const double coeff_im[
         finish = new bool[n + 1];
 
         // Simple upper bound for P(z) using Horner with complex coefficients
-        f0  = complex_abs(a_re[n], a_im[n]);
+        f0 = complex_abs(a_re[n], a_im[n]);
         // eps = 6 * n * f0 * pow((double) _DBL_RADIX, -DBL_MANT_DIG);
         eps = 2 * n * f0 * MACHINE_EPSILON;
 
-        for (i        = 0; i <= n; i++)
+        for (i = 0; i <= n; i++)
             apolyr[i] = complex_abs(a_re[i], a_im[i]);
 
         // If we have initial guesses (warm start), use them
@@ -722,7 +729,7 @@ static void AberthEhrlich(int n, const double coeff_re[], const double coeff_im[
             StartPoints(n, apolyr, Z_re, Z_im);
         }
 
-        for (i        = 1; i <= n; i++)
+        for (i = 1; i <= n; i++)
             finish[i] = false;
 
         max_f   = 1;
@@ -757,8 +764,8 @@ static void AberthEhrlich(int n, const double coeff_re[], const double coeff_im[
                             if (!finish[i]) {
                                 // Add a tiny random perturbation
                                 double scale = 1e-15 * complex_abs(Z_re[i], Z_im[i]);
-                                Z_re[i] += scale * ((double) rand() / RAND_MAX - 0.5);
-                                Z_im[i] += scale * ((double) rand() / RAND_MAX - 0.5);
+                                Z_re[i]      += scale * ((double) rand() / RAND_MAX - 0.5);
+                                Z_im[i]      += scale * ((double) rand() / RAND_MAX - 0.5);
                             }
                         }
                     } else {
@@ -980,8 +987,14 @@ int PolynomialRootsAberth(
 
     // Call the Aberth-Ehrlich implementation, with warm start if available
     if (usingCachedRoots) {
-        AberthEhrlich(degree, complexCoeffs_re, complexCoeffs_im, roots_re, roots_im,
-                      cachedReal, cachedImag, cachedRootCount);
+        AberthEhrlich(degree,
+                      complexCoeffs_re,
+                      complexCoeffs_im,
+                      roots_re,
+                      roots_im,
+                      cachedReal,
+                      cachedImag,
+                      cachedRootCount);
     } else {
         AberthEhrlich(degree, complexCoeffs_re, complexCoeffs_im, roots_re, roots_im);
     }

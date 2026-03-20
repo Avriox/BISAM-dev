@@ -159,7 +159,7 @@ int main() {
     bisam::ModelSelectionOutput out = bisam::model_selection_with_strategy(
         y,
         x,
-        2,
+        1000,
         1,
         1,
         delta_init,
