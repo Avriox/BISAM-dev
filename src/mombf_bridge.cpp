@@ -600,6 +600,152 @@ namespace bisam {
         pars.priorcode = &priorcode;
 
 
+        // --- Debugging Print Statements ---
+        std::cout << "--- Parameters for modelSelectionGibbs ---" << std::endl;
+
+        std::cout << "postSample (first 10 elements): ";
+        for (int k = 0; k < std::min(10, mcmc2save * mycols); ++k) {
+            std::cout << postSample[k] << " ";
+        }
+        std::cout << (mcmc2save * mycols > 10 ? "..." : "") << std::endl;
+        std::cout << "Dimensions of postSample: " << mcmc2save << " x " << mycols << std::endl;
+
+        std::cout << "margpp: ";
+        for (int k = 0; k < mycols2; ++k) {
+            std::cout << margpp[k] << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "Length of margpp: " << mycols2 << std::endl;
+
+        std::cout << "postMode: ";
+        for (int k = 0; k < mycols; ++k) {
+            std::cout << postMode[k] << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "Length of postMode: " << mycols << std::endl;
+
+        std::cout << "postModeProb: " << postModeProb[0] << std::endl;
+
+        std::cout << "postProb (first 10 elements): ";
+        for (int k = 0; k < std::min(10, mcmc2save); ++k) {
+            std::cout << postProb[k] << " ";
+        }
+        std::cout << (mcmc2save > 10 ? "..." : "") << std::endl;
+        std::cout << "Length of postProb: " << mcmc2save << std::endl;
+
+        std::cout << "priorDelta: " << SpriorDelta << std::endl;
+        std::cout << "priorConstr: " << SpriorConstr << std::endl;
+        std::cout << "niter: " << Sniter << std::endl;
+        std::cout << "thinning: " << Sthinning << std::endl;
+        std::cout << "burnin: " << Sburnin << std::endl;
+        std::cout << "ndeltaini: " << Sndeltaini << std::endl;
+
+        std::cout << "deltaini: ";
+        for (int k = 0; k < (int) Sdeltaini.n_elem; ++k) {
+            std::cout << Sdeltaini[k] << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "Length of deltaini: " << Sdeltaini.n_elem << std::endl;
+
+        std::cout << "includevars: ";
+        for (int k = 0; k < (int) Sincludevars.n_elem; ++k) {
+            std::cout << Sincludevars[k] << " ";
+        }
+        std::cout << std::endl;
+        std::cout << "Length of includevars: " << Sincludevars.n_elem << std::endl;
+
+        std::cout << "constraints (first level pointers): " << constraints.size() << std::endl;
+        std::cout << "invconstraints (first level pointers): " << invconstraints.size() << std::endl;
+
+        std::cout << "verbose: " << Sverbose << std::endl;
+
+        std::cout << "--- Parameters of pars struct ---" << std::endl;
+        std::cout << "pars.family: " << *(pars.family) << std::endl;
+        std::cout << "pars.n: " << *(pars.n) << std::endl;
+        std::cout << "pars.nuncens: " << *(pars.nuncens) << std::endl;
+        std::cout << "pars.p: " << *(pars.p) << std::endl;
+        std::cout << "pars.y (first 10 elements): ";
+        for (int k = 0; k < std::min(10, *(pars.n)); ++k) std::cout << pars.y[k] << " ";
+        std::cout << (*(pars.n) > 10 ? "..." : "") << std::endl;
+        std::cout << "pars.uncens (first 10 elements): ";
+        if (pars.uncens != NULL) {
+            for (int k = 0; k < std::min(10, *(pars.n)); ++k) std::cout << pars.uncens[k] << " ";
+            std::cout << (*(pars.n) > 10 ? "..." : "") << std::endl;
+        } else {
+            std::cout << "NULL" << std::endl;
+        }
+        std::cout << "pars.sumy2: " << *(pars.sumy2) << std::endl;
+        std::cout << "pars.sumy: " << *(pars.sumy) << std::endl;
+        std::cout << "pars.sumlogyfact: " << *(pars.sumlogyfact) << std::endl;
+        std::cout << "pars.x (first 10 elements): ";
+        for (int k = 0; k < std::min(10, (*(pars.n) * *(pars.p))); ++k) std::cout << pars.x[k] << " ";
+        std::cout << ((*(pars.n) * *(pars.p)) > 10 ? "..." : "") << std::endl;
+        std::cout << "pars.colsumsx (first " << *(pars.p) << " elements): ";
+        for (int k = 0; k < *(pars.p); ++k) std::cout << pars.colsumsx[k] << " ";
+        std::cout << std::endl;
+        std::cout << "pars.XtX: (printing address) " << pars.XtX << std::endl;
+        std::cout << "pars.ytX (first " << *(pars.p) << " elements): ";
+        for (int k = 0; k < *(pars.p); ++k) std::cout << pars.ytX[k] << " ";
+        std::cout << std::endl;
+        std::cout << "pars.method: " << *(pars.method) << std::endl;
+        std::cout << "pars.adjoverdisp: " << *(pars.adjoverdisp) << std::endl;
+        std::cout << "pars.hesstype: " << *(pars.hesstype) << std::endl;
+        std::cout << "pars.optimMethod: " << *(pars.optimMethod) << std::endl;
+        std::cout << "pars.optim_maxit: " << *(pars.optim_maxit) << std::endl;
+        std::cout << "pars.usethinit: " << *(pars.usethinit) << std::endl;
+        std::cout << "pars.thinit (first 10 elements): ";
+        for (int k = 0; k < std::min(10, mycols2 + 2); ++k) std::cout << pars.thinit[k] << " ";
+        std::cout << (mycols2 + 2 > 10 ? "..." : "") << std::endl;
+        std::cout << "pars.B: " << *(pars.B) << std::endl;
+        std::cout << "pars.alpha: " << *(pars.alpha) << std::endl;
+        std::cout << "pars.lambda: " << *(pars.lambda) << std::endl;
+        std::cout << "pars.knownphi: " << *(pars.knownphi) << std::endl;
+        std::cout << "pars.phi: " << *(pars.phi) << std::endl;
+        std::cout << "pars.tau: " << *(pars.tau) << std::endl;
+        std::cout << "pars.taugroup: " << *(pars.taugroup) << std::endl;
+        std::cout << "pars.taualpha: " << *(pars.taualpha) << std::endl;
+        std::cout << "pars.fixatanhalpha: " << *(pars.fixatanhalpha) << std::endl;
+        std::cout << "pars.r: " << *(pars.r) << std::endl;
+        std::cout << "pars.prDeltap: " << *(pars.prDeltap) << std::endl;
+        std::cout << "pars.parprDeltap: " << *(pars.parprDeltap) << std::endl;
+        std::cout << "pars.prConstrp: " << *(pars.prConstrp) << std::endl;
+        std::cout << "pars.parprConstrp: " << *(pars.parprConstrp) << std::endl;
+        std::cout << "pars.logscale: " << *(pars.logscale) << std::endl;
+        std::cout << "pars.offset: " << *(pars.offset) << std::endl;
+        std::cout << "pars.groups (first " << *(pars.ngroups) << " elements): ";
+        if (pars.groups != NULL) {
+            for (int k = 0; k < *(pars.ngroups); ++k) std::cout << pars.groups[k] << " ";
+            std::cout << std::endl;
+        } else {
+            std::cout << "NULL" << std::endl;
+        }
+        std::cout << "pars.isgroup (first " << *(pars.p) << " elements): ";
+        for (int k = 0; k < *(pars.p); ++k) std::cout << pars.isgroup[k] << " ";
+        std::cout << std::endl;
+        std::cout << "pars.ngroups: " << *(pars.ngroups) << std::endl;
+        std::cout << "pars.ngroupsconstr: " << *(pars.ngroupsconstr) << std::endl;
+        std::cout << "pars.nvaringroup (first " << *(pars.ngroups) << " elements): ";
+        for (int k = 0; k < *(pars.ngroups); ++k) std::cout << pars.nvaringroup[k] << " ";
+        std::cout << std::endl;
+        std::cout << "pars.nconstraints (first " << *(pars.ngroups) << " elements): ";
+        for (int k = 0; k < *(pars.ngroups); ++k) std::cout << pars.nconstraints[k] << " ";
+        std::cout << std::endl;
+        std::cout << "pars.ninvconstraints (first " << *(pars.ngroups) << " elements): ";
+        for (int k = 0; k < *(pars.ngroups); ++k) std::cout << pars.ninvconstraints[k] << " ";
+        std::cout << std::endl;
+        std::cout << "pars.XtXuncens: (printing address) " << pars.XtXuncens << std::endl;
+        std::cout << "pars.ytXuncens (first " << *(pars.p) << " elements): ";
+        if (pars.ytXuncens != NULL) {
+            for (int k = 0; k < *(pars.p); ++k) std::cout << pars.ytXuncens[k] << " ";
+            std::cout << std::endl;
+        } else {
+            std::cout << "NULL" << std::endl;
+        }
+        std::cout << "pars.priorcode: " << *(pars.priorcode) << std::endl;
+
+        // --- End of Debugging Print Statements ---
+
+
         modelSelectionGibbs(postSample,
                             margpp,
                             postMode,
@@ -629,7 +775,7 @@ namespace bisam {
         // TODO this extra copy here is really not all that nice!
         arma::Col<int> post_sample = arma::Col<int>(mcmc2save * mycols);
         for (j = 0; j < (mcmc2save * mycols); j++) post_sample[j] = postSample[j];
- arma::Col<double> marginal_pp = arma::Col<double>(mycols2);
+        arma::Col<double> marginal_pp = arma::Col<double>(mycols2);
         for (j = 0; j < (mycols2); j++) marginal_pp[j] = margpp[j];
 
         ModelSelectionOutput model_selection_output;
