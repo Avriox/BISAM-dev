@@ -1674,7 +1674,6 @@ SEXP modelSelectionGibbsCI(SEXP SpostModeini, SEXP SpostModeiniProb, SEXP Sknown
   // Note: Printing the content of constraints and invconstraints requires knowing their exact structure.
   // Assuming they are vectors of integer pointers, you would need to dereference them.
   // For safety, and without knowing the exact structure, we'll just print the size.
-
   Rcout << "invconstraints (first level pointers): " << invconstraints.size() << endl;
 
   Rcout << "verbose: " << INTEGER(Sverbose)[0] << endl;
